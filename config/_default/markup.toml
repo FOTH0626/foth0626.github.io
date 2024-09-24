@@ -1,6 +1,6 @@
 # Markdown renderer configuration
 [goldmark.renderer]
-unsafe = true
+unsafe = false
 
 [goldmark.extensions.passthrough]
 enable = true
@@ -12,9 +12,9 @@ block = [['\[', '\]'], ['$$', '$$']]
 inline = [['\(', '\)']]
 
 [tableOfContents]
-endLevel = 4
-ordered = true
-startLevel = 2
+endLevel = 5
+ordered = false 
+startLevel = 1
 
 [highlight]
 noClasses = false
@@ -23,4 +23,4 @@ guessSyntax = true
 lineNoStart = 1
 lineNos = true
 lineNumbersInTable = true
-tabWidth = 4
+tabWidth = 2

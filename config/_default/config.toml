@@ -1,7 +1,7 @@
 # Change baseurl before deploy
 baseurl = "https://foth0626.github.io"
-languageCode = "en-us"
-title = "Hugo Theme Stack Starter"
+languageCode = "en"
+title = "FOTH0626"
 
 # Theme i18n support
 # Available values: en, fr, id, ja, ko, pt-br, zh-cn, zh-tw, es, de, nl, it, th, el, uk, ar
@@ -15,5 +15,10 @@ hasCJKLanguage = true
 disqusShortname = "hugo-theme-stack"
 
 [pagination]
-pagerSize = 5
+pagerSize = 20 
 
+ignoreFiles = [
+  "content/post/Templates/template1.md",
+  "content/post/Templates/template1.md",
+  "content/post/.obsidian/*"
+]
