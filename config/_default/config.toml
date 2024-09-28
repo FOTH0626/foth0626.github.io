@@ -17,8 +17,4 @@ disqusShortname = "hugo-theme-stack"
 [pagination]
 pagerSize = 20 
 
-ignoreFiles = [
-  "content/post/Templates/template1.md",
-  "content/post/Templates/template1.md",
-  "content/post/.obsidian/*"
-]
+
