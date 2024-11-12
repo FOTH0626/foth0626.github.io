@@ -11,13 +11,17 @@ tags:
   - RTR4
 weight: 0
 ---
-> [! ]
+
 
 > "All it takes is for the rendered image to look right." ——Jim Blinn
 
   
 
-==本节课参考RTR4-CN 第六章==
+---
+本节课参考RTR4-CN 第六章
+
+---
+
 
   
 
