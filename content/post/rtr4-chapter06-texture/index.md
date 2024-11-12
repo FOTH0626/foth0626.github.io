@@ -3,7 +3,7 @@ title: RTR4-CN 第六章 纹理（Texture）
 description: texturing
 slug: rtr4-chapter06-texture
 image: 纹理管线.png
-draft: true
+draft: false
 categories:
   - Graphics
 date: 2024-11-12 20:51:56+08:00
