@@ -23,7 +23,7 @@ src = "img/foth.jpg"
 
 [article]
 headingAnchor = false
-math = true 
+math =true 
 readingTime = true
 
 [article.license]
@@ -105,11 +105,11 @@ clientSecret = ""
 autoCreateIssue = false
 
 [comments.waline]
-serverURL = "https://comment.foth.top/"
+serverURL = "https://comment.foth.top"
 lang = "zh-CN"
 visitor = "Anonymous"
 avatar = ""
-emoji = ["https://unpkg.com/@waline/emojis@1.2.0/bilibili"]
+emoji = []
 requiredMeta = ["name", "email", "url"]
 placeholder = "leave a comment"
 
