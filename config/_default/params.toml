@@ -76,8 +76,8 @@ enabled = true
 
 ## Comments
 [comments]
-enabled = false
-provider = "disqus"
+enabled = true
+provider = "waline"
 
 [comments.disqusjs]
 shortname = ""
@@ -105,13 +105,13 @@ clientSecret = ""
 autoCreateIssue = false
 
 [comments.waline]
-serverURL = ""
-lang = ""
-visitor = ""
+serverURL = "https://comment.foth.top/"
+lang = "zh-CN"
+visitor = "Anonymous"
 avatar = ""
-emoji = ["https://cdn.jsdelivr.net/gh/walinejs/emojis/weibo"]
+emoji = ["https://unpkg.com/@waline/emojis@1.2.0/bilibili"]
 requiredMeta = ["name", "email", "url"]
-placeholder = ""
+placeholder = "leave a comment"
 
 [comments.waline.locale]
 admin = "Admin"
