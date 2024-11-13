@@ -12,7 +12,7 @@ defaultContentLanguage = "en"
 hasCJKLanguage = true 
 
 # Change it to your Disqus shortname before using
-disqusShortname = "hugo-theme-stack"
+# disqusShortname = "hugo-theme-stack"
 
 [pagination]
 pagerSize = 20 

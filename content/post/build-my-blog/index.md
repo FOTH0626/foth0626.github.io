@@ -12,6 +12,9 @@ weight: 0
 封面来自KiTA的[墨染の桜](https://www.pixiv.net/artworks/92462879)
 
 ---
+本篇博客更新于2024.11.13
+
+---
 # 为什么选择更换博客
 本人上一个博客大约在2023年3到4月左右部署，使用的是Typecho框架下的Joe主题，域名在Namesilo购买，服务器算是白嫖的同学的（甚至证书和cdn之类的也是他帮忙搞的），他的个人博客贴在这里：[Glucy2的个人博客](https://glucy2.com/)。总而言之，感激不尽。    
 这个博客平稳运营了两年，但是由于本人的摆烂行径，在两年内除了一篇初始博客之外并没有写其他文章，几乎接近荒废。最近重拾学习，准备重新开始写博客。  
@@ -25,6 +28,7 @@ weight: 0
 主题使用Stack，来源于[Hugo的官方主题列表](https://themes.gohugo.io/)，网站按Github的star数排序，简单浏览前几个主题后选择比较对眼的stack。
 从stack的[快速开始仓库](https://github.com/CaiJimmy/hugo-theme-stack-starter)fork到我的账户并命名为`usrname.github.io` 后clone到本地，就完成了基本部署。
 在settings-->pages设置中选择`gh-pages` 分支就可以浏览主题模板了。
+快速开始仓库中声明了需要原仓库https://github.com/CaiJimmy/hugo-theme-stack
 # 一些小主题更改
 ## 基本设置
 在`config.toml` 中，更改如下
