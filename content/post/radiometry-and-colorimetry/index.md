@@ -3,7 +3,7 @@ title: PBR1：辐射度量学和色度学
 description: Physically Based Rendering (1):Radiometry and Colorimetry
 slug: radiometry-and-colorimetry
 image: 电磁波谱.png
-draft: true
+draft: false
 categories:
   - Graphics
 date: 2024-11-24 10:47:33+08:00
