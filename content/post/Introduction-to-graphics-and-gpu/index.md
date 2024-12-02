@@ -3,7 +3,7 @@ title: 计算机图形学与GPU架构简介
 description: a Introduction to computer grahpics and GPU Attributes
 slug: Introduction-to-graphics-and-gpu
 image: ADA_Arttibutes.png
-draft: true
+draft: false
 categories:
   - Graphics
 date: 2024-11-27 11:01:19+08:00
