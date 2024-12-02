@@ -7,7 +7,8 @@ draft: false
 categories:
   - Graphics
 date: 2024-11-27 11:01:19+08:00
-tags: 
+tags:
+  - SAST
 weight: 0
 ---
 > 本博客为校科协Graphics组授课文档记录
