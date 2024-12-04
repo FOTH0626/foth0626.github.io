@@ -11,7 +11,7 @@ tags:
   - SAST
 weight: 0
 ---
-> 本博客为校科协Graphics组授课文档记录
+> 本博客为SAST.Graphics组授课文档记录
 
 ---
   
