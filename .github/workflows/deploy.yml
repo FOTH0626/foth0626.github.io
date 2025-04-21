@@ -19,7 +19,7 @@ jobs:
                   fetch-depth: 0
 
             - name: Clone Hugo theme
-              run: git clone https://github.com/FOTH0626/hugo-theme-stack.git themes/hugo-theme-stack
+              run: git clone https://github.com/CaiJimmy/hugo-theme-stack.git themes/hugo-theme-stack
 
             - name: Cache Hugo resources
               uses: actions/cache@v4
