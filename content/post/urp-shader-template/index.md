@@ -3,7 +3,7 @@ title: URP Shader 模板
 description: a template for urp shaders
 slug: urp-shader-template
 image: 
-draft: true
+draft: false
 categories:
   - Graphics
 date: 2025-06-03 15:49:54+08:00
