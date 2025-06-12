@@ -3,7 +3,7 @@ title: 叙事和符号，创作之思
 description: 我的一些二刺螈观察，以及思考
 slug: creation-and-symbol
 image: 
-draft: true
+draft: false
 categories:
   - individual
 date: 2025-06-03 16:29:49+08:00
