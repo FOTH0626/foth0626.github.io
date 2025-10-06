@@ -3,7 +3,7 @@ title: some C++ new Parts in 11/14/17/20
 description: some new important parts in cpp11/14/17/20
 slug: some-cpp-new-parts
 image:
-draft: true
+draft: false
 categories:
   - Programming
 date: 2025-10-05 16:36:14+08:00
