@@ -1,7 +1,7 @@
 ---
-title: some C++ new Parts in 11/14/17/20
-description: some new important parts in cpp11/14/17/20
-slug: some-cpp-new-parts
+title: some C++ new Parts Features in 11/14/17/20
+description: some new important parts features in cpp11/14/17/20
+slug: some-cpp-new-parts-features
 image:
 draft: false
 categories:
