@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>GDC on FOTH0626</title><link>https://foth0626.github.io/tags/gdc/</link><description>Recent content in GDC on FOTH0626</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Sun, 08 Jun 2025 15:41:35 +0800</lastBuildDate><atom:link href="https://foth0626.github.io/tags/gdc/index.xml" rel="self" type="application/rss+xml"/><item><title>[GDC]3D Toon Rendering in 'Hi-Fi Rush'</title><link>https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/</link><pubDate>Sun, 08 Jun 2025 15:41:35 +0800</pubDate><guid>https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/</guid><description>&lt;img src="https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/face2.png" alt="Featured image of post [GDC]3D Toon Rendering in 'Hi-Fi Rush'" /&gt;&lt;blockquote&gt;
+&lt;p&gt;Refer:&lt;a class="link" href="https://youtu.be/gdBACyIOCtc?si=GvZljy0oLHoUwoGK" target="_blank" rel="noopener"
+&gt;3D Toon Rendering in &amp;lsquo;Hi-Fi RUSH&amp;rsquo;&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h1 id="goals"&gt;Goals
+&lt;/h1&gt;&lt;p&gt;使用ue4进行卡通渲染，包括角色和场景。&lt;/p&gt;
+&lt;p&gt;优先确保60fps&lt;/p&gt;
+&lt;p&gt;画面干净锐利鲜亮&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/renderFeatureOverview.png"
+width="2062"
+height="1067"
+srcset="https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/renderFeatureOverview_hu_9f7a7032c5ff6838.png 480w, https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/renderFeatureOverview_hu_a37a1affe7a078f9.png 1024w"
+loading="lazy"
+alt="overview"
+class="gallery-image"
+data-flex-grow="193"
+data-flex-basis="463px"
+&gt;&lt;/p&gt;
+&lt;h1 id="overview"&gt;overview
+&lt;/h1&gt;&lt;p&gt;Deferred lighting + toon post-processing.&lt;/p&gt;
+&lt;p&gt;Target: decouple toon rendering and gbuffer rendering. Artists can change toon postprocess volume to change areas which want to use toon shading.&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/gbuffer.png"
+width="2057"
+height="1141"
+srcset="https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/gbuffer_hu_3c1b32b6b6ff09d8.png 480w, https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/gbuffer_hu_6d5eded44a771b00.png 1024w"
+loading="lazy"
+alt="gbuffer"
+class="gallery-image"
+data-flex-grow="180"
+data-flex-basis="432px"
+&gt;&lt;/p&gt;
+&lt;p&gt;use individual toon postprocessing params for each lighting layer&lt;/p&gt;
+&lt;h1 id="shadow-color"&gt;Shadow color
+&lt;/h1&gt;&lt;p&gt;Target:Need different shadow color.&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/blackShadow.png"
+width="1280"
+height="709"
+srcset="https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/blackShadow_hu_c90810bd284db38c.png 480w, https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/blackShadow_hu_c0cb96d1fc028639.png 1024w"
+loading="lazy"
+alt="blackShadow"
+class="gallery-image"
+data-flex-grow="180"
+data-flex-basis="433px"
+&gt;&lt;br&gt;
+&lt;img src="https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/colorfulShadow.png"
+width="1280"
+height="717"
+srcset="https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/colorfulShadow_hu_ce3c3d5584a6fdd.png 480w, https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/colorfulShadow_hu_c0c8639e31987824.png 1024w"
+loading="lazy"
+alt="colorfulShadow"
+class="gallery-image"
+data-flex-grow="178"
+data-flex-basis="428px"
+&gt;&lt;/p&gt;
+&lt;p&gt;Use shadow volume ,implemented by mapping 3d texture to 3d world position.&lt;/p&gt;
+&lt;p&gt;Ambient cubemap volume to customlize ambient&lt;/p&gt;
+&lt;h1 id="comic-shader"&gt;Comic shader
+&lt;/h1&gt;&lt;ul&gt;
+&lt;li&gt;Lit: halftone dot&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/halftoneDots.png"
+width="1280"
+height="649"
+srcset="https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/halftoneDots_hu_5d5569b8e2f8673c.png 480w, https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/halftoneDots_hu_6b69a40c20811735.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="197"
+data-flex-basis="473px"
+&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Shadow : hatching lines&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/hatchingLines.png"
+width="1280"
+height="660"
+srcset="https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/hatchingLines_hu_1da4e80c7c5cbe57.png 480w, https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/hatchingLines_hu_b0e237c889290e1f.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="193"
+data-flex-basis="465px"
+&gt;&lt;/p&gt;
+&lt;h2 id="shader-on--off"&gt;Shader on / off
+&lt;/h2&gt;&lt;p&gt;&lt;img src="https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/comicShaderOn.png"
+width="1280"
+height="660"
+srcset="https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/comicShaderOn_hu_ae57e793af739672.png 480w, https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/comicShaderOn_hu_1383ab63ec0b4a95.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="193"
+data-flex-basis="465px"
+&gt;&lt;br&gt;
+&lt;img src="https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/comicShaderOff.png"
+width="1280"
+height="717"
+srcset="https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/comicShaderOff_hu_e2eee49e8be42603.png 480w, https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/comicShaderOff_hu_ec987d92049e1944.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="178"
+data-flex-basis="428px"
+&gt;&lt;/p&gt;
+&lt;p&gt;Dirty GI and SSAO, remove gradation&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/sdf.png"
+width="1280"
+height="715"
+srcset="https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/sdf_hu_777a46ee27bf39cb.png 480w, https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/sdf_hu_784a02cbd22f5d3e.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="179"
+data-flex-basis="429px"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/sdfShader.png"
+width="1280"
+height="631"
+srcset="https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/sdfShader_hu_69442c05bfeba3d0.png 480w, https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/sdfShader_hu_30e4263f1d5db160.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="202"
+data-flex-basis="486px"
+&gt;&lt;/p&gt;
+&lt;p&gt;Use smoothstep and alpha blend to anti aliasing&lt;/p&gt;
+&lt;p&gt;Tips : not suit bloom things&lt;/p&gt;
+&lt;p&gt;Avoid these halftones look like print on the camera instead of on the models(we dont want this )&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/worldNormal.png"
+width="1280"
+height="662"
+srcset="https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/worldNormal_hu_fac4f998420d4a4c.png 480w, https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/worldNormal_hu_57a4fab403f70709.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="193"
+data-flex-basis="464px"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/worldUV.png"
+width="1280"
+height="424"
+srcset="https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/worldUV_hu_3d2677f5a69d0cb7.png 480w, https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/worldUV_hu_c735ecb8f8ea059c.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="301"
+data-flex-basis="724px"
+&gt;&lt;/p&gt;
+&lt;p&gt;Adapt to luminace strength, larger the luminace bigger&lt;/p&gt;
+&lt;h1 id="toon-lights"&gt;Toon lights
+&lt;/h1&gt;&lt;p&gt;In base pass , change lighting in forward render.&lt;/p&gt;
+&lt;p&gt;Mostly use decal lights instead of forward lights&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/toonlights.png"
+width="1280"
+height="667"
+srcset="https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/toonlights_hu_f95ac74667f8c149.png 480w, https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/toonlights_hu_bb2d912cc1add900.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="191"
+data-flex-basis="460px"
+&gt;&lt;/p&gt;
+&lt;p&gt;Step gradiation lights&lt;/p&gt;
+&lt;p&gt;Decal lights can use a decal volume to specifically assign which area needs to be lighted . Also, it will have a smaller area to lighting and better art control instead of forward lights because of the decal volume. Decal volume can be used to prevent light leaking .&lt;/p&gt;
+&lt;p&gt;Character render is not influenced by environment lighting(decal lights and forward lights).&lt;/p&gt;
+&lt;h1 id="shadows"&gt;Shadows
+&lt;/h1&gt;&lt;h2 id="shadow-only-lights"&gt;Shadow-only lights
+&lt;/h2&gt;&lt;p&gt;use shadow-only lights to player, character and environment.&lt;/p&gt;
+&lt;p&gt;player and giant-boss&amp;rsquo;s shadow is seperated from environment cascaded shadows.&lt;/p&gt;
+&lt;h2 id="enemy-shadows"&gt;Enemy shadows
+&lt;/h2&gt;&lt;p&gt;enemy shadow use capsule shadows for high performance.&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/enemyShadow.png"
+width="432"
+height="583"
+srcset="https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/enemyShadow_hu_72b5418f86c8b917.png 480w, https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/enemyShadow_hu_2278b1d16a15e22.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="74"
+data-flex-basis="177px"
+&gt;&lt;/p&gt;
+&lt;p&gt;For little floating in the air enemy, use cpu raycast to decal shadows&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/decalShadow.png"
+width="1280"
+height="585"
+srcset="https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/decalShadow_hu_966ea6600e6fc6d2.png 480w, https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/decalShadow_hu_a44302cba0803f06.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="218"
+data-flex-basis="525px"
+&gt;&lt;/p&gt;
+&lt;h2 id="static-shadow-map"&gt;Static shadow map
+&lt;/h2&gt;&lt;p&gt;艺术家手动放置摄像机生成一张深度图，使用volume以渲染这些深度图对应的阴影。&lt;/p&gt;
+&lt;p&gt;预烘焙相机的深度图。&lt;/p&gt;
+&lt;p&gt;4x4的pcf消除锯齿。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/staticShadow.png"
+width="1280"
+height="699"
+srcset="https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/staticShadow_hu_45254efdc0285ec4.png 480w, https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/staticShadow_hu_5dd2f135f2e4abf6.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="183"
+data-flex-basis="439px"
+&gt;&lt;/p&gt;
+&lt;h1 id="gi"&gt;GI
+&lt;/h1&gt;&lt;p&gt;ue4 light mass 烘焙时间太长&lt;/p&gt;
+&lt;p&gt;自定义一套light volumetric light map 以提高烘焙速度和可用性。&lt;/p&gt;
+&lt;p&gt;原因之一：可选择需要GI烘焙的部分区域&lt;/p&gt;
+&lt;p&gt;修改了ue4 将 光照探针按照per actor 存储 而不是per level&lt;/p&gt;
+&lt;h2 id="gi-workflow"&gt;GI workflow
+&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;用一个world volume lighting volumer actor 选择需要烘焙GI的区域&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;开始烘焙，等待1，2mins，区域内的GI烘焙完成&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/GIworkflow.png"
+width="1280"
+height="655"
+srcset="https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/GIworkflow_hu_7ded80b007636a96.png 480w, https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/GIworkflow_hu_79d549b864f6a61b.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="195"
+data-flex-basis="469px"
+&gt;&lt;/p&gt;
+&lt;h1 id="toon-face-shadow"&gt;Toon face shadow
+&lt;/h1&gt;&lt;p&gt;Face shadow should &lt;strong&gt;always clean .&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Problems:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Model normal will lead to a messy shadow&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/face1.png"
+width="1280"
+height="652"
+srcset="https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/face1_hu_49cab11d4461b84c.png 480w, https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/face1_hu_db61efd118f14509.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="196"
+data-flex-basis="471px"
+&gt;&lt;/p&gt;
+&lt;ol start="2"&gt;
+&lt;li&gt;Face motion will break shadow shape&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/face2.png"
+width="1280"
+height="658"
+srcset="https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/face2_hu_1f883ea5dbcf89d5.png 480w, https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/face2_hu_c76328ec4215eeea.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="194"
+data-flex-basis="466px"
+&gt;&lt;/p&gt;
+&lt;ol start="3"&gt;
+&lt;li&gt;Artist cant solve 1 and 2 problems by adjusting model&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;Solution&lt;/strong&gt; : mihoyo &amp;rsquo;s sdf face shadow (i can do it ,so i dont explain it )&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/faceSDF.png"
+width="1280"
+height="720"
+srcset="https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/faceSDF_hu_51d26e1de31d0e63.png 480w, https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/faceSDF_hu_a8ec36663f797309.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="177"
+data-flex-basis="426px"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/faceShadow.png"
+width="1280"
+height="715"
+srcset="https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/faceShadow_hu_be71ed716adaebee.png 480w, https://foth0626.github.io/article/gdc-2024-hifirush-toonrendering-notes/faceShadow_hu_f7efb5df71ee2474.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="179"
+data-flex-basis="429px"
+&gt;&lt;/p&gt;</description></item></channel></rss>

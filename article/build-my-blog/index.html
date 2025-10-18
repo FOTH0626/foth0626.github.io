@@ -1,0 +1,234 @@
+<!doctype html><html lang=en dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="How do I create my blog easily"><title>GithubPages + Hugo 搭建博客</title><link rel=canonical href=https://foth0626.github.io/article/build-my-blog/><link rel=stylesheet href=/scss/style.min.6a692fd055deae459f2a9767f57f3855ba80cafd5041317f24f7360f6ca47cdf.css><meta property='og:title' content="GithubPages + Hugo 搭建博客"><meta property='og:description' content="How do I create my blog easily"><meta property='og:url' content='https://foth0626.github.io/article/build-my-blog/'><meta property='og:site_name' content='FOTH0626'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:published_time' content='2024-09-24T00:00:00+00:00'><meta property='article:modified_time' content='2024-09-24T00:00:00+00:00'><meta property='og:image' content='https://foth0626.github.io/article/build-my-blog/cover.jpg'><meta name=twitter:title content="GithubPages + Hugo 搭建博客"><meta name=twitter:description content="How do I create my blog easily"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content='https://foth0626.github.io/article/build-my-blog/cover.jpg'><link rel="shortcut icon" href=/heart-code.png></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label="Toggle Menu">
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/><img src=/img/foth_hu_4eff4256c12406c3.jpg width=300 height=300 class=site-logo loading=lazy alt=Avatar>
+</a><span class=emoji>🍥</span></figure><div class=site-meta><h1 class=site-name><a href=/>FOTH0626</a></h1><h2 class=site-description>小小的人偶，想要摘月亮</h2></div></header><ol class=menu-social><li><a href=https://space.bilibili.com/351177307 target=_blank title=Bilibili rel=me><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-brand-bilibili"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 10a4 4 0 014-4h10a4 4 0 014 4v6a4 4 0 01-4 4H7a4 4 0 01-4-4v-6z"/><path d="M8 3l2 3"/><path d="M16 3l-2 3"/><path d="M9 13v-2"/><path d="M15 11v2"/></svg></a></li><li><a href=https://github.com/FOTH0626 target=_blank title=GitHub rel=me><svg class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li><li><a href=mailto:fothli0626@gmail.com target=_blank title=Gmail rel=me><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-mail"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 7a2 2 0 012-2h14a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/><path d="M3 7l9 6 9-6"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/archives/><svg class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+<span>Archives</span></a></li><li><a href=/search/><svg class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+<span>Search</span></a></li><li><a href=/links/><svg class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M10 14a3.5 3.5.0 005 0l4-4a3.5 3.5.0 00-5-5l-.5.5"/><path d="M14 10a3.5 3.5.0 00-5 0l-4 4a3.5 3.5.0 005 5l.5-.5"/></svg>
+<span>Links</span></a></li><li class=menu-bottom-section><ol class=menu><li id=dark-mode-toggle><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>Dark Mode</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">Table of contents</h2><div class=widget--toc><nav id=TableOfContents><ul><li><a href=#为什么选择更换博客>为什么选择更换博客</a></li><li><a href=#框架选择>框架选择</a><ul><li><a href=#主题选择>主题选择</a></li></ul></li><li><a href=#一些小主题更改>一些小主题更改</a><ul><li><a href=#基本设置>基本设置</a></li><li><a href=#个人信息左栏>个人信息（左栏）</a></li><li><a href=#更改网页逻辑>更改网页逻辑</a></li><li><a href=#文章目录设置>文章目录设置</a></li></ul></li><li><a href=#写作环境>写作环境</a></li><li><a href=#个人域名cname与dns>个人域名，CNAME与DNS</a><ul><li><a href=#个人域名>个人域名</a></li><li><a href=#dns解析>DNS解析</a></li></ul></li><li><a href=#评论系统>评论系统</a><ul><li><a href=#评论系统选择>评论系统选择</a></li><li><a href=#waline-部署>Waline 部署</a></li><li><a href=#math-与-waline冲突问题>Math 与 Waline冲突问题</a></li><li><a href=#修改github-workflow>修改github workflow</a></li></ul></li><li><a href=#clustr-map-访客热力图>Clustr Map 访客热力图。</a></li></ul></nav></div></section></aside><main class="main full-width"><article class="has-image main-article"><header class=article-header><div class=article-image><a href=/article/build-my-blog/><img src=/article/build-my-blog/cover_hu_fc3c3f2c8a58706.jpg srcset="/article/build-my-blog/cover_hu_fc3c3f2c8a58706.jpg 800w, /article/build-my-blog/cover_hu_e1cbf14ede483444.jpg 1600w" width=800 height=400 loading=lazy alt="Featured image of post GithubPages + Hugo 搭建博客"></a></div><div class=article-details><header class=article-category><a href=/categories/other/>Other</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/article/build-my-blog/>GithubPages + Hugo 搭建博客</a></h2><h3 class=article-subtitle>How do I create my blog easily</h3></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published>2024-09-24</time></div><div><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>7 minute read</time></div></footer></div></header><section class=article-content><p>封面来自KiTA的<a class=link href=https://www.pixiv.net/artworks/92462879 target=_blank rel=noopener>墨染の桜</a></p><hr><p>本篇博客更新于2024.11.18</p><hr><h1 id=为什么选择更换博客>为什么选择更换博客</h1><p>本人上一个博客大约在2023年3到4月左右部署，使用的是Typecho框架下的Joe主题，域名在Namesilo购买，服务器算是白嫖的同学的（甚至证书和cdn之类的也是他帮忙搞的），他的个人博客贴在这里：<a class=link href=https://glucy2.com/ target=_blank rel=noopener>Glucy2的个人博客</a>。总而言之，感激不尽。<br>这个博客平稳运营了两年，但是由于本人的摆烂行径，在两年内除了一篇初始博客之外并没有写其他文章，几乎接近荒废。最近重拾学习，准备重新开始写博客。<br>两年前选择框架时，选择了动态博客是因为支持评论系统，但是由于不好意思继续白嫖服务器，顺便薅薅github羊毛，准备更换到GithubPages做静态博客。<br>然后本人发现了静态博客也可以通过第三方的托管与插件实现评论系统，最后的阻碍也可以被解决，便最终决定重新开始。</p><h1 id=框架选择>框架选择</h1><p>静态博客框架在简单查询后，Jekyll，Hexo，Hugo 最终加入决赛圈。Jekyll是github 官方推荐的框架，Hexo和Hugo都是被很多人使用的博客框架。<br>首先是Hexo和Hugo的比较，最终结论是两者功能都比较相似，但是Hugo在生成时较Hexo更加快速，所以Hexo被我放弃了。
+然后是Jekyll 和 Hugo，经过既不仔细也不严谨的搜索后，选择了Hugo，理由是部署流程较为简单不需要过多操心。</p><h2 id=主题选择>主题选择</h2><p>主题使用Stack，来源于<a class=link href=https://themes.gohugo.io/ target=_blank rel=noopener>Hugo的官方主题列表</a>，网站按Github的star数排序，简单浏览前几个主题后选择比较对眼的stack。
+从stack的<a class=link href=https://github.com/CaiJimmy/hugo-theme-stack-starter target=_blank rel=noopener>快速开始仓库</a>fork到我的账户并命名为<code>usrname.github.io</code> 后clone到本地，就完成了基本部署。
+在settings->pages设置中选择<code>gh-pages</code> 分支就可以浏览主题模板了。</p><blockquote><p>快速开始仓库中声明了需要原仓库https://github.com/CaiJimmy/hugo-theme-stack，这导致了之后的一些问题，我会在稍后说明</p></blockquote><h1 id=一些小主题更改>一些小主题更改</h1><h2 id=基本设置>基本设置</h2><p>在<code>config.toml</code> 中，更改如下</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-toml data-lang=toml><span class=line><span class=cl><span class=c># Change baseurl before deploy</span>
+</span></span><span class=line><span class=cl><span class=nx>baseurl</span> <span class=p>=</span> <span class=s2>&#34;https://foth0626.github.io&#34;</span>
+</span></span><span class=line><span class=cl><span class=nx>languageCode</span> <span class=p>=</span> <span class=s2>&#34;en&#34;</span>
+</span></span><span class=line><span class=cl><span class=nx>title</span> <span class=p>=</span> <span class=s2>&#34;FOTH0626&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nx>defaultContentLanguage</span> <span class=p>=</span> <span class=s2>&#34;en&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nx>hasCJKLanguage</span> <span class=p>=</span> <span class=kc>true</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=nx>pagination</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=nx>pagerSize</span> <span class=p>=</span> <span class=mi>20</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c>#ignoreFiles = [</span>
+</span></span><span class=line><span class=cl><span class=c>#&#34;content/post/Templates/*&#34;</span>
+</span></span><span class=line><span class=cl><span class=c>#]</span>
+</span></span></code></pre></td></tr></table></div></div><p>我来解释一下我的更改</p><ul><li><code>baseurl</code> 应该被解析到个人的域名（即<code>usrname.github.io</code>）</li><li><code>title</code> 会成为你的名字</li><li><code>hasCJKLanguage</code> 开启后会正确识别CJK字符，对于中文写作者来说必开</li><li><code>pagerSize</code> 决定一页显示多少篇博文</li><li><code>ignoreFiles</code> 是因为个人的写作软件设置，稍后解释。更新： Templates文件夹已更改到根目录，写作软件直接打开根目录而不是原先的 <code>content</code> 目录。另外需要额外在 <code>.gitignore</code> 文件中添加 <code>.obsidian/</code>和 <code>Templates</code> 目录</li></ul><h2 id=个人信息左栏>个人信息（左栏）</h2><p>在<code>menu.toml</code> 中更改如下</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-toml data-lang=toml><span class=line><span class=cl><span class=p>[[</span><span class=nx>social</span><span class=p>]]</span>
+</span></span><span class=line><span class=cl><span class=nx>identifier</span> <span class=p>=</span> <span class=s2>&#34;github&#34;</span>
+</span></span><span class=line><span class=cl><span class=nx>name</span> <span class=p>=</span> <span class=s2>&#34;GitHub&#34;</span>
+</span></span><span class=line><span class=cl><span class=nx>url</span> <span class=p>=</span> <span class=s2>&#34;https://github.com/FOTH0626&#34;</span>
+</span></span><span class=line><span class=cl> 
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=nx>social</span><span class=p>.</span><span class=nx>params</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=nx>icon</span> <span class=p>=</span> <span class=s2>&#34;brand-github&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=p>[[</span><span class=nx>social</span><span class=p>]]</span>
+</span></span><span class=line><span class=cl><span class=nx>identifier</span> <span class=p>=</span> <span class=s2>&#34;bilibili&#34;</span>
+</span></span><span class=line><span class=cl><span class=nx>name</span> <span class=p>=</span> <span class=s2>&#34;Bilibili&#34;</span>
+</span></span><span class=line><span class=cl><span class=nx>url</span> <span class=p>=</span> <span class=s2>&#34;https://space.bilibili.com/351177307&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=nx>social</span><span class=p>.</span><span class=nx>params</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=nx>icon</span> <span class=p>=</span> <span class=s2>&#34;brand-bilibili&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=p>[[</span><span class=nx>social</span><span class=p>]]</span>
+</span></span><span class=line><span class=cl><span class=nx>identifier</span> <span class=p>=</span> <span class=s2>&#34;mail&#34;</span>
+</span></span><span class=line><span class=cl><span class=nx>name</span> <span class=p>=</span> <span class=s2>&#34;Gmail&#34;</span>
+</span></span><span class=line><span class=cl><span class=nx>url</span> <span class=p>=</span> <span class=s2>&#34;mailto:fothli0626@gmail.com&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=nx>social</span><span class=p>.</span><span class=nx>params</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=nx>icon</span> <span class=p>=</span> <span class=s2>&#34;mail&#34;</span>
+</span></span></code></pre></td></tr></table></div></div><ul><li><code>identifier</code>为唯一标识符</li><li><code>name</code>为网页中图标名称</li><li><code>url</code> 表示图标应该解析到的位置</li><li><code>icon</code> 代表图标，本人从<a class=link href=https://tabler.io/icons target=_blank rel=noopener>tabler</a>寻找icon后复制到本地的<code>asset/icons</code> 文件夹下，这是默认的icon查找位置，需要名称与文件名对应。</li></ul><hr><p>在<code>params.toml</code> 更改如下</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-toml data-lang=toml><span class=line><span class=cl><span class=nx>favicon</span> <span class=p>=</span> <span class=s2>&#34;/heart-code.png&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nx>subtitle</span> <span class=p>=</span> <span class=s2>&#34;小小的人偶，想要摘月亮&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=nx>sidebar</span><span class=p>.</span><span class=nx>avatar</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=nx>src</span> <span class=p>=</span> <span class=s2>&#34;img/foth.jpg&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=nx>comments</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=nx>enabled</span> <span class=p>=</span> <span class=kc>false</span>
+</span></span></code></pre></td></tr></table></div></div><ul><li>将网页的标签页icon更改，默认目录为<code>root/static</code></li><li>更改个人签名（来自Mygo二创<a class=link href=https://www.bilibili.com/video/BV1Ry421i7jL target=_blank rel=noopener>十万客服</a>）</li><li>更改个人头像（本人多个平台同头像，头像来自于本人非常喜欢的东方up主kk的一篇专栏中东方颜百选的预览图）</li><li>关闭评论功能（虽然本来就没有配置，但是最底下有评论系统会导致不必要的误解，而且看了不爽），可能在不久的未来配置（大概率参考此篇<a class=link href=https://www.pseudoyu.com/zh/2024/07/22/free_commenting_system_using_remark42_and_flyio/ target=_blank rel=noopener>博客</a>）(2024.11.19 更新，已开启评论功能)</li><li><code>params.toml</code> 新更改</li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-toml data-lang=toml><span class=line><span class=cl><span class=p>[</span><span class=nx>comments</span><span class=p>.</span><span class=nx>waline</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=nx>serverURL</span> <span class=p>=</span> <span class=s2>&#34;https://comment.foth.top&#34;</span>
+</span></span><span class=line><span class=cl><span class=nx>lang</span> <span class=p>=</span> <span class=s2>&#34;zh-CN&#34;</span>
+</span></span><span class=line><span class=cl><span class=nx>visitor</span> <span class=p>=</span> <span class=s2>&#34;Anonymous&#34;</span>
+</span></span><span class=line><span class=cl><span class=nx>avatar</span> <span class=p>=</span> <span class=s2>&#34;&#34;</span>
+</span></span><span class=line><span class=cl><span class=nx>emoji</span> <span class=p>=</span> <span class=p>[]</span>
+</span></span><span class=line><span class=cl><span class=nx>requiredMeta</span> <span class=p>=</span> <span class=p>[</span><span class=s2>&#34;name&#34;</span><span class=p>,</span> <span class=s2>&#34;email&#34;</span><span class=p>,</span> <span class=s2>&#34;url&#34;</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=nx>placeholder</span> <span class=p>=</span> <span class=s2>&#34;leave a comment&#34;</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=更改网页逻辑>更改网页逻辑</h2><p><code>permalinks.toml</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-toml data-lang=toml><span class=line><span class=cl><span class=nx>post</span> <span class=p>=</span> <span class=s2>&#34;/article/:slug/&#34;</span>
+</span></span></code></pre></td></tr></table></div></div><p>文章的url会被创建为/article/name，更好区分</p><h2 id=文章目录设置>文章目录设置</h2><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-toml data-lang=toml><span class=line><span class=cl><span class=p>[</span><span class=nx>tableOfContents</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=nx>endLevel</span> <span class=p>=</span> <span class=mi>5</span>
+</span></span><span class=line><span class=cl><span class=nx>ordered</span> <span class=p>=</span> <span class=kc>false</span> 
+</span></span><span class=line><span class=cl><span class=nx>startLevel</span> <span class=p>=</span> <span class=mi>1</span>
+</span></span></code></pre></td></tr></table></div></div><p>现在目录会显示为从一级标题到五级标题的无序列表排列</p><h1 id=写作环境>写作环境</h1><p>我在之前提到关于这个设置是因为本人的写作软件的问题</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-toml data-lang=toml><span class=line><span class=cl><span class=nx>ignoreFiles</span> <span class=p>=</span> <span class=p>[</span>
+</span></span><span class=line><span class=cl><span class=s2>&#34;content/post/Templates/*&#34;</span>
+</span></span><span class=line><span class=cl><span class=p>]</span>
+</span></span></code></pre></td></tr></table></div></div><p>现在我来详细解释，本人的写作软件为Obsidian，它有许多的插件，而我选择了一个名为Templater的插件用来快捷生成满足hugo前置格式的markdown文章，它本身需要一个模板但是模板文章明显不可以作为博客，所以我选择无视这个文件。我的模板如下</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-markdown data-lang=markdown><span class=line><span class=cl>---
+</span></span><span class=line><span class=cl>title: &#34;&#34;
+</span></span><span class=line><span class=cl>description: &#34;&#34;
+</span></span><span class=line><span class=cl>slug: &#34;&#34;
+</span></span><span class=line><span class=cl>date:
+</span></span><span class=line><span class=cl>  &lt;% tp.date.now(&#34;YYYY-MM-DD HH:mm:ss&#34;) %&gt;
+</span></span><span class=line><span class=cl>image:
+</span></span><span class=line><span class=cl>categories:
+</span></span><span class=line><span class=cl>tags:
+</span></span><span class=line><span class=cl>weight: 0
+</span></span><span class=line><span class=cl>---
+</span></span></code></pre></td></tr></table></div></div><p>最有效的是它会记录下我的博客文件创建日期，而且我可以在软件通过下拉框选择文件与tag，而不需要手动输入。<br><strong>更新</strong> ：现在date为 <code>&lt;% tp.date.now("YYYY-MM-DD HH:mm:ss+08:00") %></code> 对齐 <code>UTC + 8</code> 时区。</p><h1 id=个人域名cname与dns>个人域名，CNAME与DNS</h1><h2 id=个人域名>个人域名</h2><p>个人域名购买自Namesilo，一年续费五六刀，相当便宜。
+在githubpages设置中添加cname即可正确解析到foth0626.github.io。<br>DNS还没配，等待后续更新。</p><h2 id=dns解析>DNS解析</h2><p>DNS 白嫖 Vercel 的服务，推荐使用github注册并登陆，这样可以直接链接到个人仓库。Import来自Github的仓库时，会让你选择模板部署，这时候<strong>选择 Hugo 模板不能正确解析！</strong><br>在push到github时，github workflow已经根据模板生成了静态网页，所以这时候应该在 Vercel 的 <code>Setting -> Git -> Production Branch </code>中，选择 <code>gh-pages</code> 分支，模板选择Other 直接部署静态网页。
+然后开始部署DNS， 我们进入 <code>Namesilo</code> 管理域名 添加DNS解析记录。</p><div class=table-wrapper><table><thead><tr><th>HOSTNAME</th><th>TYPE</th><th>ADDRESS / VALUE</th></tr></thead><tbody><tr><td></td><td>A</td><td>76.223.126.88</td></tr><tr><td>comment</td><td>CNAME</td><td>cname-china.vercel-dns.com</td></tr><tr><td>www</td><td>CNAME</td><td>cname-china.vercel-dns.com</td></tr></tbody></table></div><pre><code>comment 的CNAME解析是因为评论系统
+</code></pre><p>更改Namesilo的 <code>NameServer Manager</code> 为 <code>ns1.vercel-dns.com</code> 和 <code>ns2.vercel-dns.com</code> 。</p><hr><p>然后在Vercel的<code>Settings -> Domains</code> 添加两条记录 <code>www.foth.top</code> 和 <code>foth.top</code> 。其中 和 <code>foth.top</code> 指向了 <code>www.foth.top</code> 。<br>这时候基本部署完成。在workflow推送后，Vercel会自动解析并部署。</p><h1 id=评论系统>评论系统</h1><h2 id=评论系统选择>评论系统选择</h2><p>对于静态博客的评论系统，有许多可选的服务。stack主题本身也原生支持一些评论系统，见这个<a class=link href=https://stack.jimmycai.com/config/comments target=_blank rel=noopener>网址</a>。一开始我跟随这篇教程：<a class=link href=https://www.pseudoyu.com/zh/2024/07/22/free_commenting_system_using_remark42_and_flyio/ target=_blank rel=noopener>从零开始搭建你的免费博客评论系统（Remark42 + fly.io)</a>。选择了相同的部署方案，基于go的开发环境+SQLite单文件的解决方案非常优雅，不过遇到一个始料未及的问题：我没有一张多币种的信用卡，无法在fly.io进行验证。</p><h2 id=waline-部署>Waline 部署</h2><p>最终切换到Waline评论系统，直接跟随官方的<a class=link href=https://waline.js.org/guide/get-started/ target=_blank rel=noopener>快速上手</a>教程。在Leancloud部署数据库，再把key 传入Vercel的环境变量。<br>再前往域名服务商，添加一个CNAME <code>comment.foth.top</code> ，并填入Vercel的域名。</p><h2 id=math-与-waline冲突问题>Math 与 Waline冲突问题</h2><p>然后又遇到一个很离谱的问题：Stack主题最新的release的数学公式渲染支持与Waline冲突，发现也有人遇到这个问题，见这个Issue<a class=link href=https://github.com/CaiJimmy/hugo-theme-stack/issues/1044 target=_blank rel=noopener>关于最新版与Waline评论冲突问题 #1044</a>。虽然通过关闭数学公式渲染可以暂缓这个问题，但是我的一些文章有不少公式，于是拷打GPT后得到一个暂时的解决方案。
+首先在 <code>go.mod</code> 文件修改依赖关系为</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=nx>module</span><span class=w> </span><span class=nx>github</span><span class=p>.</span><span class=nx>com</span><span class=o>/</span><span class=nx>CaiJimmy</span><span class=o>/</span><span class=nx>hugo</span><span class=o>-</span><span class=nx>theme</span><span class=o>-</span><span class=nx>stack</span><span class=o>-</span><span class=nx>starter</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=k>go</span><span class=w> </span><span class=mf>1.17</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nx>require</span><span class=w> </span><span class=nx>github</span><span class=p>.</span><span class=nx>com</span><span class=o>/</span><span class=nx>CaiJimmy</span><span class=o>/</span><span class=nx>hugo</span><span class=o>-</span><span class=nx>theme</span><span class=o>-</span><span class=nx>stack</span><span class=o>/</span><span class=nx>v3</span><span class=w> </span><span class=nx>v3</span><span class=mf>.29.0</span><span class=w> </span><span class=c1>// indirect</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nx>replace</span><span class=w> </span><span class=nx>github</span><span class=p>.</span><span class=nx>com</span><span class=o>/</span><span class=nx>CaiJimmy</span><span class=o>/</span><span class=nx>hugo</span><span class=o>-</span><span class=nx>theme</span><span class=o>-</span><span class=nx>stack</span><span class=o>/</span><span class=nx>v3</span><span class=w> </span><span class=p>=&gt;</span><span class=w> </span><span class=p>.</span><span class=o>/</span><span class=nx>theme</span><span class=o>/</span><span class=nx>hugo</span><span class=o>-</span><span class=nx>theme</span><span class=o>-</span><span class=nx>stack</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><p>将原主题clone到本地对应路径，然后修改 <code>waline.html</code> 为</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-html data-lang=html><span class=line><span class=cl><span class=p>&lt;</span><span class=nt>script</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nb>document</span><span class=p>.</span><span class=nx>addEventListener</span><span class=p>(</span><span class=s2>&#34;DOMContentLoaded&#34;</span><span class=p>,</span> <span class=kd>function</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nx>setTimeout</span><span class=p>(()</span> <span class=p>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=kr>const</span> <span class=nx>walineContainer</span> <span class=o>=</span> <span class=nb>document</span><span class=p>.</span><span class=nx>querySelector</span><span class=p>(</span><span class=s1>&#39;#waline&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=p>(</span><span class=nx>walineContainer</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=nx>Waline</span><span class=p>.</span><span class=nx>init</span><span class=p>({{</span> <span class=nx>$config</span> <span class=o>|</span> <span class=nx>jsonify</span> <span class=o>|</span> <span class=nx>safeJS</span> <span class=p>}});</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span> <span class=k>else</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=nx>console</span><span class=p>.</span><span class=nx>error</span><span class=p>(</span><span class=s2>&#34;Waline container not found. Make sure the element with ID &#39;waline&#39; exists.&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=p>},</span> <span class=mi>500</span><span class=p>);</span>  <span class=c1>// Delay 500ms to load waline comments.
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=p>});</span>
+</span></span><span class=line><span class=cl><span class=p>&lt;/</span><span class=nt>script</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>{{- end -}}
+</span></span></code></pre></td></tr></table></div></div><p>通过一个500ms的延迟加载解决。</p><h2 id=修改github-workflow>修改github workflow</h2><p>将 Github Action 的 deploy Workflow ，从clone原作者的仓库更改为clone 自己的fork。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yml data-lang=yml><span class=line><span class=cl><span class=nt>steps</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>Clone Hugo theme</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>run</span><span class=p>:</span><span class=w> </span><span class=l>git clone https://github.com/FOTH0626/hugo-theme-stack.git themes/hugo-theme-stack</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><p>此外，把workflow 的update theme 修改为每月执行一次。（这事实上是不对的，问题并没有解决，在下次执行workflow时，github 依然会从原仓库clone后进行，每次执行工作流仍然会导致执行失败，不过可以把它当作每月提醒自己去检查原主题的更新情况。）</p><h1 id=clustr-map-访客热力图>Clustr Map 访客热力图。</h1><p>浏览到博客 <a class=link href=https://www.cnblogs.com/guoxinyu/p/blog-player-ClustrMaps.html target=_blank rel=noopener>【Blog怎么玩】学长教你用ClustrMaps定制全球用户访问地图</a>添加访客热力图（如果访客过多超过免费额度会考虑删除功能。）
+前往 <a class=link href=https://www.clustrmaps.com target=_blank rel=noopener>www.clustrmaps.com</a> 注册登录，输入自己的网站域名，复制widget代码添加到 本地的 <code>./themes/hugo-theme-stack/layouts/baseof.html</code> 在 <code>&lt;head></code> 标签里插入代码，形式如下</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-html data-lang=html><span class=line><span class=cl><span class=p>&lt;</span><span class=nt>head</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>{{- partial &#34;head/head.html&#34; . -}}
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>{{- block &#34;head&#34; . -}}{{ end }}
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=p>&lt;</span><span class=nt>script</span> <span class=na>type</span><span class=o>=</span><span class=s>&#34;text/javascript&#34;</span> <span class=na>id</span><span class=o>=</span><span class=s>&#34;clustrmaps&#34;</span> <span class=na>src</span><span class=o>=</span><span class=s>&#34;//clustrmaps.com/map_v2.js?d= YOUR_KEY &#34;</span><span class=p>&gt;&lt;/</span><span class=nt>script</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=err>&lt;</span>/head
+</span></span></code></pre></td></tr></table></div></div></section><footer class=article-footer><section class=article-copyright><svg class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg>
+<span>Licensed under CC BY-NC-SA 4.0</span></section></footer><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css integrity=sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV crossorigin=anonymous><script src=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js integrity=sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8 crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js integrity=sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05 crossorigin=anonymous defer></script><script>window.addEventListener("DOMContentLoaded",()=>{const e=document.querySelector(".main-article");renderMathInElement(e,{delimiters:[{left:"$$",right:"$$",display:!0},{left:"$",right:"$",display:!1},{left:"\\(",right:"\\)",display:!1},{left:"\\[",right:"\\]",display:!0}],ignoredClasses:["gist"]})})</script></article><script src=//unpkg.com/@waline/client@v2/dist/waline.js></script><link href=//unpkg.com/@waline/client@v2/dist/waline.css rel=stylesheet><div id=waline class=waline-container></div><style>.waline-container{background-color:var(--card-background);border-radius:var(--card-border-radius);box-shadow:var(--shadow-l1);padding:var(--card-padding);--waline-font-size:var(--article-font-size)}.waline-container .wl-count{color:var(--card-text-color-main)}</style><script>Waline.init({avatar:"",dark:'html[data-scheme="dark"]',el:"#waline",emoji:[],lang:"zh-CN",locale:{admin:"Admin",placeholder:null},placeholder:"leave a comment",requiredMeta:["name","email","url"],serverURL:"https://comment.foth.top",visitor:"Anonymous"})</script><footer class=site-footer><section class=copyright>&copy;
+2020 -
+2025 FOTH0626</section><section class=powerby>Built with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a><br>Theme <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.31.0>Stack</a></b> designed by <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a></section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>
