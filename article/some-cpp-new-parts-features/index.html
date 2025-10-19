@@ -1,0 +1,388 @@
+<!doctype html><html lang=en dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="some new important parts features in cpp11/14/17/20"><title>some C++ new Parts Features in 11/14/17/20</title><link rel=canonical href=https://foth0626.github.io/article/some-cpp-new-parts-features/><link rel=stylesheet href=/scss/style.min.6a692fd055deae459f2a9767f57f3855ba80cafd5041317f24f7360f6ca47cdf.css><meta property='og:title' content="some C++ new Parts Features in 11/14/17/20"><meta property='og:description' content="some new important parts features in cpp11/14/17/20"><meta property='og:url' content='https://foth0626.github.io/article/some-cpp-new-parts-features/'><meta property='og:site_name' content='FOTH0626'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='CPP'><meta property='article:published_time' content='2025-10-05T16:36:14+08:00'><meta property='article:modified_time' content='2025-10-05T16:36:14+08:00'><meta name=twitter:title content="some C++ new Parts Features in 11/14/17/20"><meta name=twitter:description content="some new important parts features in cpp11/14/17/20"><link rel="shortcut icon" href=/heart-code.png></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label="Toggle Menu">
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/><img src=/img/foth_hu_4eff4256c12406c3.jpg width=300 height=300 class=site-logo loading=lazy alt=Avatar>
+</a><span class=emoji>🍥</span></figure><div class=site-meta><h1 class=site-name><a href=/>FOTH0626</a></h1><h2 class=site-description>小小的人偶，想要摘月亮</h2></div></header><ol class=menu-social><li><a href=https://space.bilibili.com/351177307 target=_blank title=Bilibili rel=me><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-brand-bilibili"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 10a4 4 0 014-4h10a4 4 0 014 4v6a4 4 0 01-4 4H7a4 4 0 01-4-4v-6z"/><path d="M8 3l2 3"/><path d="M16 3l-2 3"/><path d="M9 13v-2"/><path d="M15 11v2"/></svg></a></li><li><a href=https://github.com/FOTH0626 target=_blank title=GitHub rel=me><svg class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li><li><a href=mailto:fothli0626@gmail.com target=_blank title=Gmail rel=me><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-mail"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 7a2 2 0 012-2h14a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/><path d="M3 7l9 6 9-6"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/archives/><svg class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+<span>Archives</span></a></li><li><a href=/search/><svg class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+<span>Search</span></a></li><li><a href=/links/><svg class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M10 14a3.5 3.5.0 005 0l4-4a3.5 3.5.0 00-5-5l-.5.5"/><path d="M14 10a3.5 3.5.0 00-5 0l-4 4a3.5 3.5.0 005 5l.5-.5"/></svg>
+<span>Links</span></a></li><li class=menu-bottom-section><ol class=menu><li id=dark-mode-toggle><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>Dark Mode</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">Table of contents</h2><div class=widget--toc><nav id=TableOfContents><ul><li><a href=#intro>Intro</a></li><li><a href=#c11>C++11</a><ul><li><a href=#auto>auto</a></li><li><a href=#ranged-for-loops>ranged-for loops</a></li><li><a href=#lambda>lambda</a></li><li><a href=#unique_ptr>unique_ptr</a></li><li><a href=#constexpr>constexpr</a></li><li><a href=#variadic-templates>variadic templates</a></li></ul></li><li><a href=#c14>C++14</a><ul><li><a href=#auto-1>auto</a></li><li><a href=#lambda优化>lambda优化</a></li><li><a href=#make_unique><code>make_unique</code></a></li><li><a href=#constexpr-1>constexpr</a></li></ul></li><li><a href=#c17>C++17</a><ul><li><a href=#copymove-elison强制复制消除>Copy/Move Elison（强制复制消除）</a></li><li><a href=#stl-和-lambda-中-开始加入-constexpr-的支持>STL 和 lambda 中 开始加入 <code>constexpr</code> 的支持</a></li><li><a href=#string_view><code>string_view</code></a></li><li><a href=#class-template-argument-deduction>Class Template Argument Deduction</a></li><li><a href=#fold-expression>fold expression</a></li><li><a href=#structured-bindings>structured bindings</a></li><li><a href=#if-init-expressions>if-init expressions</a></li></ul></li><li><a href=#c20>C++20</a><ul><li><a href=#designated-initializers指定初始化器>Designated Initializers（指定初始化器）</a></li><li><a href=#太空船运算符三向比较运算符>太空船运算符（三向比较运算符）</a><ul><li><a href=#stdstrong_ordering><code>std::strong_ordering</code></a></li><li><a href=#stdweak_ordering><code>std::weak_ordering</code></a></li><li><a href=#stdpartial_ordering><code>std::partial_ordering</code></a></li></ul></li><li><a href=#module>module</a></li><li><a href=#coroutines>coroutines</a></li><li><a href=#concepts>concepts</a></li><li><a href=#format><code>&lt;format></code></a></li><li><a href=#source_location><code>&lt;source_location></code></a></li><li><a href=#万年历的功能增强>万年历的功能增强</a></li><li><a href=#ranges><code>&lt;ranges></code></a></li><li><a href=#constexpr-2><code>constexpr</code></a></li><li><a href=#span><code>&lt;span></code></a></li><li><a href=#thread-updates>thread updates</a></li></ul></li></ul></nav></div></section></aside><main class="main full-width"><article class=main-article><header class=article-header><div class=article-details><header class=article-category><a href=/categories/programming/>Programming</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/article/some-cpp-new-parts-features/>some C++ new Parts Features in 11/14/17/20</a></h2><h3 class=article-subtitle>some new important parts features in cpp11/14/17/20</h3></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published>2025-10-05</time></div><div><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>6 minute read</time></div></footer></div></header><section class=article-content><h1 id=intro>Intro</h1><p>前几天被朋友问到 C++11中引入了哪些新特性。自己竟然直接语塞答不出来，发现自己虽然知道一些似乎高大上的名词，譬如CTAD，concepts，三五定律等等，但对c++整体的了解存在不足，于是有了这篇文章。当然这篇文章的水平也十分低下，笔者对于所提到的知识的细节事实上非常不足，许多概念都需要借助LLM为我讲解，如有错误，还请批评指正。</p><blockquote><p>Reference:<br><a class=link href="https://www.youtube.com/playlist?list=PLs3KjaCtOwSY34fFKyhOFovFlB7LikDwe" target=_blank rel=noopener>Curated Learning C++ Playlist</a></p></blockquote><h1 id=c11>C++11</h1><h2 id=auto>auto</h2><h2 id=ranged-for-loops>ranged-for loops</h2><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-C++ data-lang=C++><span class=line><span class=cl><span class=k>for</span><span class=p>(</span><span class=k>const</span> <span class=k>auto</span> <span class=o>&amp;</span><span class=nl>i</span> <span class=p>:</span> <span class=n>vec</span><span class=p>){</span>
+</span></span><span class=line><span class=cl>	<span class=c1>//do something
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=lambda>lambda</h2><h2 id=unique_ptr>unique_ptr</h2><h2 id=constexpr>constexpr</h2><h2 id=variadic-templates>variadic templates</h2><h1 id=c14>C++14</h1><p>对C++11的小修小补</p><h2 id=auto-1>auto</h2><p>函数返回类型可以是 <code>auto</code></p><h2 id=lambda优化>lambda优化</h2><p>lambda可以使用auto作为参数类型，自动捕获不同类型的变量。
+增强了捕获机制，可以使用移动捕获<code>unique_ptr</code>，或者在捕获时创建一个新变量（你甚至可以在捕获里再写一个lambda）。</p><h2 id=make_unique><code>make_unique</code></h2><p>现在可以使用<code>make_unique</code> 而不是 <code>new</code> 来初始化指针了（我们整个程序都可以不使用<code>new</code> 和 <code>delete</code>了）。</p><h2 id=constexpr-1>constexpr</h2><p>强化了<code>constexpr</code> 的功能。比如循环，分支等都可以使用<code>constexpr</code>了</p><h1 id=c17>C++17</h1><h2 id=copymove-elison强制复制消除>Copy/Move Elison（强制复制消除）</h2><p>在C++14中</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-C++ data-lang=C++><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=cp>#include</span> <span class=cpf>&lt;iostream&gt;</span><span class=cp>
+</span></span></span><span class=line><span class=cl><span class=cp></span>
+</span></span><span class=line><span class=cl><span class=k>struct</span> <span class=nc>MyType</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>MyType</span><span class=p>()</span> <span class=p>{</span> <span class=n>std</span><span class=o>::</span><span class=n>cout</span> <span class=o>&lt;&lt;</span> <span class=s>&#34;Default constructor</span><span class=se>\n</span><span class=s>&#34;</span><span class=p>;</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=n>MyType</span><span class=p>(</span><span class=k>const</span> <span class=n>MyType</span><span class=o>&amp;</span><span class=p>)</span> <span class=p>{</span> <span class=n>std</span><span class=o>::</span><span class=n>cout</span> <span class=o>&lt;&lt;</span> <span class=s>&#34;Copy constructor</span><span class=se>\n</span><span class=s>&#34;</span><span class=p>;</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=n>MyType</span><span class=p>(</span><span class=n>MyType</span><span class=o>&amp;&amp;</span><span class=p>)</span> <span class=k>noexcept</span> <span class=p>{</span> <span class=n>std</span><span class=o>::</span><span class=n>cout</span> <span class=o>&lt;&lt;</span> <span class=s>&#34;Move constructor</span><span class=se>\n</span><span class=s>&#34;</span><span class=p>;</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=o>~</span><span class=n>MyType</span><span class=p>()</span> <span class=p>{</span> <span class=n>std</span><span class=o>::</span><span class=n>cout</span> <span class=o>&lt;&lt;</span> <span class=s>&#34;Destructor</span><span class=se>\n</span><span class=s>&#34;</span><span class=p>;</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>};</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>MyType</span> <span class=nf>create_object</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>MyType</span><span class=p>();</span> <span class=c1>// 返回一个临时对象
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kt>int</span> <span class=nf>main</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>MyType</span> <span class=n>obj</span> <span class=o>=</span> <span class=n>create_object</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=mi>0</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>会输出Default constructor，（会消除掉一个移动），但是这是建议进行的，是由编译器进行的优化，并且要求复制构造/移动构造是可访问的。在17中，这要求成为强制执行。所以下面这段代码能在C++17而不能在C++14通过编译。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-C++ data-lang=C++><span class=line><span class=cl><span class=cp>#include</span> <span class=cpf>&lt;iostream&gt;</span><span class=cp>
+</span></span></span><span class=line><span class=cl><span class=cp></span>
+</span></span><span class=line><span class=cl><span class=k>struct</span> <span class=nc>NoCopyMove</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=n>NoCopyMove</span><span class=p>()</span> <span class=p>{</span> <span class=n>std</span><span class=o>::</span><span class=n>cout</span> <span class=o>&lt;&lt;</span> <span class=s>&#34;Default constructor</span><span class=se>\n</span><span class=s>&#34;</span><span class=p>;</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>  <span class=n>NoCopyMove</span><span class=p>(</span><span class=k>const</span> <span class=n>NoCopyMove</span><span class=o>&amp;</span><span class=p>)</span> <span class=o>=</span> <span class=k>delete</span><span class=p>;</span> <span class=c1>// 删除拷贝构造
+</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=n>NoCopyMove</span><span class=p>(</span><span class=n>NoCopyMove</span><span class=o>&amp;&amp;</span><span class=p>)</span> <span class=o>=</span> <span class=k>delete</span><span class=p>;</span> <span class=c1>// 删除移动构造
+</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=o>~</span><span class=n>NoCopyMove</span><span class=p>()</span> <span class=p>{</span> <span class=n>std</span><span class=o>::</span><span class=n>cout</span> <span class=o>&lt;&lt;</span> <span class=s>&#34;Destructor</span><span class=se>\n</span><span class=s>&#34;</span><span class=p>;</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>};</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl><span class=n>NoCopyMove</span> <span class=nf>create_object</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=k>return</span> <span class=n>NoCopyMove</span><span class=p>();</span> <span class=c1>// 这是一个纯右值 (prvalue)
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kt>int</span> <span class=nf>main</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=n>NoCopyMove</span> <span class=n>obj</span> <span class=o>=</span> <span class=n>create_object</span><span class=p>();</span> <span class=c1>// 初始化 obj
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=stl-和-lambda-中-开始加入-constexpr-的支持>STL 和 lambda 中 开始加入 <code>constexpr</code> 的支持</h2><h2 id=string_view><code>string_view</code></h2><p>一个非拥有的，轻量的只读的字符串工具，除非有修改原始字符串的需求，否则大部分情况都可以使用<code>string_view</code> 。不过需要注意指向对象先于 <code>string_view</code>的生命周期前被销毁造成空悬引用。</p><h2 id=class-template-argument-deduction>Class Template Argument Deduction</h2><p>类模板参数类型推导，CTAD，如</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-C++ data-lang=C++><span class=line><span class=cl><span class=cp>#include</span> <span class=cpf>&lt;array&gt;</span><span class=cp>
+</span></span></span><span class=line><span class=cl><span class=cp></span>
+</span></span><span class=line><span class=cl><span class=n>std</span><span class=o>::</span><span class=n>array</span> <span class=n>arr</span><span class=p>{</span><span class=mi>1</span><span class=p>,</span><span class=mi>2</span><span class=p>,</span><span class=mi>3</span><span class=p>,</span><span class=mi>4</span><span class=p>,</span><span class=mi>5</span><span class=p>};</span>
+</span></span></code></pre></td></tr></table></div></div><p>不需要显式写出<code>array</code>的参数<code>&lt;int,5></code>。</p><h2 id=fold-expression>fold expression</h2><p>过去的模板处理多个参数需要进行递归，如</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-C++ data-lang=C++><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=cp>#include</span> <span class=cpf>&lt;iostream&gt;</span><span class=cp>
+</span></span></span><span class=line><span class=cl><span class=cp></span>
+</span></span><span class=line><span class=cl><span class=c1>// 递归的终止条件（基础情况）
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>template</span><span class=o>&lt;</span><span class=k>typename</span> <span class=n>T</span><span class=o>&gt;</span>
+</span></span><span class=line><span class=cl><span class=n>T</span> <span class=n>sum</span><span class=p>(</span><span class=n>T</span> <span class=n>t</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>t</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// 递归的模板定义
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>template</span><span class=o>&lt;</span><span class=k>typename</span> <span class=n>T</span><span class=p>,</span> <span class=k>typename</span><span class=p>...</span> <span class=n>Args</span><span class=o>&gt;</span>
+</span></span><span class=line><span class=cl><span class=n>T</span> <span class=n>sum</span><span class=p>(</span><span class=n>T</span> <span class=n>t</span><span class=p>,</span> <span class=n>Args</span><span class=p>...</span> <span class=n>args</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>t</span> <span class=o>+</span> <span class=n>sum</span><span class=p>(</span><span class=n>args</span><span class=p>...);</span> <span class=c1>// 递归调用，将当前参数与剩余参数的和相加
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kt>int</span> <span class=nf>main</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>std</span><span class=o>::</span><span class=n>cout</span> <span class=o>&lt;&lt;</span> <span class=n>sum</span><span class=p>(</span><span class=mi>1</span><span class=p>,</span> <span class=mi>2</span><span class=p>,</span> <span class=mi>3</span><span class=p>,</span> <span class=mi>4</span><span class=p>,</span> <span class=mi>5</span><span class=p>)</span> <span class=o>&lt;&lt;</span> <span class=n>std</span><span class=o>::</span><span class=n>endl</span><span class=p>;</span> <span class=c1>// 输出 15
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>而在C++17中，</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-C++ data-lang=C++><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=cp>#include</span> <span class=cpf>&lt;iostream&gt;</span><span class=cp>
+</span></span></span><span class=line><span class=cl><span class=cp></span>
+</span></span><span class=line><span class=cl><span class=k>template</span><span class=o>&lt;</span><span class=k>typename</span><span class=p>...</span> <span class=n>Args</span><span class=o>&gt;</span>
+</span></span><span class=line><span class=cl><span class=k>auto</span> <span class=n>sum</span><span class=p>(</span><span class=n>Args</span><span class=p>...</span> <span class=n>args</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=p>(</span><span class=n>args</span> <span class=o>+</span> <span class=p>...);</span> <span class=c1>// 这就是折叠表达式！
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kt>int</span> <span class=nf>main</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>std</span><span class=o>::</span><span class=n>cout</span> <span class=o>&lt;&lt;</span> <span class=n>sum</span><span class=p>(</span><span class=mi>1</span><span class=p>,</span> <span class=mi>2</span><span class=p>,</span> <span class=mi>3</span><span class=p>,</span> <span class=mi>4</span><span class=p>,</span> <span class=mi>5</span><span class=p>)</span> <span class=o>&lt;&lt;</span> <span class=n>std</span><span class=o>::</span><span class=n>endl</span><span class=p>;</span> <span class=c1>// 输出 15
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=structured-bindings>structured bindings</h2><p>可以将 <code>std::pair</code>这样类型的两个成员分别绑定到不同的变量上，并且不需要提前声明（即使用<code>std::tie</code>)</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-C++ data-lang=C++><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=cp>#include</span> <span class=cpf>&lt;iostream&gt;</span><span class=cp>
+</span></span></span><span class=line><span class=cl><span class=cp>#include</span> <span class=cpf>&lt;string&gt;</span><span class=cp>
+</span></span></span><span class=line><span class=cl><span class=cp>#include</span> <span class=cpf>&lt;utility&gt;</span><span class=cp>
+</span></span></span><span class=line><span class=cl><span class=cp></span>  
+</span></span><span class=line><span class=cl><span class=n>std</span><span class=o>::</span><span class=n>pair</span><span class=o>&lt;</span><span class=n>std</span><span class=o>::</span><span class=n>string</span><span class=p>,</span> <span class=kt>int</span><span class=o>&gt;</span> <span class=n>get_person</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=k>return</span> <span class=p>{</span><span class=s>&#34;Alice&#34;</span><span class=p>,</span> <span class=mi>30</span><span class=p>};</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kt>int</span> <span class=nf>main</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=k>auto</span> <span class=p>[</span><span class=n>name</span><span class=p>,</span> <span class=n>age</span><span class=p>]</span> <span class=o>=</span> <span class=n>get_person</span><span class=p>();</span> <span class=c1>// 一行代码完成解构和声明
+</span></span></span><span class=line><span class=cl><span class=c1></span>	<span class=c1>//name type : basic_string&lt;char&gt;
+</span></span></span><span class=line><span class=cl><span class=c1></span>	<span class=c1>//age type : int
+</span></span></span><span class=line><span class=cl><span class=c1></span>	<span class=n>std</span><span class=o>::</span><span class=n>cout</span> <span class=o>&lt;&lt;</span> <span class=s>&#34;Name: &#34;</span> <span class=o>&lt;&lt;</span> <span class=n>name</span> <span class=o>&lt;&lt;</span> <span class=s>&#34;, Age: &#34;</span> <span class=o>&lt;&lt;</span> <span class=n>age</span> <span class=o>&lt;&lt;</span> <span class=n>std</span><span class=o>::</span><span class=n>endl</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=if-init-expressions>if-init expressions</h2><p>C++17 可以在 if 语句的条件部分，直接声明并初始化一个变量。这个变量的作用域被严格限制在 if 及其对应的 else if / else 块内部。避免了作用域的污染。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-C++ data-lang=C++><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=cp>#include</span> <span class=cpf>&lt;iostream&gt;</span><span class=cp>
+</span></span></span><span class=line><span class=cl><span class=cp>#include</span> <span class=cpf>&lt;map&gt;</span><span class=cp>
+</span></span></span><span class=line><span class=cl><span class=cp>#include</span> <span class=cpf>&lt;string&gt;</span><span class=cp>
+</span></span></span><span class=line><span class=cl><span class=cp></span>
+</span></span><span class=line><span class=cl><span class=n>std</span><span class=o>::</span><span class=n>map</span><span class=o>&lt;</span><span class=n>std</span><span class=o>::</span><span class=n>string</span><span class=p>,</span> <span class=kt>int</span><span class=o>&gt;</span> <span class=n>user_ages</span> <span class=o>=</span> <span class=p>{{</span><span class=s>&#34;Alice&#34;</span><span class=p>,</span> <span class=mi>30</span><span class=p>},</span> <span class=p>{</span><span class=s>&#34;Bob&#34;</span><span class=p>,</span> <span class=mi>25</span><span class=p>}};</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kt>void</span> <span class=nf>check_user_cpp17</span><span class=p>(</span><span class=k>const</span> <span class=n>std</span><span class=o>::</span><span class=n>string</span><span class=o>&amp;</span> <span class=n>name</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// 初始化和条件检查在一行内完成
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>if</span> <span class=p>(</span><span class=k>auto</span> <span class=n>it</span> <span class=o>=</span> <span class=n>user_ages</span><span class=p>.</span><span class=n>find</span><span class=p>(</span><span class=n>name</span><span class=p>);</span> <span class=n>it</span> <span class=o>!=</span> <span class=n>user_ages</span><span class=p>.</span><span class=n>end</span><span class=p>())</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=c1>// it 的作用域从这里开始
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=n>std</span><span class=o>::</span><span class=n>cout</span> <span class=o>&lt;&lt;</span> <span class=n>name</span> <span class=o>&lt;&lt;</span> <span class=s>&#34; is &#34;</span> <span class=o>&lt;&lt;</span> <span class=n>it</span><span class=o>-&gt;</span><span class=n>second</span> <span class=o>&lt;&lt;</span> <span class=s>&#34; years old.&#34;</span> <span class=o>&lt;&lt;</span> <span class=n>std</span><span class=o>::</span><span class=n>endl</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=c1>// it 在 if 块内可见
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=p>}</span> <span class=k>else</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>std</span><span class=o>::</span><span class=n>cout</span> <span class=o>&lt;&lt;</span> <span class=n>name</span> <span class=o>&lt;&lt;</span> <span class=s>&#34; not found.&#34;</span> <span class=o>&lt;&lt;</span> <span class=n>std</span><span class=o>::</span><span class=n>endl</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=c1>// it 在 else 块内也可见 (此时 it == user_ages.end())
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// it 的作用域在这里结束！
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=c1>// 在这里访问 it 会导致编译错误，这是我们期望的行为！
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h1 id=c20>C++20</h1><p>我们引流狗最爱的C++20，永远遥遥无期的 <code>module</code> 喜欢吗（</p><h2 id=designated-initializers指定初始化器>Designated Initializers（指定初始化器）</h2><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-C++ data-lang=C++><span class=line><span class=cl><span class=k>struct</span> <span class=nc>S</span><span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=kt>int</span> <span class=n>i</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>	<span class=kt>int</span> <span class=n>j</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>	<span class=kt>int</span> <span class=n>k</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>};</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>S</span> <span class=n>s</span><span class=p>{.</span><span class=n>i</span> <span class=o>=</span> <span class=mi>1</span><span class=p>,</span> <span class=p>.</span><span class=n>j</span> <span class=o>=</span> <span class=mi>2</span><span class=p>,</span> <span class=p>.</span><span class=n>k</span> <span class=o>=</span> <span class=mi>3</span><span class=p>};</span>
+</span></span></code></pre></td></tr></table></div></div><p>可以指定成员初始化（其余成员默认初始化）。
+有如下要求</p><ul><li>必须是聚合类型，即：没有自定义构造函数，没有<code>private</code> 或 <code>protected</code> 类型的成员，没有基类，没有虚函数。（感觉基本上就是适用于一些<code>struct</code> 初始化）</li><li>初始化时成员不允许乱序，不允许多次出现。</li></ul><h2 id=太空船运算符三向比较运算符>太空船运算符（三向比较运算符）</h2><p><del>这东西真有人用吗（）</del></p><p>在 <code>&lt;compare></code> 中定义了 <code>std::strong_ordering</code> （强排序） <code>std::weak_ordering</code> （弱排序） <code>std::partial_ordering</code> （偏排序）</p><h3 id=stdstrong_ordering><code>std::strong_ordering</code></h3><p><code>std::strong_ordering</code> 存在的关系分别为 <code>less</code> <code>equal</code> <code>greater</code> ，当两者关系为<code>equal</code> 时，两者可交换。<br>通常用于 <code>int</code> ，标准库容器等。</p><h3 id=stdweak_ordering><code>std::weak_ordering</code></h3><p>相较于 <code>std::strong_ordering</code> ，<code>std::weak_ordering</code> 的关系为<code>less</code> <code>equivalent</code> <code>greater</code> ，其中的 <code>equivalent</code> 不是严格的相等关系，而是等价关系 ：如 <code>"hello"</code> 和 <code>"HELLO"</code> 。两个关系为 <code>equivalent</code> 的对象不可以交换,但是<code>==</code> 运算符为真。</p><h3 id=stdpartial_ordering><code>std::partial_ordering</code></h3><p>存在关系为<code>less</code> <code>equivalent</code> <code>greater</code> <code>unordered</code> ，其中 <code>unordered</code> 类型 意思是无法比较，此时：<code>A&lt;B</code>,<code>A>B</code>,<code>A==B</code>,<code>A&lt;=B</code>,<code>A>=B</code> 全部为<code>false</code> . 如一个浮点数和 <code>NaN</code> 比较结果就是<code>std::partial_ordering::unordered</code> 。</p><hr><ul><li>编译器会根据返回的比较结果，自动生成出 <code>&lt;</code> <code>></code> <code>==</code> <code>!=</code> <code>&lt;=</code> <code>>=</code> 的bool值。</li><li>比较过程是字典式的，比如说，在第一个成员中就可以判断出 <strong>小于</strong> 的关系，那么即使之后的每一个成员都是 <strong>大于</strong> 也是返回小于。</li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-C++ data-lang=C++><span class=line><span class=cl><span class=cp>#import &lt;iostream&gt;
+</span></span></span><span class=line><span class=cl><span class=cp></span>
+</span></span><span class=line><span class=cl><span class=k>struct</span> <span class=nc>S</span><span class=p>{</span>
+</span></span><span class=line><span class=cl><span class=kt>int</span> <span class=n>i</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=kt>int</span> <span class=n>j</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=kt>int</span> <span class=n>k</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>constexpr</span> <span class=k>auto</span> <span class=k>operator</span><span class=o>&lt;=&gt;</span><span class=p>(</span><span class=k>const</span> <span class=n>S</span><span class=o>&amp;</span><span class=p>)</span> <span class=k>const</span> <span class=o>=</span> <span class=k>default</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>};</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kt>int</span> <span class=nf>main</span><span class=p>(){</span>
+</span></span><span class=line><span class=cl><span class=n>S</span> <span class=n>s1</span><span class=p>{.</span><span class=n>i</span> <span class=o>=</span><span class=mi>1</span><span class=p>,</span> <span class=p>.</span><span class=n>j</span> <span class=o>=</span> <span class=mi>5</span><span class=p>,</span> <span class=p>.</span><span class=n>k</span> <span class=o>=</span> <span class=mi>5</span><span class=p>};</span>
+</span></span><span class=line><span class=cl><span class=n>S</span> <span class=n>s2</span><span class=p>{.</span><span class=n>i</span> <span class=o>=</span><span class=mi>2</span><span class=p>,</span> <span class=p>.</span><span class=n>j</span> <span class=o>=</span> <span class=mi>2</span><span class=p>,</span> <span class=p>.</span><span class=n>k</span> <span class=o>=</span> <span class=mi>2</span><span class=p>};</span>
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl><span class=kt>bool</span> <span class=n>res</span> <span class=o>=</span> <span class=n>s1</span> <span class=o>&lt;</span> <span class=n>s2</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=n>std</span><span class=o>::</span><span class=n>cout</span> <span class=o>&lt;&lt;</span> <span class=n>res</span> <span class=o>&lt;&lt;</span> <span class=n>std</span><span class=o>::</span><span class=n>endl</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=c1>//输出结果为 1
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>return</span> <span class=mi>0</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=module>module</h2><p>不清楚具体实现，听朋友说是预编译，可以不导入头文件改为导入模块</p><h2 id=coroutines>coroutines</h2><p>不清楚,目测和协程有关</p><h2 id=concepts>concepts</h2><p>可以对模板进行约束，提高了模板编程的质量。</p><p>譬如 我之前在写一个自己的矩阵类，初始化时需要满足一个初始化列表中有且仅有16个元素，朋友跟我说可以使用 <code>requires</code> 关键词约束。</p><h2 id=format><code>&lt;format></code></h2><p>感觉不如。。。<code>fmt</code><br>简单来说，可以使用类似于 <code>("info {}:{}", id, description)</code> 这种语法来灵活的输出，并且，这种可以在 <code>{}</code> 输入对应的索引达到乱序的目的。</p><h2 id=source_location><code>&lt;source_location></code></h2><p>可以在获得源文件的信息，如文件名，行号，函数名（这不是我们的<code>__FILE__</code>, <code>__LINE__</code>, <code>__func__</code>吗），并且是在编译时获取的，在运行时开销非常小。</p><h2 id=万年历的功能增强>万年历的功能增强</h2><h2 id=ranges><code>&lt;ranges></code></h2><p>emm我也不会讲怎么形容它，总之就是对于容器的数据有了更方便、更安全的处理方式？<br>这里有一个来自gemini的示例。顺带一提 管道运算符<code>|</code> 和命名空间别名似乎也是C++20才引入的。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-C++ data-lang=C++><span class=line><span class=cl><span class=cp>#import &lt;iostream&gt;
+</span></span></span><span class=line><span class=cl><span class=cp>#import &lt;vector&gt;
+</span></span></span><span class=line><span class=cl><span class=cp>#import &lt;ranges&gt;
+</span></span></span><span class=line><span class=cl><span class=cp></span>
+</span></span><span class=line><span class=cl><span class=kt>int</span> <span class=nf>main</span><span class=p>(){</span>
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl><span class=n>std</span><span class=o>::</span><span class=n>vector</span> <span class=n>numbers</span><span class=p>{</span><span class=mi>1</span><span class=p>,</span><span class=mi>2</span><span class=p>,</span><span class=mi>3</span><span class=p>,</span><span class=mi>4</span><span class=p>,</span><span class=mi>5</span><span class=p>,</span><span class=mi>6</span><span class=p>,</span><span class=mi>7</span><span class=p>,</span><span class=mi>8</span><span class=p>};</span>
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl><span class=k>namespace</span> <span class=n>views</span> <span class=o>=</span> <span class=n>std</span><span class=o>::</span><span class=n>views</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl><span class=k>auto</span> <span class=n>process_view</span> <span class=o>=</span> <span class=n>numbers</span> <span class=o>|</span> <span class=n>views</span><span class=o>::</span><span class=n>filter</span><span class=p>([](</span><span class=kt>int</span> <span class=n>n</span> <span class=p>){</span><span class=k>return</span> <span class=n>n</span><span class=o>%</span><span class=mi>2</span> <span class=o>==</span> <span class=mi>0</span> <span class=p>;})</span>
+</span></span><span class=line><span class=cl>			<span class=o>|</span> <span class=n>views</span><span class=o>::</span><span class=n>transform</span><span class=p>([](</span><span class=kt>int</span> <span class=n>n</span><span class=p>){</span><span class=k>return</span> <span class=n>n</span><span class=o>*</span><span class=n>n</span><span class=p>;});</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>return</span> <span class=mi>0</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=constexpr-2><code>constexpr</code></h2><ol><li>虚函数可被声明为<code>constexpr</code> ，可在编译时进行多态调用</li><li><code>constexpr</code> 可以被用于内存分配和释放了，所以<code>std::vector</code> 等容器可以在编译期求值。</li><li><code>constexpr</code> 函数可以使用try-catch了</li><li>新关键词 <code>consteval</code> ,被声明的函数必须在编译器执行，而 <code>constexpr</code> 可以在运行时运行。</li><li>新关键词 <code>constinit</code> ，变量必须静态初始化。</li></ol><h2 id=span><code>&lt;span></code></h2><p><code>span</code>是一个轻量级的，安全的，高效的用于操作连续内存队列的一部分或全部（如 <code>std::vector</code> ， <code>std::array</code> 或者C-style数组 ）</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-C++ data-lang=C++><span class=line><span class=cl><span class=cp>#include</span> <span class=cpf>&lt;span&gt;</span><span class=cp>
+</span></span></span><span class=line><span class=cl><span class=cp>#include</span> <span class=cpf>&lt;vector&gt;</span><span class=cp>
+</span></span></span><span class=line><span class=cl><span class=cp>#include</span> <span class=cpf>&lt;array&gt;</span><span class=cp>
+</span></span></span><span class=line><span class=cl><span class=cp>#include</span> <span class=cpf>&lt;iostream&gt;</span><span class=cp>
+</span></span></span><span class=line><span class=cl><span class=cp></span>
+</span></span><span class=line><span class=cl><span class=c1>// 函数接受一个 span，可以处理所有连续容器
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kt>void</span> <span class=nf>print_elements</span><span class=p>(</span><span class=n>std</span><span class=o>::</span><span class=n>span</span><span class=o>&lt;</span><span class=k>const</span> <span class=kt>int</span><span class=o>&gt;</span> <span class=n>data</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>std</span><span class=o>::</span><span class=n>cout</span> <span class=o>&lt;&lt;</span> <span class=s>&#34;Size: &#34;</span> <span class=o>&lt;&lt;</span> <span class=n>data</span><span class=p>.</span><span class=n>size</span><span class=p>()</span> <span class=o>&lt;&lt;</span> <span class=n>std</span><span class=o>::</span><span class=n>endl</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=k>for</span> <span class=p>(</span><span class=kt>int</span> <span class=nl>n</span> <span class=p>:</span> <span class=n>data</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>std</span><span class=o>::</span><span class=n>cout</span> <span class=o>&lt;&lt;</span> <span class=n>n</span> <span class=o>&lt;&lt;</span> <span class=s>&#34; &#34;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=n>std</span><span class=o>::</span><span class=n>cout</span> <span class=o>&lt;&lt;</span> <span class=n>std</span><span class=o>::</span><span class=n>endl</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kt>void</span> <span class=nf>test_span</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// 1. 原生数组
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=kt>int</span> <span class=n>arr</span><span class=p>[]</span> <span class=o>=</span> <span class=p>{</span><span class=mi>1</span><span class=p>,</span> <span class=mi>2</span><span class=p>,</span> <span class=mi>3</span><span class=p>,</span> <span class=mi>4</span><span class=p>,</span> <span class=mi>5</span><span class=p>};</span>
+</span></span><span class=line><span class=cl>    <span class=n>print_elements</span><span class=p>(</span><span class=n>arr</span><span class=p>);</span> 
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1>// 2. std::vector
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=n>std</span><span class=o>::</span><span class=n>vector</span><span class=o>&lt;</span><span class=kt>int</span><span class=o>&gt;</span> <span class=n>vec</span> <span class=o>=</span> <span class=p>{</span><span class=mi>10</span><span class=p>,</span> <span class=mi>20</span><span class=p>,</span> <span class=mi>30</span><span class=p>};</span>
+</span></span><span class=line><span class=cl>    <span class=n>print_elements</span><span class=p>(</span><span class=n>vec</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1>// 3. std::array
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=n>std</span><span class=o>::</span><span class=n>array</span><span class=o>&lt;</span><span class=kt>int</span><span class=p>,</span> <span class=mi>2</span><span class=o>&gt;</span> <span class=n>arr20</span> <span class=o>=</span> <span class=p>{</span><span class=mi>55</span><span class=p>,</span> <span class=mi>66</span><span class=p>};</span>
+</span></span><span class=line><span class=cl>    <span class=n>print_elements</span><span class=p>(</span><span class=n>arr20</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1>// 4. 作为子序列视图
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=c1>// span 可以通过构造函数或 subspan() 方法表示原序列的子集
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=n>std</span><span class=o>::</span><span class=n>span</span><span class=o>&lt;</span><span class=kt>int</span><span class=o>&gt;</span> <span class=n>vec_span</span><span class=p>(</span><span class=n>vec</span><span class=p>);</span> 
+</span></span><span class=line><span class=cl>    <span class=k>auto</span> <span class=n>sub_span</span> <span class=o>=</span> <span class=n>vec_span</span><span class=p>.</span><span class=n>subspan</span><span class=p>(</span><span class=mi>1</span><span class=p>,</span> <span class=mi>1</span><span class=p>);</span> <span class=c1>// 从索引 1 开始，长度为 1
+</span></span></span><span class=line><span class=cl><span class=c1></span>    
+</span></span><span class=line><span class=cl>    <span class=c1>// 通过 span 修改原始数据
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=n>sub_span</span><span class=p>[</span><span class=mi>0</span><span class=p>]</span> <span class=o>=</span> <span class=mi>999</span><span class=p>;</span> 
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=n>std</span><span class=o>::</span><span class=n>cout</span> <span class=o>&lt;&lt;</span> <span class=s>&#34;Modified vec[1]: &#34;</span> <span class=o>&lt;&lt;</span> <span class=n>vec</span><span class=p>[</span><span class=mi>1</span><span class=p>]</span> <span class=o>&lt;&lt;</span> <span class=n>std</span><span class=o>::</span><span class=n>endl</span><span class=p>;</span> <span class=c1>// 输出 999
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=thread-updates>thread updates</h2><p>我不知道</p></section><footer class=article-footer><section class=article-tags><a href=/tags/cpp/>CPP</a></section><section class=article-copyright><svg class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg>
+<span>Licensed under CC BY-NC-SA 4.0</span></section></footer><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css integrity=sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV crossorigin=anonymous><script src=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js integrity=sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8 crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js integrity=sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05 crossorigin=anonymous defer></script><script>window.addEventListener("DOMContentLoaded",()=>{const e=document.querySelector(".main-article");renderMathInElement(e,{delimiters:[{left:"$$",right:"$$",display:!0},{left:"$",right:"$",display:!1},{left:"\\(",right:"\\)",display:!1},{left:"\\[",right:"\\]",display:!0}],ignoredClasses:["gist"]})})</script></article><aside class=related-content--wrapper><h2 class=section-title>Related content</h2><div class=related-content><div class="flex article-list--tile"><article><a href=/article/progit-book-2/><div class=article-details><h2 class=article-title>ProGit Learn Record 2：Git基础</h2></div></a></article><article><a href=/article/progit-book-1/><div class=article-details><h2 class=article-title>ProGit Learn Record 1 ：起步</h2></div></a></article></div></div></aside><script src=//unpkg.com/@waline/client@v2/dist/waline.js></script><link href=//unpkg.com/@waline/client@v2/dist/waline.css rel=stylesheet><div id=waline class=waline-container></div><style>.waline-container{background-color:var(--card-background);border-radius:var(--card-border-radius);box-shadow:var(--shadow-l1);padding:var(--card-padding);--waline-font-size:var(--article-font-size)}.waline-container .wl-count{color:var(--card-text-color-main)}</style><script>Waline.init({avatar:"",dark:'html[data-scheme="dark"]',el:"#waline",emoji:[],lang:"zh-CN",locale:{admin:"Admin",placeholder:null},placeholder:"leave a comment",requiredMeta:["name","email","url"],serverURL:"https://comment.foth.top",visitor:"Anonymous"})</script><footer class=site-footer><section class=copyright>&copy;
+2020 -
+2025 FOTH0626</section><section class=powerby>Built with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a><br>Theme <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.31.0>Stack</a></b> designed by <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a></section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>
