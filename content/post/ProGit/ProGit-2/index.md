@@ -64,7 +64,7 @@ Changes to be committed:
 ```bash
 On branch master
 Changes not staged for commit:
-  (use "git add <file>..." to update what will远程仓库可以在本地的主机上 be committed)
+  (use "git add <file>..." to update what will be committed)
   (use "git restore <file>..." to discard changes in working directory)
 	modified:   aaa.md
 
