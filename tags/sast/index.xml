@@ -1,0 +1,1318 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>SAST on FOTH0626</title><link>https://foth0626.github.io/tags/sast/</link><description>Recent content in SAST on FOTH0626</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Wed, 04 Dec 2024 08:29:07 +0800</lastBuildDate><atom:link href="https://foth0626.github.io/tags/sast/index.xml" rel="self" type="application/rss+xml"/><item><title>The BRDF and Rendering Equation</title><link>https://foth0626.github.io/article/brdf-and-rendering-equation/</link><pubDate>Wed, 04 Dec 2024 08:29:07 +0800</pubDate><guid>https://foth0626.github.io/article/brdf-and-rendering-equation/</guid><description>&lt;img src="https://foth0626.github.io/article/brdf-and-rendering-equation/frostbite_pbr.png" alt="Featured image of post The BRDF and Rendering Equation" /&gt;&lt;pre&gt;&lt;code&gt;本文章为SAST.Graphics组授课文档记录
+&lt;/code&gt;&lt;/pre&gt;
+&lt;blockquote&gt;
+&lt;p&gt;引用资料：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;a class="link" href="https://zhuanlan.zhihu.com/p/53086060" target="_blank" rel="noopener"
+&gt;毛星云：PBR白皮书&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://learnopengl-cn.github.io/07%20PBR/01%20Theory/" target="_blank" rel="noopener"
+&gt;LearnOpenGL-CN&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://www.bilibili.com/video/BV1fL411F7YG/" target="_blank" rel="noopener"
+&gt;百人计划-5.1 PBR基础&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/blockquote&gt;
+&lt;h1 id="pbr核心理论"&gt;PBR核心理论
+&lt;/h1&gt;&lt;p&gt;基于物理的渲染（Physically Based Rendering，PBR）是指使用基于物理原理和微平面理论建模的着色/光照模型，以及使用从现实中测量的表面参数来准确表示真实世界材质的渲染理念。它指的是在不同程度上使用与现实世界的物理原理更相符的基本理论所构成的渲染技术的集合。正因为基于物理的渲染目的便是使用一个中更符合物理学规律的方式来模拟光线，因此PBR的渲染效果总是比实际上看上去要更真实一些。除此之外，因为它与物理性质的相似，所以艺术家可以直接基于物理参数来编写材质，而不需要依据经验和反复试错使光照效果看起来正常。&lt;/p&gt;
+&lt;p&gt;寒霜(Frostbite)引擎在SIGGRAPH 2014的分享《Moving Frostbite to PBR》中提出，基于物理的渲染的范畴，由三部分组成：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;基于物理的材质（Material）&lt;/li&gt;
+&lt;li&gt;基于物理的光照（Lighting）&lt;/li&gt;
+&lt;li&gt;基于物理适配的摄像机（Camera)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/brdf-and-rendering-equation/frostbite_pbr.png"
+width="1266"
+height="713"
+srcset="https://foth0626.github.io/article/brdf-and-rendering-equation/frostbite_pbr_hu_53decb40a1e42167.png 480w, https://foth0626.github.io/article/brdf-and-rendering-equation/frostbite_pbr_hu_f7dd1f9e5120a56f.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="177"
+data-flex-basis="426px"
+&gt;&lt;/p&gt;
+&lt;p&gt;完整的这三者，才是真正完整的基于物理的渲染系统。&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;值得注意的是，PBR仍然只是对现实世界的一种&lt;strong&gt;近似&lt;/strong&gt;，所以它被称为&lt;strong&gt;基于&lt;/strong&gt;物理的渲染（Physically &lt;strong&gt;Based&lt;/strong&gt; Rendering），而不是物理渲染（Physically Rendering）！
+&lt;img src="https://foth0626.github.io/article/brdf-and-rendering-equation/pbr_1.png"
+width="1200"
+height="750"
+srcset="https://foth0626.github.io/article/brdf-and-rendering-equation/pbr_1_hu_946e3aa713fde5c0.png 480w, https://foth0626.github.io/article/brdf-and-rendering-equation/pbr_1_hu_5f0e3ad98c94a193.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="160"
+data-flex-basis="384px"
+&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;微平面理论（Microfacet Theory）&lt;/strong&gt; :微平面理论是将物体表面建模成做无数微观尺度上有随机朝向的理想镜面反射的小平面（microfacet）的理论。在实际的PBR工作流中，这种物体表面的不规则性用粗糙度贴图或者高光度贴图来表示。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;能量守恒（Energy Conservation）&lt;/strong&gt; :出射光线的能量永远不能超过入射光线的能量。随着粗糙度的上升镜面反射区域的面积会增加，作为平衡，镜面反射区域的平均亮度则会下降。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;菲涅尔反射（Fresnel Reflectance）&lt;/strong&gt; :光线以不同角度入射会有不同的反射率。相同的入射角度，不同的物质也会有不同的反射率。万物皆有菲涅尔反射。F0是即 0 度角入射的菲涅尔反射值。大多数非金属的F0范围是0.02~0.04，大多数金属的F0范围是0.7 ~ 1.0。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;线性空间（Linear Space）&lt;/strong&gt; :光照计算必须在线性空间完成，shader中输入的gamma空间的贴图比如漫反射贴图需要被转成线性空间，在具体操作时需要根据不同引擎和渲染器的不同做不同的操作。而描述物体表面属性的贴图如粗糙度，高光贴图，金属贴图等必须保证是线性空间。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;色调映射（Tone Mapping）&lt;/strong&gt; :也称色调复制（tone reproduction），是将宽范围的照明级别拟合到屏幕有限色域内的过程。因为基于HDR渲染出来的亮度值会超过显示器能够显示最大亮度，所以需要使用色调映射，将光照结果从HDR转换为显示器能够正常显示的LDR。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;物质的光学特性（Substance Optical Properties）&lt;/strong&gt;: 现实世界中有不同类型的物质可分为三大类：绝缘体（Insulators），半导体（semi-conductors）和导体（conductors）。在渲染和游戏领域，我们一般只对其中的两个感兴趣：导体（金属）和绝缘体（电解质，非金属）。其中非金属具有单色/灰色镜面反射颜色。而金属具有彩色的镜面反射颜色。即非金属的F0是一个float。而金属的F0是一个float3。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id="微表面理论"&gt;微表面理论
+&lt;/h1&gt;&lt;h2 id="光与非光学平坦表面的交互原理"&gt;光与非光学平坦表面的交互原理
+&lt;/h2&gt;&lt;p&gt;大多数真实世界的表面不是光学上光滑的，但是具有比光波长大得多但比像素小的尺度的不规则性。 这种&lt;strong&gt;微观几何&lt;/strong&gt;（microgeometry）变化导致每个表面点反射（和折射）不同方向的光：材质的部分外观组成是这些反射和折射方向的聚合结果。
+光在与非光学平坦表面（Non-Optically-Flat Surfaces)的交互时，非光学平坦表面表现的像一个微小的光学平坦表面的大集合。表面上的每个点都会以略微不同的入射光反射，而最终反射的表面外观是许多不同取向的点的聚合结果。
+在微观尺度上，表面越模糊，反射越模糊，因为微表面与整个宏观表面取向的偏离更强。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/brdf-and-rendering-equation/microfacet.png"
+width="971"
+height="678"
+srcset="https://foth0626.github.io/article/brdf-and-rendering-equation/microfacet_hu_34b8ac89a777becf.png 480w, https://foth0626.github.io/article/brdf-and-rendering-equation/microfacet_hu_9decd9b4542147ff.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="143"
+data-flex-basis="343px"
+&gt;&lt;/p&gt;
+&lt;p&gt;出于着色的目的，我们通常会使用统计方法去处理这种微观几何现象，并视为表面上的点在多个方向上反射和折射光线。&lt;/p&gt;
+&lt;p&gt;有关微观几何对反射率影响的数学分析，被称为微表面理论（microfacet theory），许多 BRDF 模型都是建立在这个理论之上的。这个工具最初是由光学界的研究人员提出的，1977 年由 Blinn引入了计算机图形学，1981 年由 Cook 和 Torrance 再次引入。&lt;/p&gt;
+&lt;p&gt;该理论的基础是，将微观几何建模为一组微表面的集合。每个微表面都是平坦的，它具有一个微表面法线 $m$ ；这些微表面会根据 micro-BRDF $f_\mu(l,v,m)$ 来对光线进行分别反射，将所有微表面的反射率加起来，就是整个表面的 BRDF。通常的做法是将每个微表面都当成一个完美的菲涅尔镜面，这会产生镜面的微表面 BRDF，用于模拟表面反射。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/brdf-and-rendering-equation/microfacet2.png"
+width="1173"
+height="411"
+srcset="https://foth0626.github.io/article/brdf-and-rendering-equation/microfacet2_hu_5a1752233b66c136.png 480w, https://foth0626.github.io/article/brdf-and-rendering-equation/microfacet2_hu_a8980dc1197cec86.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="285"
+data-flex-basis="684px"
+&gt;
+图 微平面粗糙度对材质外观的影响。（图片来自Moving Frostbite to PBR，SIGGRAPH 2014）&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/brdf-and-rendering-equation/reflectance.png"
+width="1280"
+height="746"
+srcset="https://foth0626.github.io/article/brdf-and-rendering-equation/reflectance_hu_1c59d5df4ed92ffc.png 480w, https://foth0626.github.io/article/brdf-and-rendering-equation/reflectance_hu_f3ba39a33d860e39.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="171"
+data-flex-basis="411px"
+&gt;&lt;/p&gt;
+&lt;p&gt;对于反射光线，它的行为很好理解，但是折射进表面的光会发生什么变化呢？这取决于物质本身的特性&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;对于 &lt;strong&gt;金属&lt;/strong&gt; ,折射光会立刻被吸收，这是因为金属中有大量的自由电子。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/brdf-and-rendering-equation/metal_reflectance.png"
+width="1128"
+height="499"
+srcset="https://foth0626.github.io/article/brdf-and-rendering-equation/metal_reflectance_hu_a5822dc213a3be2d.png 480w, https://foth0626.github.io/article/brdf-and-rendering-equation/metal_reflectance_hu_c3fdc1ecb516494a.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="226"
+data-flex-basis="542px"
+&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;对于&lt;strong&gt;非金属&lt;/strong&gt;（电介质或者绝缘体），一旦光在其内部折射，就表示为常规的参与介质，表现出吸收和散射两种行为。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/brdf-and-rendering-equation/no_metal_ref.png"
+width="1120"
+height="513"
+srcset="https://foth0626.github.io/article/brdf-and-rendering-equation/no_metal_ref_hu_2accb28a86a8fc6a.png 480w, https://foth0626.github.io/article/brdf-and-rendering-equation/no_metal_ref_hu_f82aef16dea5e660.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="218"
+data-flex-basis="523px"
+&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="漫反射和次表面散射本质相同"&gt;漫反射和次表面散射本质相同
+&lt;/h2&gt;&lt;p&gt;漫反射本质也是折射光的次表面散射的结果。唯一的区别是观察尺度，如果散射距离相对于观察尺度（像素采样大小）的大小非常小，那么次表面散射可以直接近似为漫反射。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/brdf-and-rendering-equation/ss.png"
+width="1280"
+height="682"
+srcset="https://foth0626.github.io/article/brdf-and-rendering-equation/ss_hu_fda8b611c35733fb.png 480w, https://foth0626.github.io/article/brdf-and-rendering-equation/ss_hu_86ff8b3a1c4c2456.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="187"
+data-flex-basis="450px"
+&gt;&lt;/p&gt;
+&lt;h1 id="能量守恒"&gt;能量守恒
+&lt;/h1&gt;&lt;h2 id="渲染方程the-rendering-equation"&gt;渲染方程（The Rendering Equation）
+&lt;/h2&gt;&lt;p&gt;渲染方程描述了光能在场景中的流动，是渲染中的不可感知方面的最抽象的表示。根据光学的物理学原理，渲染方程在理论上给出了一个完美的解，而各种各样的渲染技术，只是这个理想结果的近似。&lt;/p&gt;
+&lt;p&gt;对于某一点的渲染方程，可以表示为&lt;/p&gt;
+$$L_o = L_e + \int_{\Omega} f_r \cdotp L_i \cdotp (\omega_i\cdot n)\cdot d\omega_i$$&lt;ul&gt;
+&lt;li&gt;$L_o$ 是p点的出射光亮度。&lt;/li&gt;
+&lt;li&gt;$L_e$ 是p点发出的光亮度。&lt;/li&gt;
+&lt;li&gt;$f_r$ 是p点入射方向到出射方向光的反射比例，即BxDF，一般为BRDF。&lt;/li&gt;
+&lt;li&gt;$L_i$ 是p点入射光亮度。&lt;/li&gt;
+&lt;li&gt;$(\omega_i \cdotp n)$ 是入射角带来的入射光衰减&lt;/li&gt;
+&lt;li&gt;$\int_{\Omega} &amp;hellip;d w_i$ 是入射方向半球的积分。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;在实时渲染中，我们常用的反射方程（The Reflectance Equation）则是渲染方程的一个简化版本，或者说一个特例。&lt;/p&gt;
+$$L_o =\int_{\Omega} f_r \cdotp L_i \cdotp (\omega_i \cdotp n) \cdotp d \omega_i$$&lt;p&gt;&lt;img src="https://foth0626.github.io/article/brdf-and-rendering-equation/ref_equation.png"
+width="739"
+height="398"
+srcset="https://foth0626.github.io/article/brdf-and-rendering-equation/ref_equation_hu_e34526b65742b69b.png 480w, https://foth0626.github.io/article/brdf-and-rendering-equation/ref_equation_hu_c5e2622307deb92e.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="185"
+data-flex-basis="445px"
+&gt;&lt;/p&gt;
+&lt;h2 id="能量守恒-1"&gt;能量守恒
+&lt;/h2&gt;&lt;p&gt;概念：出射光线的能量 永远不大于 入射光线的能量&lt;/p&gt;
+&lt;p&gt;表现：随着粗糙度的上升镜面反射区域的面积会增加，作为平衡，镜面反射区域的平均亮度则会下降。&lt;/p&gt;
+&lt;p&gt;如何确保能量守恒？&lt;/p&gt;
+&lt;p&gt;使用反射方程：&lt;/p&gt;
+$$L_o =\int_{\Omega} f_r \cdotp L_i \cdotp (\omega_i \cdotp n) \cdotp d \omega_i$$&lt;p&gt;
+简单理解：出射光线强度 = 入射光强度 * 入射角度衰减 * 反射比例&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;$L_i$ ：入射光强度&lt;/li&gt;
+&lt;li&gt;$(\omega_i \cdotp n)$ : 入射角度带来的入射光衰减&lt;/li&gt;
+&lt;li&gt;$f_r$ : 反射比例&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;如何求反射比例？：BRDF !&lt;/p&gt;
+&lt;h2 id="bxdf"&gt;BxDF
+&lt;/h2&gt;&lt;p&gt;BxDF 一般而言是对BRDF、BTDF、BSDF、BSSRDF等几个双向分布函数的一个统一表示。
+其中，BSDF可以看作BRDF和BTDF更一般的形式，而且BSDF = BRDF + BTDF。
+BSSRDF和BRDF的不同之处在于，BSSRDF可以指定不同的光线入射位置和出射位置。
+BRDF最为简单，也最为常用。因为游戏和电影中的大多数物体都是不透明的，用BRDF就完全足够。而BSDF、BTDF、BSSRDF往往更多用于半透明材质和次表面散射材质。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/brdf-and-rendering-equation/bxdf.png"
+width="597"
+height="800"
+srcset="https://foth0626.github.io/article/brdf-and-rendering-equation/bxdf_hu_a1e107fbac0adc15.png 480w, https://foth0626.github.io/article/brdf-and-rendering-equation/bxdf_hu_687402be8e225da0.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="74"
+data-flex-basis="179px"
+&gt;&lt;/p&gt;
+&lt;h2 id="brdfbidirectional-reflectance-distribution-function"&gt;BRDF（Bidirectional Reflectance Distribution Function）
+&lt;/h2&gt;&lt;p&gt;&lt;a class="link" href="https://en.wikipedia.org/wiki/Bidirectional_reflectance_distribution_function" target="_blank" rel="noopener"
+&gt;Wikipedia&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;双向分布反射函数，$f_r(\omega_i,\omega_r)$ 是四个实变量的函数，用于定义光源的光如何从不透明表面反射。每个方向 $\omega$ 由天顶角和方位角确定，所以是四个参数的函数。BRDF描述了出射光方向的radiance和入射到表面的irradiance的比例。&lt;br&gt;
+值得一提的是，图形学中的BRDF通常来说应该是SVBRDF（Spatially Varying Bidirectional Reflectance Distribution Function）或者SBRDF（Spatially Bidirectional Reflectance Distribution Function），即 $f_r(\omega_i,\omega_r, x)$ ， $x$ 是物体表面的2D位置。&lt;/p&gt;
+&lt;p&gt;严格来说，同样使用 $\omega_i$ 和 $\omega_o$ 作为输入参数的Blinn-Phong 光照模型也被人认为一个BRDF模型，但是 Blinn-Phong 模型并没有遵循能量守恒定律，因此它不是基于物理的渲染。&lt;/p&gt;
+&lt;h3 id="基于物理的brdf"&gt;基于物理的BRDF
+&lt;/h3&gt;&lt;p&gt;基于物理的BRDF还有一些性质：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;BRDF的值总是大于等于零的&lt;/li&gt;
+&lt;li&gt;遵从亥姆霍兹光路可逆性（Helmholtz Recoprpcity Rule），即光路相反值不变。&lt;/li&gt;
+&lt;li&gt;能量守恒，对于所有的BRDF的在整个球面的积分总是小于1&lt;/li&gt;
+&lt;li&gt;线性特征，表面上某一点的全部反射辐射度可以简单地表示为各BRDF反射辐射度之和&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h1 id="cook-torrance-反射率方程"&gt;Cook-Torrance 反射率方程
+&lt;/h1&gt;&lt;p&gt;现在有好几种BRDF都能得出对于物体表面对于光的反应，但是几乎所有实时渲染管线都是使用的同一套模型： Cook-Torrance BRDF 模型。&lt;/p&gt;
+$$f_r = k_d f_{lambert} + k_s f_{cook-torrance}$$&lt;p&gt;Cook-Torrance BRDF 模型兼有漫反射和镜面反射两个部分， $k_d$ 就是入射光线中的折射部分占的比例，而 $k_s$ 是反射部分的比例。
+其中， $f_{lambert} = \frac{c}{\pi}$ ，表示的是表面颜色，除以 $\pi$ 是为了对漫反射进行归一化，因为BRDF的积分方程受 $\pi$ 影响。&lt;/p&gt;
+&lt;p&gt;目前存在着许多不同类型的模型来实现BRDF的漫反射部分，大多看上去都相当真实，但是相应的运算开销也非常的昂贵。不过按照Epic公司给出的结论，Lambertian漫反射模型已经足够应付大多数实时渲染的用途了。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/brdf-and-rendering-equation/diffuse_brdf.png"
+width="1268"
+height="743"
+srcset="https://foth0626.github.io/article/brdf-and-rendering-equation/diffuse_brdf_hu_ad4638f592150984.png 480w, https://foth0626.github.io/article/brdf-and-rendering-equation/diffuse_brdf_hu_ea3ab5b70d5e5949.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="170"
+data-flex-basis="409px"
+&gt;&lt;/p&gt;
+&lt;p&gt;而镜面反射 $f_{cook-torrance}$ 则更加高级一些，形式如下：&lt;/p&gt;
+$$f_{cook-torrance} = \frac {DFG}{4(\omega_o \cdotp n)(\omega_i \cdotp n)}$$&lt;p&gt;Cook-Torrance BRDF的镜面反射部分包含三个函数，此外分母部分还有一个标准化因子 。字母D，F与G分别代表着一种类型的函数，各个函数分别用来近似的计算出表面反射特性的一个特定部分。三个函数分别为法线分布函数(Normal &lt;strong&gt;D&lt;/strong&gt;istribution Function)，菲涅尔方程(&lt;strong&gt;F&lt;/strong&gt;resnel Rquation)和几何函数(&lt;strong&gt;G&lt;/strong&gt;eometry Function)：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;法线分布函数&lt;/strong&gt;：估算在受到表面粗糙度的影响下，朝向方向与半程向量一致的微平面的数量。这是用来估算微平面的主要函数。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;几何函数&lt;/strong&gt; ：描述了微平面自成阴影的属性。当一个平面相对比较粗糙的时候，平面表面上的微平面有可能挡住其他的微平面从而减少表面所反射的光线。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;菲涅尔方程&lt;/strong&gt;：菲涅尔方程描述的是在不同的表面角下表面所反射的光线所占的比率。
+&lt;img src="https://foth0626.github.io/article/brdf-and-rendering-equation/specular_brdf.png"
+width="1280"
+height="645"
+srcset="https://foth0626.github.io/article/brdf-and-rendering-equation/specular_brdf_hu_ff1019cd9ef6901c.png 480w, https://foth0626.github.io/article/brdf-and-rendering-equation/specular_brdf_hu_a7824f33e385b918.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="198"
+data-flex-basis="476px"
+&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="法线分布函数"&gt;法线分布函数
+&lt;/h2&gt;&lt;p&gt;法线分布函数D表明的是从统计学上近似的表示的与向量相同方向的微平面的比率。目前有很多NDF都可以从统计学上估算微平面的总体取向度，只要给定一些粗糙度的参数。我们在这里要用到的是Trowbridge-Reitz GGX:&lt;/p&gt;
+$$NDF_{GGXTR}(n,h,\alpha) = \frac{\alpha^2} {\pi((n \cdotp h)^2(\alpha^2 -1)+1)^2}$$&lt;p&gt;其中， $n$ 是表面法线， $h$ 是半程向量， $\alpha$ 是表面粗糙度。&lt;/p&gt;
+&lt;p&gt;我们可以得到如下结果&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/brdf-and-rendering-equation/ndf.png"
+width="800"
+height="163"
+srcset="https://foth0626.github.io/article/brdf-and-rendering-equation/ndf_hu_cc1b8a16e44612c4.png 480w, https://foth0626.github.io/article/brdf-and-rendering-equation/ndf_hu_5b218e0e2cb17a93.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="490"
+data-flex-basis="1177px"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/brdf-and-rendering-equation/ggx_and_phong.png"
+width="393"
+height="181"
+srcset="https://foth0626.github.io/article/brdf-and-rendering-equation/ggx_and_phong_hu_63dd7d87cfc93038.png 480w, https://foth0626.github.io/article/brdf-and-rendering-equation/ggx_and_phong_hu_e736ae6ea59a3ad8.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="217"
+data-flex-basis="521px"
+&gt;&lt;/p&gt;
+&lt;p&gt;当粗糙度很低（也就是说表面很光滑）的时候，与半程向量取向一致的微平面会高度集中在一个很小的半径范围内。由于这种集中性，NDF最终会生成一个非常明亮的斑点。但是当表面比较粗糙的时候，微平面的取向方向会更加的随机。你将会发现与_h_向量取向一致的微平面分布在一个大得多的半径范围内，但是同时较低的集中性也会让我们的最终效果显得更加灰暗。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-GLSL" data-lang="GLSL"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;float&lt;/span&gt; &lt;span class="n"&gt;D_GGX_TR&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;vec3&lt;/span&gt; &lt;span class="n"&gt;N&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="k"&gt;vec3&lt;/span&gt; &lt;span class="n"&gt;H&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="k"&gt;float&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;){&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;float&lt;/span&gt; &lt;span class="n"&gt;a2&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;float&lt;/span&gt; &lt;span class="n"&gt;NdotH&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;max&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;dot&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;N&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;H&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="mf"&gt;0.0&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;float&lt;/span&gt; &lt;span class="n"&gt;NdotH2&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;NdotH&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;NdotH&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;float&lt;/span&gt; &lt;span class="n"&gt;nom&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;a2&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;float&lt;/span&gt; &lt;span class="n"&gt;denom&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;NdotH2&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;a2&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="mf"&gt;1.0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="mf"&gt;1.0&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;denom&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;PI&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;denom&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;denom&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;nom&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="n"&gt;denom&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id="几何函数"&gt;几何函数
+&lt;/h2&gt;&lt;p&gt;几何函数从统计学上近似的求得了微平面之间互相遮蔽的比例，这种相互遮蔽会损耗光线的能量。与NDF类似，几何函数使用一个材料的粗糙度参数作为输入参数，粗糙度较高的表面的微平面相互遮蔽的概率就越高。&lt;/p&gt;
+&lt;p&gt;关于几何函数的详细论述，见&lt;a class="link" href="https://zhuanlan.zhihu.com/p/81708753" target="_blank" rel="noopener"
+&gt;毛星云PBR白皮书（5）：几何函数总结&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;我们使用的是GGX和 Schlick-Beckmann 近似的结合体，因此也称为 Schlick-GGX&lt;/p&gt;
+$$G_{SchlickGGX}（n,v,k）= \frac{n \cdotp v}{(n \cdotp v)(1-k)+k}$$&lt;p&gt;
+其中 ，$k_{direct} = \frac{(\alpha + 1)^2}{8}$ ，直接光照。 $k_{IBL} = \frac{\alpha^2}{2}$ ，屏幕空间光照。&lt;/p&gt;
+&lt;p&gt;为了有效的估算几何部分，需要将观察方向（几何遮蔽(Geometry Obstruction)）和光线方向向量（几何阴影(Geometry Shadowing)）都考虑进去。我们可以使用史密斯法(Smith’s method)来把两者都纳入其中：&lt;/p&gt;
+$$G(n,v,l,k)= G_{sub}(n,v,k)G_{sub}(n,l,k)$$&lt;p&gt;可以得到这样的效果。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/brdf-and-rendering-equation/geo_func.png"
+width="800"
+height="163"
+srcset="https://foth0626.github.io/article/brdf-and-rendering-equation/geo_func_hu_8b5f20756ed58318.png 480w, https://foth0626.github.io/article/brdf-and-rendering-equation/geo_func_hu_eef5bc85a681d74c.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="490"
+data-flex-basis="1177px"
+&gt;&lt;/p&gt;
+&lt;p&gt;几何函数是一个值域为[0.0, 1.0]的乘数，其中白色或者说1.0表示没有微平面阴影，而黑色或者说0.0则表示微平面彻底被遮蔽。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;span class="lnt"&gt;15
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-GLSL" data-lang="GLSL"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;float&lt;/span&gt; &lt;span class="n"&gt;GeometrySchlickGGX&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;float&lt;/span&gt; &lt;span class="n"&gt;NdotV&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="k"&gt;float&lt;/span&gt; &lt;span class="n"&gt;k&lt;/span&gt;&lt;span class="p"&gt;){&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;float&lt;/span&gt; &lt;span class="n"&gt;nom&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;NdotV&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;float&lt;/span&gt; &lt;span class="n"&gt;denom&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;NdotV&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mf"&gt;1.0&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;k&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;k&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;nom&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="n"&gt;denom&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;float&lt;/span&gt; &lt;span class="n"&gt;GeometrySmith&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;vec3&lt;/span&gt; &lt;span class="n"&gt;N&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="k"&gt;vec3&lt;/span&gt; &lt;span class="n"&gt;V&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="k"&gt;vec3&lt;/span&gt; &lt;span class="n"&gt;L&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="k"&gt;float&lt;/span&gt; &lt;span class="n"&gt;k&lt;/span&gt;&lt;span class="p"&gt;){&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;float&lt;/span&gt; &lt;span class="n"&gt;NdotV&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;max&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;dot&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;N&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;V&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="mf"&gt;0.0&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;float&lt;/span&gt; &lt;span class="n"&gt;NdotL&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;max&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;dot&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;N&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;L&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="mf"&gt;0.0&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;float&lt;/span&gt; &lt;span class="n"&gt;ggx1&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;GeometrySchlickGGX&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;NdotV&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;k&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;float&lt;/span&gt; &lt;span class="n"&gt;ggx2&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;GeometrySchlickGGX&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;NdotL&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;k&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;ggx1&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;ggx2&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id="菲涅尔方程"&gt;菲涅尔方程
+&lt;/h2&gt;&lt;p&gt;菲涅尔（发音为Freh-nel）方程描述的是被反射的光线对比光线被折射的部分所占的比率，这个比率会随着我们观察的角度不同而不同。当光线碰撞到一个表面的时候，菲涅尔方程会根据观察角度告诉我们被反射的光线所占的百分比。利用这个反射比率和能量守恒原则，我们可以直接得出光线被折射的部分以及光线剩余的能量。&lt;/p&gt;
+&lt;p&gt;当垂直观察的时候，任何物体或者材质表面都有一个基础反射率(Base Reflectivity)，但是如果以一定的角度往平面上看的时候所有反光都会变得明显起来。你可以自己尝试一下，用垂直的视角观察你自己的木制/金属桌面，此时一定只有最基本的反射性。但是如果你从近乎90度（译注：应该是指和法线的夹角）的角度观察的话反光就会变得明显的多。如果从理想的90度视角观察，所有的平面理论上来说都能完全的反射光线。这种现象因菲涅尔而闻名，并体现在了菲涅尔方程之中。&lt;/p&gt;
+&lt;p&gt;菲涅尔方程是一个相当复杂的方程式，它本质上是麦克斯韦方程组的一个特殊解。不过幸运的是菲涅尔方程可以用Fresnel-Schlick近似法求得近似解：&lt;/p&gt;
+$$F_{Schlick}(h,v,F_0) = F_0 + (1-F0)(1-(h \cdotp v))^5$$&lt;p&gt;$F_0$ 表示平面的基础反射率，它是利用所谓的折射指数（Indices of Refraction ,IOR）计算得出的。然后正如下图所示，我们朝这略射角的方向上看时，反光越来越强。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/brdf-and-rendering-equation/frenel.png"
+width="256"
+height="245"
+srcset="https://foth0626.github.io/article/brdf-and-rendering-equation/frenel_hu_28523981e05d455a.png 480w, https://foth0626.github.io/article/brdf-and-rendering-equation/frenel_hu_c6633b06c8f16399.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="104"
+data-flex-basis="250px"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/brdf-and-rendering-equation/frenel2.png"
+width="711"
+height="671"
+srcset="https://foth0626.github.io/article/brdf-and-rendering-equation/frenel2_hu_a17efa382fcceb00.png 480w, https://foth0626.github.io/article/brdf-and-rendering-equation/frenel2_hu_5535d9347bcd85a9.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="105"
+data-flex-basis="254px"
+&gt;&lt;/p&gt;
+&lt;p&gt;但是有一个问题：Fresnel-Schlick 近似仅仅是对非金属表面做了定义，对于金属表面，我们不能通过计算得出 $F_0$ 所以通常，我们会预计算出 $F_0$ 使用一张纹理存储。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/brdf-and-rendering-equation/f0.png"
+width="827"
+height="378"
+srcset="https://foth0626.github.io/article/brdf-and-rendering-equation/f0_hu_1e7ec8f906d432b3.png 480w, https://foth0626.github.io/article/brdf-and-rendering-equation/f0_hu_5258774fc44a64c4.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="218"
+data-flex-basis="525px"
+&gt;&lt;/p&gt;
+&lt;h2 id="完整公式"&gt;完整公式
+&lt;/h2&gt;$$L_o(p,\omega_o) = \int_\Omega (k_d \frac{c}{\pi}+k_s \frac{DFG}{4(\omega_o \cdotp n)(\omega_i\cdotp n)})L_i(p,\omega_i) n \cdotp \omega_{i} d \omega_i$$&lt;h1 id="迪士尼原则的bxdf"&gt;迪士尼原则的BxDF
+&lt;/h1&gt;&lt;p&gt;基于物理的渲染（Phyasically Based Rendering )技术，自从迪士尼在SIGGRAPH 2012上提出了著名的“迪士尼原则的BRDF（Disney Principled BRDF）后，由于高度的易用性和方便的的工作流，已经被电影和游戏业界广泛使用。&lt;/p&gt;
+&lt;p&gt;迪士尼动画工作室则是这次PBR革命的重要推动者。迪士尼的Brent Burley于SIGGRAPH 2012上进行了著名的talk《Physically-based shading at Disney》，提出了迪士尼原则的BRDF（Disney Principled BRDF）， 由于其高度的通用性，将材质复杂的物理属性，用非常直观的少量变量表达了出来（如金属度metallic和粗糙度roughness），在电影业界和游戏业界引起了不小的轰动。从此，基于物理的渲染正式进入大众的视野。&lt;/p&gt;
+&lt;h2 id="迪士尼原则的brdf"&gt;迪士尼原则的BRDF
+&lt;/h2&gt;&lt;p&gt;在2012年迪士尼原则的BRDF被提出之前，基于物理的渲染都需要大量复杂而不直观的参数，此时PBR的优势，并没有那么明显。在2012年迪士尼提出，他们的&lt;strong&gt;着色模型是艺术导向（Art Directable）的，而不一定要是完全物理正确（physically correct）的&lt;/strong&gt; ，并且对微平面BRDF的各项都进行了严谨的调查，并提出了清晰明确而简单的解决方案。&lt;/p&gt;
+&lt;p&gt;迪士尼原则的BRDF（Disney Principled BRDF）核心理念如下：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;应使用直观的参数，而不是物理类的晦涩参数。&lt;/li&gt;
+&lt;li&gt;参数应尽可能少。&lt;/li&gt;
+&lt;li&gt;参数在其合理范围内应该为0到1。&lt;/li&gt;
+&lt;li&gt;允许参数在有意义时超出正常的合理范围。&lt;/li&gt;
+&lt;li&gt;所有参数组合应尽可能健壮和合理。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;以上五条原则，很好地保证了迪士尼原则的BRDF的易用性。&lt;/p&gt;
+&lt;h3 id="disney-principled-brdf参数"&gt;Disney Principled BRDF参数
+&lt;/h3&gt;&lt;p&gt;以上述理念为基础，迪士尼动画工作室对每个参数的添加进行了把关，最终得到了一个颜色参数（baseColor）和下面描述的十个标量参数：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;baseColor（基础色）&lt;/strong&gt;：表面颜色，通常由纹理贴图提供。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;subsurface（次表面）&lt;/strong&gt;：使用次表面近似控制漫反射形状。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;metallic（金属度）&lt;/strong&gt;：金属（0 =电介质，1=金属）。这是两种不同模型之间的线性混合。金属模型没有漫反射成分，并且还具有等于基础色的着色入射镜面反射。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;specular（镜面反射强度）&lt;/strong&gt;：入射镜面反射量。用于取代折射率&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;specularTint（镜面反射颜色）&lt;/strong&gt;：对美术控制的让步，用于对基础色（base color）的入射镜面反射进行颜色控制。掠射镜面反射仍然是非彩色的。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;roughness（粗糙度）&lt;/strong&gt;：表面粗糙度，控制漫反射和镜面反射。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;anisotropic（各向异性强度）&lt;/strong&gt;：各向异性程度。用于控制镜面反射高光的纵横比。（0 =各向同性，1 =最大各向异性）&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;sheen（光泽度）&lt;/strong&gt;：一种额外的掠射分量（grazing component），主要用于布料。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;sheenTint（光泽颜色）&lt;/strong&gt;：对sheen（光泽度）的颜色控制。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;clearcoat（清漆强度）&lt;/strong&gt;：有特殊用途的第二个镜面波瓣（specular lobe）。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;clearcoatGloss（清漆光泽度）&lt;/strong&gt;：控制透明涂层光泽度，0 =“缎面（satin）”外观，1=“光泽（gloss）”外观。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;每个参数的效果的渲染示例如下图所示。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/brdf-and-rendering-equation/disney.png"
+width="1104"
+height="855"
+srcset="https://foth0626.github.io/article/brdf-and-rendering-equation/disney_hu_85dd03f401ac41e1.png 480w, https://foth0626.github.io/article/brdf-and-rendering-equation/disney_hu_42191f1b3ee26d7c.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="129"
+data-flex-basis="309px"
+&gt;&lt;/p&gt;
+&lt;h2 id="disney-principled-bsdf"&gt;Disney Principled BSDF
+&lt;/h2&gt;&lt;p&gt;随后的2015年，迪士尼动画工作室在Disney Principled BRDF的基础上进行了修订，提出了Disney Principled BSDF [Extending the Disney BRDF to a BSDF with Integrated Subsurface Scattering, 2015]。&lt;/p&gt;
+&lt;p&gt;以下是开源三维动画软件Blender实现的Disney Principled BSDF的图示：&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/brdf-and-rendering-equation/disney_bsdf.png"
+width="960"
+height="930"
+srcset="https://foth0626.github.io/article/brdf-and-rendering-equation/disney_bsdf_hu_f36bd6064b3c3772.png 480w, https://foth0626.github.io/article/brdf-and-rendering-equation/disney_bsdf_hu_c1eabbc00ef13179.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="103"
+data-flex-basis="247px"
+&gt;&lt;/p&gt;</description></item><item><title>计算机图形学与GPU架构简介</title><link>https://foth0626.github.io/article/introduction-to-graphics-and-gpu/</link><pubDate>Wed, 27 Nov 2024 11:01:19 +0800</pubDate><guid>https://foth0626.github.io/article/introduction-to-graphics-and-gpu/</guid><description>&lt;img src="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/ADA_Arttibutes.png" alt="Featured image of post 计算机图形学与GPU架构简介" /&gt;&lt;blockquote&gt;
+&lt;p&gt;本博客为SAST.Graphics组授课文档记录&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;hr&gt;
+&lt;p&gt;``&lt;/p&gt;
+&lt;h1 id="前言"&gt;前言
+&lt;/h1&gt;&lt;p&gt;本课程大量参考GAMES101、RTR4-CN、B站视频等资料，如有雷同，应该不是巧合。&lt;/p&gt;
+&lt;h2 id="我们的授课不包含这些"&gt;我们的授课不包含这些
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;3D建模软件/游戏引擎入门到精深&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/UE4_Editor.png"
+width="1280"
+height="769"
+srcset="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/UE4_Editor_hu_c54dd76501e4af41.png 480w, https://foth0626.github.io/article/introduction-to-graphics-and-gpu/UE4_Editor_hu_6eb5b8fb96b9589f.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="166"
+data-flex-basis="399px"
+&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;计算机视觉（Computer Vision）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/CG_CV.png"
+width="1280"
+height="436"
+srcset="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/CG_CV_hu_be08234c0b7b207e.png 480w, https://foth0626.github.io/article/introduction-to-graphics-and-gpu/CG_CV_hu_c533af6d7f7bbfe.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="293"
+data-flex-basis="704px"
+&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;深度学习（deep learning）&lt;br&gt;
+ml等人工智能领域使用显卡是因为显卡并行处理大型数据和计算矩阵的优势，和图形学没有任何关系！&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="我们的课程不需要一张独立显卡一台游戏本"&gt;我们的课程不需要一张独立显卡/一台游戏本！
+&lt;/h2&gt;&lt;p&gt;&lt;img src="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/Not4090.png"
+width="978"
+height="566"
+srcset="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/Not4090_hu_7d9323e4d126cfd6.png 480w, https://foth0626.github.io/article/introduction-to-graphics-and-gpu/Not4090_hu_240bc9604f6fde95.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="172"
+data-flex-basis="414px"
+&gt;&lt;/p&gt;
+&lt;p&gt;我们的教学聚焦于图形学原理，不需要高性能的显卡做算力支持。只需要你的电脑能够正常启动，那么基本可以肯定你的电脑足以进行编程和学习。&lt;/p&gt;
+&lt;h2 id="使用一个ide集成开发环境"&gt;使用一个IDE（集成开发环境）！
+&lt;/h2&gt;&lt;p&gt;我不想有人使用&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;txt文本阅读器/记事本&lt;/li&gt;
+&lt;li&gt;vi/vim/emacs&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/Txt.png"
+width="1194"
+height="625"
+srcset="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/Txt_hu_4b167319ec24d35.png 480w, https://foth0626.github.io/article/introduction-to-graphics-and-gpu/Txt_hu_2434b8910f733090.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="191"
+data-flex-basis="458px"
+&gt;&lt;/p&gt;
+&lt;p&gt;大哥你至少用个写代码的玩意。。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Dev C++&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;不能支持多文件编译的低能软件，界面还丑&lt;/p&gt;
+&lt;p&gt;界面过丑不予展示&lt;/p&gt;
+&lt;h3 id="个人推荐ide"&gt;个人推荐IDE
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;MSVC：大，全，重；可用，我只推荐windows平台用来做编译器&lt;/li&gt;
+&lt;li&gt;Visual Studio Code + CMake + MSVC&lt;/li&gt;
+&lt;li&gt;Jetbrains Clion一把梭
+关于C++，可以去校科协C++组学习。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="学习图形学能对我有什么帮助"&gt;学习图形学能对我有什么帮助？
+&lt;/h2&gt;&lt;h3 id="校招"&gt;校招
+&lt;/h3&gt;&lt;p&gt;&lt;img src="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/%E8%85%BE%E8%AE%AF%E6%A0%A1%E6%8B%9B.png"
+width="867"
+height="594"
+srcset="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/%E8%85%BE%E8%AE%AF%E6%A0%A1%E6%8B%9B_hu_52afdf886110ffdd.png 480w, https://foth0626.github.io/article/introduction-to-graphics-and-gpu/%E8%85%BE%E8%AE%AF%E6%A0%A1%E6%8B%9B_hu_f89db6a4f604de68.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="145"
+data-flex-basis="350px"
+&gt;&lt;/p&gt;
+&lt;p&gt;大部分游戏客户端都会把图形学作为加分项，近年更是在越来越卷的环境下又成为人手必备的技能的趋势。&lt;/p&gt;
+&lt;h3 id="考研"&gt;考研
+&lt;/h3&gt;&lt;p&gt;计算机图形学是计算机科学大类下的一个子学科。&lt;/p&gt;
+&lt;h1 id="计算机图形学简介"&gt;计算机图形学简介
+&lt;/h1&gt;&lt;p&gt;&lt;strong&gt;计算机图形学&lt;/strong&gt;是计算机科学的一个子领域，研究数字合成和操作视觉内容的方法。尽管该术语通常指三维计算机图形学的研究，但它也包含二维图形和图像处理。&lt;/p&gt;
+&lt;h2 id="图形学细分领域"&gt;图形学细分领域
+&lt;/h2&gt;&lt;h3 id="渲染render"&gt;渲染（Render）
+&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;渲染&lt;/strong&gt;或&lt;strong&gt;图像合成&lt;/strong&gt;是通过计算机程序从2D或3D 模型生成真实感或非真实感图像的过程。可以在包含严格定义的语言或数据结构的对象的_场景文件_中定义多个模型。场景文件包含描述虚拟场景的几何、视点、纹理、照明和着色信息。然后场景文件中包含的数据被传递到渲染程序进行处理并输出到数字图像或光栅图形图像文件。术语“渲染”类似于艺术家对场景的印象的概念。术语“渲染”也用于描述在视频编辑程序中计算效果以产生最终视频输出的过程。&lt;/p&gt;
+&lt;p&gt;渲染是3D 计算机图形学的&lt;strong&gt;主要子主题&lt;/strong&gt;之一，在实践中它总是与其他主题相关。这是图形管道中的最后一个主要步骤，为模型和动画提供最终外观。自 20 世纪 70 年代以来，随着计算机图形学的日益复杂，它已成为一门更加独特的学科。&lt;/p&gt;
+&lt;p&gt;渲染可用于建筑、视频游戏、模拟器、电影和电视视觉效果以及设计可视化，每种都采用不同的功能和技术平衡。有多种渲染器可供使用。有些集成到更大的建模和动画包中，有些是独立的，有些是免费的开源项目。从内部来看，渲染器是一个基于多个学科精心设计的程序，包括物理光学、视觉感知、数学和软件开发。&lt;/p&gt;
+&lt;h3 id="几何geometry"&gt;几何（Geometry）
+&lt;/h3&gt;&lt;p&gt;几何学的子领域研究在离散数字环境中三维物体的表示。由于对象的外观在很大程度上取决于其外部，因此边界表示法是最常用的。二维表面是大多数物体的良好表示，尽管它们可能是非流形的。由于曲面不是有限的，因此使用离散数字近似。多边形网格（以及较小程度上的细分曲面）是迄今为止最常见的表示，尽管基于点的表示最近变得更加流行（例如，参见基于点的图形研讨会）。最近，_欧拉_表面描述（即，其中空间样本是固定的），例如水平集，已经发展成用于使经历许多拓扑变化的表面变形的有用表示（流体是最显著的示例）。&lt;/p&gt;
+&lt;h3 id="动画仿真animation-and-simulation"&gt;动画仿真（Animation and Simulation）
+&lt;/h3&gt;&lt;p&gt;动画的子领域研究随着时间的推移移动或变形的表面（和其他现象）的描述。从历史上看，这一领域的大多数工作都集中在参数和数据驱动的模型上，但最近随着计算机在计算方面变得更加强大，物理模拟变得更加流行。&lt;/p&gt;
+&lt;p&gt;动画子领域包括：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;动作捕捉&lt;/li&gt;
+&lt;li&gt;角色动画&lt;/li&gt;
+&lt;li&gt;物理模拟（例如布料建模、流体动力学动画等）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="图形学应用领域"&gt;图形学应用领域
+&lt;/h2&gt;&lt;p&gt;(以下图片来自&lt;img src="https://www.bilibili.com/video/av90798049/?p=1"
+loading="lazy"
+alt="GAMES101"
+&gt;)&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/videogame.png"
+width="1280"
+height="957"
+srcset="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/videogame_hu_b81968ef1fa1f6e2.png 480w, https://foth0626.github.io/article/introduction-to-graphics-and-gpu/videogame_hu_8c4c517b242dd4f4.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="321px"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/videogame2.png"
+width="1280"
+height="957"
+srcset="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/videogame2_hu_23eaa91e542c03d9.png 480w, https://foth0626.github.io/article/introduction-to-graphics-and-gpu/videogame2_hu_b1d4e9b78a073be0.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="321px"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/movies.png"
+width="1280"
+height="878"
+srcset="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/movies_hu_531fd5b7adda0df6.png 480w, https://foth0626.github.io/article/introduction-to-graphics-and-gpu/movies_hu_1ae7e4fd13b45f0.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="145"
+data-flex-basis="349px"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/movies2.png"
+width="1280"
+height="880"
+srcset="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/movies2_hu_67ff109ef8c1a64b.png 480w, https://foth0626.github.io/article/introduction-to-graphics-and-gpu/movies2_hu_4d44fed6a353fec4.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="145"
+data-flex-basis="349px"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/animation.png"
+width="1280"
+height="816"
+srcset="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/animation_hu_1c82a06eed5dd694.png 480w, https://foth0626.github.io/article/introduction-to-graphics-and-gpu/animation_hu_d09cc67487b387df.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="156"
+data-flex-basis="376px"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/design.png"
+width="1280"
+height="708"
+srcset="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/design_hu_2e0ae0d83225cca6.png 480w, https://foth0626.github.io/article/introduction-to-graphics-and-gpu/design_hu_1c6fa005cdf0fa6f.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="180"
+data-flex-basis="433px"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/design2.png"
+width="1280"
+height="878"
+srcset="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/design2_hu_f60080f0f4844664.png 480w, https://foth0626.github.io/article/introduction-to-graphics-and-gpu/design2_hu_ff60ff4259a8b950.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="145"
+data-flex-basis="349px"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/visualization.png"
+width="1280"
+height="822"
+srcset="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/visualization_hu_776ab59997107b60.png 480w, https://foth0626.github.io/article/introduction-to-graphics-and-gpu/visualization_hu_99f21363995d703b.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="155"
+data-flex-basis="373px"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/vr.png"
+width="1280"
+height="894"
+srcset="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/vr_hu_5e245ce454b2870b.png 480w, https://foth0626.github.io/article/introduction-to-graphics-and-gpu/vr_hu_d0ba75c8435f94b.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="143"
+data-flex-basis="343px"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/ar.png"
+width="1280"
+height="893"
+srcset="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/ar_hu_d588806a1546e7a9.png 480w, https://foth0626.github.io/article/introduction-to-graphics-and-gpu/ar_hu_1e97bf5f6a60aebc.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="143"
+data-flex-basis="344px"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/digitalpicture.png"
+width="1280"
+height="894"
+srcset="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/digitalpicture_hu_b1be4b19b72ccb52.png 480w, https://foth0626.github.io/article/introduction-to-graphics-and-gpu/digitalpicture_hu_105c44feb36d181.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="143"
+data-flex-basis="343px"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/simulation.png"
+width="1280"
+height="682"
+srcset="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/simulation_hu_9636cdba1f1d4274.png 480w, https://foth0626.github.io/article/introduction-to-graphics-and-gpu/simulation_hu_e2434d7af6ac0d91.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="187"
+data-flex-basis="450px"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/gui.png"
+width="1280"
+height="772"
+srcset="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/gui_hu_dde043a8a7513549.png 480w, https://foth0626.github.io/article/introduction-to-graphics-and-gpu/gui_hu_96209ce3ac078520.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="165"
+data-flex-basis="397px"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/typography.png"
+width="1280"
+height="789"
+srcset="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/typography_hu_3970be37b812ea21.png 480w, https://foth0626.github.io/article/introduction-to-graphics-and-gpu/typography_hu_a91ee4f54a68b5dc.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="162"
+data-flex-basis="389px"
+&gt;&lt;/p&gt;
+&lt;h2 id="为什么学习图形学"&gt;为什么学习图形学？
+&lt;/h2&gt;&lt;h3 id="图形学学习中的困难"&gt;图形学学习中的困难
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;理解真实世界的物理规律并创造真实的虚拟世界&lt;/li&gt;
+&lt;li&gt;投影，曲线，表面的数学表示&lt;/li&gt;
+&lt;li&gt;光学和着色的物理学知识&lt;/li&gt;
+&lt;li&gt;表示/操作3D形体&lt;/li&gt;
+&lt;li&gt;动画/模拟&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/whystudy.png"
+width="1280"
+height="912"
+srcset="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/whystudy_hu_30c4c42e98e80e42.png 480w, https://foth0626.github.io/article/introduction-to-graphics-and-gpu/whystudy_hu_7dac4ca309dc1fe2.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="140"
+data-flex-basis="336px"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/raster.png"
+width="1280"
+height="898"
+srcset="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/raster_hu_fae92d77652c40cd.png 480w, https://foth0626.github.io/article/introduction-to-graphics-and-gpu/raster_hu_3d017468f3c15c99.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="142"
+data-flex-basis="342px"
+&gt;
+&lt;img src="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/curves.png"
+width="1280"
+height="909"
+srcset="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/curves_hu_578db361511eb2c0.png 480w, https://foth0626.github.io/article/introduction-to-graphics-and-gpu/curves_hu_5225f508002cd264.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="140"
+data-flex-basis="337px"
+&gt;
+&lt;img src="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/raytracing.png"
+width="1280"
+height="901"
+srcset="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/raytracing_hu_2911d892f9e487b0.png 480w, https://foth0626.github.io/article/introduction-to-graphics-and-gpu/raytracing_hu_6d4a165acbee5d71.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="142"
+data-flex-basis="340px"
+&gt;
+&lt;img src="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/animationandsimulation.png"
+width="1280"
+height="919"
+srcset="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/animationandsimulation_hu_a4e1fcea49573e2f.png 480w, https://foth0626.github.io/article/introduction-to-graphics-and-gpu/animationandsimulation_hu_c029a6a1865b671a.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="139"
+data-flex-basis="334px"
+&gt;&lt;/p&gt;
+&lt;h1 id="why-is-gpu"&gt;Why is GPU?
+&lt;/h1&gt;&lt;pre&gt;&lt;code&gt;“The display is the computer.” ——Jen-Hsun Huang
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id="计算机八大件"&gt;计算机八大件
+&lt;/h2&gt;&lt;p&gt;&lt;img src="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/apc.png"
+width="1280"
+height="960"
+srcset="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/apc_hu_555df23f8bce139a.png 480w, https://foth0626.github.io/article/introduction-to-graphics-and-gpu/apc_hu_d8dbd08812627802.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+&gt;&lt;/p&gt;
+&lt;p&gt;机箱、CPU、主板、内存、散热器、显卡、电源、硬盘&lt;/p&gt;
+&lt;p&gt;为什么显卡如此特殊，它和CPU一样，共同拥有作为处理器的崇高地位，却只负责一件事：图像处理？&lt;/p&gt;
+&lt;h4 id="可怕的计算量"&gt;可怕的计算量
+&lt;/h4&gt;&lt;p&gt;现代显示器最低分辨率为1920x1080，我们假设每秒渲染60张图像，那么结果是&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;1920 * 1080 * 60 = 124,416,000 次！&lt;/strong&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;如果说你的电脑配置比较好，显示器有4k分辨率（3840x2160），每秒渲染144张图像，那么结果是多少？&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;3840 * 2160 * 144 = 1,194,393,600 次！&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;不仅如此，我们只考虑了每个像素产生颜色的过程，如果是玩游戏，通常来说会有百万级别的三角面需要同时处理。&lt;/p&gt;
+&lt;p&gt;让宝贵的CPU花费大量性能去做这种体力活毫无疑问是非常低性价比和愚蠢的。所以工程师们很快想出了一个方法：我专门做个硬件去产生图像数据不就行了？&lt;/p&gt;
+&lt;h2 id="gpu简史"&gt;GPU简史
+&lt;/h2&gt;&lt;h3 id="初期1980s"&gt;初期（1980s）
+&lt;/h3&gt;&lt;p&gt;在计算机发展初期，计算机图形的显示是由CPU完成的，但是随着计算机图形需求的增长，尤其是游戏，2D图形领域的需求，最开始的图形加速硬件（图形加速器）被设计并制造出来，主要用于三角形的像素扫描线插值，并将其显示在显示器上。这时候的GPU只是一个搬运工，它只负责显示2D图像。此时它被称为图形加速器。&lt;/p&gt;
+&lt;h3 id="发展1990s"&gt;发展（1990s）
+&lt;/h3&gt;&lt;p&gt;1990年代，3D图形技术随着电子游戏和CAD的发展而发展，市面上出现了大量的3D加速卡，最著名的显卡便是3dfx的Voodoo系列。Voodoo系列卡通过独立的3D处理单元处理几何运算、纹理映射和光栅化，专门加速游戏中的3D图形。这个时期的经典游戏如《古墓丽影》、《雷神之锤》等大幅受益于Voodoo卡的加速。&lt;/p&gt;
+&lt;p&gt;图形API逐渐标准化，1992年推出的OpenGL和1995年微软推出了DirectX，给游戏开发者和软件厂商提供了一个统一的平台来开发3D图形应用程序。API的标准化推动了GPU的发展，因为它让硬件厂商能够专注于提高图形处理器的性能，而开发者则可以通过这些标准API与硬件进行交互。&lt;/p&gt;
+&lt;p&gt;1999年，划时代的芯片NVIDIA Geforce256 发布了，GPU这个术语被创造出来用以区分GeForce 256 和过去所有图形加速卡的区别。首次引入了硬件变换和光栅化（Transform and Lightling），将图形处理转移到GPU，提高了3D处理的速度。但此时的渲染过程仍然是固定的，开发者无法自由地实现自己的想要的功能。&lt;/p&gt;
+&lt;h3 id="可编程着色器2000s"&gt;可编程着色器（2000s）
+&lt;/h3&gt;&lt;p&gt;Vertex Shader 和 Fragment Shader正式出现，开发者可以通过程序自定义想要的效果。&lt;/p&gt;
+&lt;h3 id="后续2000s-至今"&gt;后续（2000s-至今）
+&lt;/h3&gt;&lt;p&gt;科研人员发现GPU能一口气处理这么多数据，相比CPU更适合做科研时产生的大量数据的处理，CUDA应运而生。一段时间后，人工智能蓬勃发展，GPU的并行处理能力被用来进行人工智能训练。AI的爆火又反过来促进显卡厂商加入Tensor（张量）单元进行ai训练。&lt;/p&gt;
+&lt;h2 id="gpu架构"&gt;GPU架构
+&lt;/h2&gt;&lt;p&gt;在GPU架构之前，我们先来看看CPU的基础架构。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/cpuarthi.png"
+width="266"
+height="210"
+srcset="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/cpuarthi_hu_37c6261927037bb7.png 480w, https://foth0626.github.io/article/introduction-to-graphics-and-gpu/cpuarthi_hu_5f32a58178adc34d.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="126"
+data-flex-basis="304px"
+&gt;&lt;/p&gt;
+&lt;p&gt;CPU 经过优化,可以处理大量的数据结构和大型代码段,CPU 一般都具有多个处理器,每个处理器都以串行的方式来执行代码,但是有限的 SIMD 向量处理是一个小例外。为了最小化延迟所带来的影响,CPU 芯片中的大部分面积都是高速的本地缓存,这些缓存中存满了接下来可能会用到的数据。CPU 还会使用一些智能技术来避免停滞,例如分支预测(branch predication)、指令重排序(instruction reordering)、寄存器重命名(register renaming)和缓存预取(prefetching)等。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/gpuarthi.png"
+width="255"
+height="218"
+srcset="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/gpuarthi_hu_d8a66030a9d7a168.png 480w, https://foth0626.github.io/article/introduction-to-graphics-and-gpu/gpuarthi_hu_4e3b186563cfe030.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="116"
+data-flex-basis="280px"
+&gt;&lt;/p&gt;
+&lt;p&gt;GPU则完全不同，GPU芯片中很大一片面积都是大量的处理器，这些相同的处理器通常有数千个，用来处理相似的数据。为了一次性处理大量的数据，GPU对吞吐量(throughput)做了专门的优化，吞吐量指的是数据能够被处理的最大速度。但是GPU用于控制和缓存的芯片较少，所以GPU的延迟普遍比CPU的延迟要大。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/ad102.png"
+width="1071"
+height="534"
+srcset="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/ad102_hu_af0d4ed04c3090bc.png 480w, https://foth0626.github.io/article/introduction-to-graphics-and-gpu/ad102_hu_1bcc8b2ff380a321.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="200"
+data-flex-basis="481px"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/gpc.png"
+width="1062"
+height="928"
+srcset="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/gpc_hu_75850272ce98316b.png 480w, https://foth0626.github.io/article/introduction-to-graphics-and-gpu/gpc_hu_8c06f369986dd90d.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="114"
+data-flex-basis="274px"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/sm.png"
+width="902"
+height="1280"
+srcset="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/sm_hu_234dbe9e0f056411.png 480w, https://foth0626.github.io/article/introduction-to-graphics-and-gpu/sm_hu_fb7f24c5320ff40e.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="70"
+data-flex-basis="169px"
+&gt;&lt;/p&gt;
+&lt;p&gt;以AD102为例，GPU芯片有12个GPC，每个GPC内有12个SM单元，每个SM单元有128CUDA核心。&lt;/p&gt;
+&lt;p&gt;所以AD102核心中有&lt;strong&gt;12 * 12 * 128=18432&lt;/strong&gt; 个CUDA单元，每个单元负载一个线程。32个CUDA核心组成了一个 &lt;strong&gt;warp&lt;/strong&gt; 。warp作为基本单元接受相同指令和不同的数据进行处理。这种架构叫做SIMD（Single Instruction Multiple Data）&lt;/p&gt;
+&lt;h1 id="other"&gt;Other
+&lt;/h1&gt;&lt;h2 id="推荐图书"&gt;推荐图书？
+&lt;/h2&gt;&lt;p&gt;&lt;img src="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/tigerbook.png"
+width="997"
+height="1280"
+srcset="https://foth0626.github.io/article/introduction-to-graphics-and-gpu/tigerbook_hu_75f5344b07b4bce8.png 480w, https://foth0626.github.io/article/introduction-to-graphics-and-gpu/tigerbook_hu_a53caaf53052c28d.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="77"
+data-flex-basis="186px"
+&gt;&lt;/p&gt;
+&lt;h2 id="自学路径"&gt;自学路径
+&lt;/h2&gt;&lt;p&gt;GAMES002、GAMES101、tinyrender、GAMES202……&lt;/p&gt;</description></item><item><title>PBR1：辐射度量学和色度学</title><link>https://foth0626.github.io/article/radiometry-and-colorimetry/</link><pubDate>Sun, 24 Nov 2024 10:47:33 +0800</pubDate><guid>https://foth0626.github.io/article/radiometry-and-colorimetry/</guid><description>&lt;img src="https://foth0626.github.io/article/radiometry-and-colorimetry/%E7%94%B5%E7%A3%81%E6%B3%A2%E8%B0%B1.png" alt="Featured image of post PBR1：辐射度量学和色度学" /&gt;&lt;p&gt;&lt;strong&gt;本文为Graphics组授课留档记录&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;“Unweave a ranibow ,as it erewhile made. The tender-person'd Lamia melt into shade.” ——John Keats
+“如刚才拆解彩虹那般，让光线娇嫩的Lamia黯然失色。” ——约翰 · 济慈
+&lt;/code&gt;&lt;/pre&gt;
+&lt;blockquote&gt;
+&lt;p&gt;参考资料&lt;br&gt;
+RTR4-CN第八章&lt;br&gt;
+&lt;a class="link" href="https://www.youtube.com/watch?v=gnUYoQ1pwes" target="_blank" rel="noopener"
+&gt;The Amazing Math behind Colors!&lt;/a&gt; &lt;br&gt;
+&lt;a class="link" href="https://www.bilibili.com/video/av308811244?t=1619" target="_blank" rel="noopener"
+&gt; 客观与认知——色度学与颜色感知【中科院科学公开课S03E09】&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;任何基于物理的渲染方法,其第一步都是以一种精确的方式,来对光进行量化(quantify)。在本小节中,我们首先会介绍辐射度量学(radiometry),因为它与光线的物理传输过程紧密相关。
+然后我们紧接着会讨论光度学(photometry),它会根据人眼的灵敏度,对光线值进行加权。&lt;/p&gt;
+&lt;h1 id="光"&gt;光
+&lt;/h1&gt;&lt;p&gt;在物理光学(physical optic)中,光被认为是一种电磁横波(electromagnetic transverse wave),它使得电场(electric field)和磁场(magnetic field)在其传播方向的垂直面上来回振荡。电场和磁场的振荡是耦合的,二者的矢量相互垂直,并且长度之比也是固定的.&lt;/p&gt;
+&lt;p&gt;光以电磁波的形式存在，光和电子的相互作用十分密切：原子的能级跃迁会吸收/释放 光子。在自然界中，电磁波的波长范围相当广，有波长不到百分之一纳米的伽马波，也有波长长达数万公里的极低频无线电波。可见光是整个电磁波谱的一小部分，是波长为380nm ~ 760 nm的电磁波。牛顿著名的三棱镜分光实验将白光分解为七个颜色（据说是因为牛顿对于音乐的喜爱所以按七个音阶对应成了七个颜色。）&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/radiometry-and-colorimetry/%E7%94%B5%E7%A3%81%E6%B3%A2%E8%B0%B1.png"
+width="863"
+height="409"
+srcset="https://foth0626.github.io/article/radiometry-and-colorimetry/%E7%94%B5%E7%A3%81%E6%B3%A2%E8%B0%B1_hu_be8b37fafe60951.png 480w, https://foth0626.github.io/article/radiometry-and-colorimetry/%E7%94%B5%E7%A3%81%E6%B3%A2%E8%B0%B1_hu_37bc4837c2ba941d.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="211"
+data-flex-basis="506px"
+&gt;&lt;/p&gt;
+&lt;h1 id="辐射度量学radiometry"&gt;辐射度量学（Radiometry）
+&lt;/h1&gt;&lt;p&gt;各个辐射量（radiometric quantity）的存在是为了对电磁辐射的各个方面进行测量和度量，例如：总能量、功率（随时间变化的能量）以及相对于面积、方向或者二者的功率密度等。&lt;/p&gt;
+&lt;h2 id="radiant-flux辐射通量"&gt;Radiant flux（辐射通量）
+&lt;/h2&gt;&lt;p&gt;在辐射度量学中，最基本的单位是辐射通量（radiant flux) $\phi$ ，辐射通量是指辐射能量随时间的流动变化，又叫做功率（power），其单位为瓦特(watts，W)。&lt;/p&gt;
+&lt;h2 id="irradiance辐照度"&gt;Irradiance（辐照度）
+&lt;/h2&gt;&lt;p&gt;辐照度（irradiance）是辐射通量相对于面积的密度，即 ( $d\phi/dA$ )。irradiance 是相对于一个面积来进行定义的，这个面积可能是空间中的一个假想区域，但是在渲染中一般都是物体的表面。irradiance 的单位是瓦特每平方米（$W/m^2$ ）。&lt;/p&gt;
+&lt;h2 id="radiant-intensity辐射强度"&gt;Radiant Intensity（辐射强度）
+&lt;/h2&gt;&lt;h3 id="立体角solid-angle"&gt;立体角（Solid Angle）
+&lt;/h3&gt;&lt;p&gt;在二维空间中，我们将角度定义为弧的长度与半径的比值，只需要 $2\pi$ 就可以表示整个单位圆的角度，在三维空间中，我们使用单位球来定义立体角，即立体角形成的一组方向与单位球所相交的面片的面积。立体弧度为 $4\pi$ 的立体角可以覆盖整个单位球。
+现在我们可以引入辐射强度(radiant intensity) $I$，即辐射通量相对于方向的密度，更准确地说，是相对于立体角的密度( $d\Phi/d\omega$ )。它的单位是瓦特每立体弧度（$W/sr$）。&lt;/p&gt;
+&lt;h2 id="radiance辐射度"&gt;Radiance(辐射度)
+&lt;/h2&gt;&lt;p&gt;最后，辐射度（radiance） L是对单条光线中电磁辐射的度量。更精确地说，它是辐射通量相对于面积和立体角的密度（ $d^2\Phi/dAd\omega$ ）。这里的面积位于垂直于光线的平面上，如果想要在其他方向上对表面施加辐射，则必须使用余弦因子进行校正。我们可能还会遇到一些其他对于 radiance 的定义，它们使用了术语“投影面积”来代表这个校正因子。&lt;br&gt;
+radiance 是传感器（例如眼睛或者相机）所直接测量的对象，因此它对渲染而言至关重要。计算着色方程的目的就是沿着给定的光线，计算从着色点到相机的radiance；沿着这条光线计算出来的结果 L，与第 5 章中的$c_{shaded}$ 在物理上是等价的。radiance的公制单位是瓦特每平方米每立体弧度（ $W/m^2sr$ ）。
+环境中的 radiance 可以被认为是五个变量（或者六个变量，将波长考虑在内）的函数，它被称为辐射分布（radiance distribution）；其中有三个变量指定了位置，另外两个变量指定了方向，这个分布函数描述了在空间中任何地方传播的任何光线。根据上面的描述，我们可以这样来理解渲染过程：将眼睛和屏幕定义为一个点和一组方向（例如从眼睛出发，穿过每个像素的光线），然后使用这个函数，在这组方向上对眼睛所在的位置进行评估。&lt;/p&gt;
+&lt;h1 id="光度学photometry"&gt;光度学（Photometry）
+&lt;/h1&gt;&lt;p&gt;辐射度量学仅仅对物理量进行了研究，它完全没有考虑人眼的感知。与此相关的一个领域被称为光度学（photometry），它与辐射度量学类似，不同之处在于，它会根据人眼的敏感度，对辐射度量学中的一切事物进行加权处理。通过乘以 CIE 光度曲线（CIE photometric curve），辐射度量学中的计算结果可以被转换为相应的光度单位。CIE 光度曲线是一条以 555 纳米为中心的钟形曲线，它代表了人眼对各种波长光线的响应程度。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/radiometry-and-colorimetry/CIE%E5%85%89%E5%BA%A6%E6%9B%B2%E7%BA%BF.png"
+width="660"
+height="294"
+srcset="https://foth0626.github.io/article/radiometry-and-colorimetry/CIE%E5%85%89%E5%BA%A6%E6%9B%B2%E7%BA%BF_hu_9d0147f42d688074.png 480w, https://foth0626.github.io/article/radiometry-and-colorimetry/CIE%E5%85%89%E5%BA%A6%E6%9B%B2%E7%BA%BF_hu_f963b032a9826bca.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="224"
+data-flex-basis="538px"
+&gt;&lt;/p&gt;
+&lt;p&gt;这个转换曲线与测量单位，是光度学理论和辐射度量学理论之间的唯一区别。每个辐射物理量都有一个对应的光度学物理量，下表给出了它们的名称和单位。这些光度学物理量的单位都有预期的对应关系（例如：lux 的单位是 lumen 每平方米）。虽然逻辑上来讲，lumen（流明）应该是个基本单位，但是在历史上，candela（坎德拉）则被定义为基本单位，而其他单位都是从坎德拉中派生出来的。在北美，照明设计师仍然会使用已被废弃的英制测量单位，而不是使用 lux（勒克斯），这个英制单位叫做英尺烛光（foot-candle，fc）。无论哪种情况，大多数测光仪都会对illuminance 进行测量，这个单位在照明工程（illumination engineering）中十分重要。&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Radiometry Quantity&lt;/th&gt;
+&lt;th&gt;Units&lt;/th&gt;
+&lt;th&gt;Photometric Quantity&lt;/th&gt;
+&lt;th&gt;Units&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;Radiant flux&lt;/td&gt;
+&lt;td&gt;watt (W)&lt;/td&gt;
+&lt;td&gt;Luminous flux&lt;/td&gt;
+&lt;td&gt;lumen (lm)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Irradiance&lt;/td&gt;
+&lt;td&gt;W/m^2&lt;/td&gt;
+&lt;td&gt;Illuminance&lt;/td&gt;
+&lt;td&gt;lux (lx)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Radiant intensity&lt;/td&gt;
+&lt;td&gt;W/sr&lt;/td&gt;
+&lt;td&gt;Luminous intensity&lt;/td&gt;
+&lt;td&gt;candela (cd)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Radiance&lt;/td&gt;
+&lt;td&gt;W/(m^2·sr)&lt;/td&gt;
+&lt;td&gt;Luminance&lt;/td&gt;
+&lt;td&gt;cd/m^2 (nit)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Luminance 通常用来描述平面的亮度。例如：高动态范围（high dynamic range，HDR）电视屏幕的峰值亮度通常在 500 到 1000 尼特（nit）之间。相比之下，晴朗天空的亮度大约为 8000 尼特，60 瓦的电灯泡约为 12 万尼特，地平线上的太阳约为60 万尼特。&lt;/p&gt;
+&lt;h1 id="色度学colorimetry"&gt;色度学（Colorimetry）
+&lt;/h1&gt;&lt;p&gt;真正关键的特性是波长，眼睛捕捉到波长通过向大脑发送信号，我们将其感知为颜色。因此色彩并非光的固有属性，而是一种心理现象，它与波长有关，本质上是间接的。所以色彩并不仅仅是不同波长的直接对应，因为还有眼镜将光转换成大脑可识别信号。&lt;/p&gt;
+&lt;h2 id="眼睛的结构"&gt;眼睛的结构
+&lt;/h2&gt;&lt;p&gt;&lt;img src="https://foth0626.github.io/article/radiometry-and-colorimetry/%E7%9C%BC%E7%9D%9B%E7%9A%84%E7%BB%93%E6%9E%841.png"
+width="1064"
+height="532"
+srcset="https://foth0626.github.io/article/radiometry-and-colorimetry/%E7%9C%BC%E7%9D%9B%E7%9A%84%E7%BB%93%E6%9E%841_hu_ab1ba76de3f01678.png 480w, https://foth0626.github.io/article/radiometry-and-colorimetry/%E7%9C%BC%E7%9D%9B%E7%9A%84%E7%BB%93%E6%9E%841_hu_38c73b46682b8751.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="200"
+data-flex-basis="480px"
+&gt;&lt;/p&gt;
+&lt;p&gt;外界物体经过折射后，成像到视网膜上。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/radiometry-and-colorimetry/%E7%9C%BC%E7%9D%9B%E7%9A%84%E7%BB%93%E6%9E%842.png"
+width="597"
+height="595"
+srcset="https://foth0626.github.io/article/radiometry-and-colorimetry/%E7%9C%BC%E7%9D%9B%E7%9A%84%E7%BB%93%E6%9E%842_hu_48eb58b0ec74d065.png 480w, https://foth0626.github.io/article/radiometry-and-colorimetry/%E7%9C%BC%E7%9D%9B%E7%9A%84%E7%BB%93%E6%9E%842_hu_ba319a6c1546ddb0.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="100"
+data-flex-basis="240px"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/radiometry-and-colorimetry/%E7%9C%BC%E7%9D%9B%E7%9A%84%E7%BB%93%E6%9E%843.png"
+width="600"
+height="600"
+srcset="https://foth0626.github.io/article/radiometry-and-colorimetry/%E7%9C%BC%E7%9D%9B%E7%9A%84%E7%BB%93%E6%9E%843_hu_a29e43f27e9f9ef6.png 480w, https://foth0626.github.io/article/radiometry-and-colorimetry/%E7%9C%BC%E7%9D%9B%E7%9A%84%E7%BB%93%E6%9E%843_hu_dda078bae4a9583c.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="100"
+data-flex-basis="240px"
+&gt;&lt;/p&gt;
+&lt;p&gt;人类的眼睛血管与神经在感光细胞之前，这是进化史上的遗留问题，为了减弱这种影响，中央的部分血管和神经更薄以减弱影响，就有了中央凹这种结构。盲点则是血管神经穿透眼球连接到大脑，导致该区域没有视觉细胞。
+黄斑区聚集了大量的视觉细胞，主要分为两种，分别是视锥细胞（Cones cells）和视杆细胞（Rod cells）。视锥细胞主要负责对颜色的感知，视杆细胞主要负责对亮度的感知。视锥细胞大约数量为600w，每种负责检测对应的波长。
+视锥细胞一共有三种，分别对短波长(400 ~ 550nm,响应曲线峰值在440nm），中等波长（400nm ~ 650nm，响应峰值在540nm），长波长（430nm ~ 700nm，响应峰值在570nm）敏感。
+&lt;img src="https://foth0626.github.io/article/radiometry-and-colorimetry/%E8%A7%86%E8%A7%89%E7%BB%86%E8%83%9E%E5%93%8D%E5%BA%94%E6%9B%B2%E7%BA%BF.png"
+width="1280"
+height="717"
+srcset="https://foth0626.github.io/article/radiometry-and-colorimetry/%E8%A7%86%E8%A7%89%E7%BB%86%E8%83%9E%E5%93%8D%E5%BA%94%E6%9B%B2%E7%BA%BF_hu_ad6b4b2ba99f6436.png 480w, https://foth0626.github.io/article/radiometry-and-colorimetry/%E8%A7%86%E8%A7%89%E7%BB%86%E8%83%9E%E5%93%8D%E5%BA%94%E6%9B%B2%E7%BA%BF_hu_33c401fc01249494.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="178"
+data-flex-basis="428px"
+&gt;&lt;/p&gt;
+&lt;p&gt;把三个视锥细胞的响应曲线绘画出来，大约长这个样子，值得注意的是短波长的绝对响应曲线峰值强度远远低于其他两条响应曲线的峰值强度。因此常会把这些曲线归一化。&lt;/p&gt;
+&lt;p&gt;人眼会把短波长，中等波长，长波长的光线识别为蓝色，绿色，红色。这有一些道理，但不准确，长波响应视锥细胞被完全激活时（570nm）时，其实仍然处于绿色范围内。所以根据波长划分才更准确。
+&lt;img src="https://foth0626.github.io/article/radiometry-and-colorimetry/%E9%A2%9C%E8%89%B2%E4%B8%8E%E7%9B%B8%E5%BA%94%E6%9B%B2%E7%BA%BF.png"
+width="1280"
+height="811"
+srcset="https://foth0626.github.io/article/radiometry-and-colorimetry/%E9%A2%9C%E8%89%B2%E4%B8%8E%E7%9B%B8%E5%BA%94%E6%9B%B2%E7%BA%BF_hu_77e1e9f44d43dcb6.png 480w, https://foth0626.github.io/article/radiometry-and-colorimetry/%E9%A2%9C%E8%89%B2%E4%B8%8E%E7%9B%B8%E5%BA%94%E6%9B%B2%E7%BA%BF_hu_2a9d646dd4cfbc52.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="157"
+data-flex-basis="378px"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/radiometry-and-colorimetry/%E9%A2%9C%E8%89%B2%E4%B8%8E%E5%93%8D%E5%BA%94%E5%80%BC.png"
+width="1280"
+height="684"
+srcset="https://foth0626.github.io/article/radiometry-and-colorimetry/%E9%A2%9C%E8%89%B2%E4%B8%8E%E5%93%8D%E5%BA%94%E5%80%BC_hu_a8d47493cbdba517.png 480w, https://foth0626.github.io/article/radiometry-and-colorimetry/%E9%A2%9C%E8%89%B2%E4%B8%8E%E5%93%8D%E5%BA%94%E5%80%BC_hu_f87bb9ec1d79fc1a.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="187"
+data-flex-basis="449px"
+&gt;&lt;/p&gt;
+&lt;h1 id="色彩空间"&gt;色彩空间
+&lt;/h1&gt;&lt;p&gt;由于人类只有三种颜色感受器，所以只用三个数字就可以精确的表示任何颜色。但是如何确定颜色之间的对应关系呢？CIE（Commission Internationale d&amp;rsquo;Eclairag）提出了一套标准，并根据标准进行了配色实验。
+当时使用汞灯，汞的原子光谱中的700nm,546nm,436nm可以做的比较纯，然后将三个颜色叠加，再另一侧使用分光计或这光栅等设备得到连续的颜色。通过调节三种颜色的权重获得相同的颜色。就得到了颜色匹配函数（color-matching function)。
+&lt;img src="https://foth0626.github.io/article/radiometry-and-colorimetry/%E9%A2%9C%E8%89%B2%E5%8C%B9%E9%85%8D%E5%87%BD%E6%95%B0.png"
+width="488"
+height="310"
+srcset="https://foth0626.github.io/article/radiometry-and-colorimetry/%E9%A2%9C%E8%89%B2%E5%8C%B9%E9%85%8D%E5%87%BD%E6%95%B0_hu_e6408e370da31ecc.png 480w, https://foth0626.github.io/article/radiometry-and-colorimetry/%E9%A2%9C%E8%89%B2%E5%8C%B9%E9%85%8D%E5%87%BD%E6%95%B0_hu_f7975c454c107eb4.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="157"
+data-flex-basis="377px"
+&gt;&lt;br&gt;
+有一段曲线的值是负的，这意味我们无法通过混合三色光得到这种颜色，而是需要把对应的光源添加到待测颜色的色块中才能使人眼的感知相同。&lt;/p&gt;
+&lt;p&gt;如果把所有波长对应的光显示出来，我们不难发现一些问题：许多颜色有缺失，比如粉色，品红，棕色，米黄？最重要的是：白色和黑色？
+&lt;img src="https://foth0626.github.io/article/radiometry-and-colorimetry/%E6%B3%A2%E9%95%BF%E5%92%8C%E9%A2%9C%E8%89%B2.png"
+width="1280"
+height="526"
+srcset="https://foth0626.github.io/article/radiometry-and-colorimetry/%E6%B3%A2%E9%95%BF%E5%92%8C%E9%A2%9C%E8%89%B2_hu_ea8522e713f1817b.png 480w, https://foth0626.github.io/article/radiometry-and-colorimetry/%E6%B3%A2%E9%95%BF%E5%92%8C%E9%A2%9C%E8%89%B2_hu_1459aa20ce4eb1f9.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="243"
+data-flex-basis="584px"
+&gt;&lt;/p&gt;
+&lt;p&gt;黑色是无光环境下的颜色，除此之外，亮度也是一个需要考虑的问题：眼睛的视锥细胞数量大约有600w，在低亮度的情况下，不可能所有的视锥细胞都能被激活。只有部分视锥细胞被激活的情况下，大脑会把黑色和原色进行混合，形成变体。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/radiometry-and-colorimetry/%E9%A2%9C%E8%89%B2%E4%B8%8E%E4%BA%AE%E5%BA%A6.png"
+width="1280"
+height="698"
+srcset="https://foth0626.github.io/article/radiometry-and-colorimetry/%E9%A2%9C%E8%89%B2%E4%B8%8E%E4%BA%AE%E5%BA%A6_hu_c4957495627c3a3c.png 480w, https://foth0626.github.io/article/radiometry-and-colorimetry/%E9%A2%9C%E8%89%B2%E4%B8%8E%E4%BA%AE%E5%BA%A6_hu_2a1624321389598d.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="183"
+data-flex-basis="440px"
+&gt;&lt;/p&gt;
+&lt;p&gt;而对于橙色，黄色这种鲜亮的颜色，当变暗后与原来的颜色差别过于明显，我们把它们视为新颜色，
+&lt;img src="https://foth0626.github.io/article/radiometry-and-colorimetry/%E6%B3%A2%E9%95%BF%E5%92%8C%E9%A2%9C%E8%89%B22.png"
+width="1280"
+height="775"
+srcset="https://foth0626.github.io/article/radiometry-and-colorimetry/%E6%B3%A2%E9%95%BF%E5%92%8C%E9%A2%9C%E8%89%B22_hu_5a15e1a589d4bdc2.png 480w, https://foth0626.github.io/article/radiometry-and-colorimetry/%E6%B3%A2%E9%95%BF%E5%92%8C%E9%A2%9C%E8%89%B22_hu_c2251644d8e88d20.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="165"
+data-flex-basis="396px"
+&gt;&lt;/p&gt;
+&lt;p&gt;使用亮度和波长，即可表现出一个二维的色彩空间。
+&lt;img src="https://foth0626.github.io/article/radiometry-and-colorimetry/%E6%B3%A2%E9%95%BF%E4%B8%8E%E4%BA%AE%E5%BA%A6%E4%BA%8C%E7%BB%B4%E8%89%B2%E5%BD%A9.png"
+width="1280"
+height="708"
+srcset="https://foth0626.github.io/article/radiometry-and-colorimetry/%E6%B3%A2%E9%95%BF%E4%B8%8E%E4%BA%AE%E5%BA%A6%E4%BA%8C%E7%BB%B4%E8%89%B2%E5%BD%A9_hu_f80a752a53cad098.png 480w, https://foth0626.github.io/article/radiometry-and-colorimetry/%E6%B3%A2%E9%95%BF%E4%B8%8E%E4%BA%AE%E5%BA%A6%E4%BA%8C%E7%BB%B4%E8%89%B2%E5%BD%A9_hu_acf221b6bafe9a10.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="180"
+data-flex-basis="433px"
+&gt;&lt;/p&gt;
+&lt;p&gt;现在有一些之前遗漏的颜色可以找到了，但是仍然有很多颜色没有找到：比如品红，粉色。为了解决这个问题，我们需要引入色彩空间的概念，我们把短波长，中波长，长波长作为坐标系的三个轴，然后我们就可以在空间中得到这样一条曲线：&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/radiometry-and-colorimetry/%E8%89%B2%E5%BD%A9%E7%A9%BA%E9%97%B4%E4%B8%AD%E7%9A%84%E5%93%8D%E5%BA%94%E6%9B%B2%E7%BA%BF.png"
+width="1280"
+height="703"
+srcset="https://foth0626.github.io/article/radiometry-and-colorimetry/%E8%89%B2%E5%BD%A9%E7%A9%BA%E9%97%B4%E4%B8%AD%E7%9A%84%E5%93%8D%E5%BA%94%E6%9B%B2%E7%BA%BF_hu_988c5ce361e72c4e.png 480w, https://foth0626.github.io/article/radiometry-and-colorimetry/%E8%89%B2%E5%BD%A9%E7%A9%BA%E9%97%B4%E4%B8%AD%E7%9A%84%E5%93%8D%E5%BA%94%E6%9B%B2%E7%BA%BF_hu_988f140561dc350e.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="182"
+data-flex-basis="436px"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/radiometry-and-colorimetry/%E7%BC%BA%E5%A4%B1%E7%9A%84%E9%A2%9C%E8%89%B2.png"
+width="1280"
+height="907"
+srcset="https://foth0626.github.io/article/radiometry-and-colorimetry/%E7%BC%BA%E5%A4%B1%E7%9A%84%E9%A2%9C%E8%89%B2_hu_5218dd467d303c68.png 480w, https://foth0626.github.io/article/radiometry-and-colorimetry/%E7%BC%BA%E5%A4%B1%E7%9A%84%E9%A2%9C%E8%89%B2_hu_38b1652f9eb8be6a.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="141"
+data-flex-basis="338px"
+&gt;&lt;/p&gt;
+&lt;p&gt;通过对不同的光线进行混合，就可以在现实中得到这些颜色。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/radiometry-and-colorimetry/LMS%E5%92%8CCIE%E8%89%B2%E5%BD%A9%E7%A9%BA%E9%97%B4.png"
+width="1280"
+height="738"
+srcset="https://foth0626.github.io/article/radiometry-and-colorimetry/LMS%E5%92%8CCIE%E8%89%B2%E5%BD%A9%E7%A9%BA%E9%97%B4_hu_17d4828a0ff76ef8.png 480w, https://foth0626.github.io/article/radiometry-and-colorimetry/LMS%E5%92%8CCIE%E8%89%B2%E5%BD%A9%E7%A9%BA%E9%97%B4_hu_a6ced1e8ae86419f.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="173"
+data-flex-basis="416px"
+&gt;&lt;/p&gt;
+&lt;p&gt;刚才讲的色彩空间叫做LMS空间，它对于响应曲线是归一化的，如果我们把真正响应曲线进行加权，那么便会得到CIE色彩空间。&lt;/p&gt;
+&lt;p&gt;好的，但是这个空间是三维的，如果我想总览所有颜色，就会不太方便。回想之前的内容，降低颜色的亮度会逐渐变成黑色，但是颜色本身的色调是没有改变的，我们把同一色调但是不同亮度的颜色可以在这个空间坐标中连成一条线，这条线被称为色度线，色度线与平面 $x+y+z=1$ 的交点，就可以认为是这个点在平面上的位置。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/radiometry-and-colorimetry/CIE%E8%89%B2%E5%BA%A6%E5%9B%BE.png"
+width="1280"
+height="947"
+srcset="https://foth0626.github.io/article/radiometry-and-colorimetry/CIE%E8%89%B2%E5%BA%A6%E5%9B%BE_hu_6d1d2fb468e5d779.png 480w, https://foth0626.github.io/article/radiometry-and-colorimetry/CIE%E8%89%B2%E5%BA%A6%E5%9B%BE_hu_4aa117e72c43c09e.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="135"
+data-flex-basis="324px"
+&gt;&lt;/p&gt;</description></item><item><title>RTR4-CN 第六章 纹理（Texture）</title><link>https://foth0626.github.io/article/rtr4-chapter06-texture/</link><pubDate>Tue, 12 Nov 2024 20:51:56 +0800</pubDate><guid>https://foth0626.github.io/article/rtr4-chapter06-texture/</guid><description>&lt;img src="https://foth0626.github.io/article/rtr4-chapter06-texture/%E7%BA%B9%E7%90%86%E7%AE%A1%E7%BA%BF.png" alt="Featured image of post RTR4-CN 第六章 纹理（Texture）" /&gt;&lt;p&gt;&lt;strong&gt;本文为Graphics组授课留档&lt;/strong&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&amp;ldquo;All it takes is for the rendered image to look right.&amp;rdquo; ——Jim Blinn&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;blockquote&gt;
+&lt;p&gt;本节课参考资料：RTR4-CN 第六章&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;表面纹理(texture)是指其外观和给人的视觉感受,就像是一幅油画的图案一样。
+而在计算机图形学中,纹理化则指的是一个过程,即通过使用一些图像、函数或者其他数据,来对每个表面位置的外观表现进行修改。例如:我们可以将一张砖墙的彩色图像应用于由两个三角形组成的矩形上,而不是去精确表现砖墙的几何结构。当我们观察这个砖墙矩形的时候,对应的彩色图像将会显示在这个矩形所在的位置上,这样可以使得这个矩形看起来很像真实的砖墙。除非相机十分靠近墙壁的话,否则砖墙几何细节的缺乏并不会带来明显的视觉瑕疵。&lt;/p&gt;
+&lt;h1 id="纹理管线"&gt;纹理管线
+&lt;/h1&gt;&lt;p&gt;纹理化（texturing）是一种用于描述表面材质以及对表面进行修饰加工的有效技术。纹理的工作原理是通过修改着色方程的中的参数，对最终结果产生影响。比如说，对于刚才的那个例子，通过替换点的位置，将顶点颜色为纹理颜色。或者粗糙度纹理修改了表面的粗糙度值，凹凸纹理修改了表面着色法线的方向。&lt;/p&gt;
+&lt;p&gt;为了与屏幕上的像素（pixel）有所区别，纹理上的像素通常被称为纹素（texel）。&lt;/p&gt;
+&lt;p&gt;纹理化的起点是一个空间中的具体位置，这个位置可以在世界空间中，但是通常是基于模型空间参考系的，因为纹理会随着模型移动而移动。这个空间点会使用一个投影函数（projection function）获得一组数字，它被称为纹理坐标，纹理坐标可以用于访问采样纹理，这个过程称为纹理映射。&lt;/p&gt;
+&lt;p&gt;在使用纹理坐标访问纹理之前，还需要使用一个或多个转换函数（corresponder funcion)，来将纹理坐标转换到纹理空间中，用来在纹理中获取像素值。例如：纹理空间位置是图像纹理的数组索引，从而检索到对应的位置的值。检索到的像素值可能还要使用一个值转换函数（value transform function)进行转换，最终这些新值会用于对表面的某些属性进行修改。值得注意的是，并不是每次纹理应用都需要激活管线中的所有步骤。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/rtr4-chapter06-texture/%E7%BA%B9%E7%90%86%E7%AE%A1%E7%BA%BF.png"
+width="1064"
+height="267"
+srcset="https://foth0626.github.io/article/rtr4-chapter06-texture/%E7%BA%B9%E7%90%86%E7%AE%A1%E7%BA%BF_hu_fba74e2d9a4faf8a.png 480w, https://foth0626.github.io/article/rtr4-chapter06-texture/%E7%BA%B9%E7%90%86%E7%AE%A1%E7%BA%BF_hu_3b3763439dfc4308.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="398"
+data-flex-basis="956px"
+&gt;&lt;/p&gt;
+&lt;p&gt;例如:对于一个具有砖墙纹理的三角形,我们在其表面上进行采样时会发生如下情况(112如图 6.3 所示):首先我们会在该物体的局部参考系中,找到对应的采样位置(x, y, z),这里假设它是 (−2.3, 7.1, 88.2)。然后会对这个位置坐标应用一个投影函数,就像世界地图是三维地球的二维投影那样,这里的投影函数通常会将一个三维向量 (x, y, z)转换为一个二维向量 (u, v)。本例中所使用的投影函数,实际上与正交投影是等价的(章节 2.3.1),它就像幻灯片放映机一样,将砖墙图像投影到三角形表面上;并且为了最后能将图象值返回到墙面上,其表面上的点都会被转换为一个0-1 范围内的数值对,这里我们假设转换后的值是 (0.32, 0.29),这个数值对也被称为纹理坐标或者 UV 坐标。这个纹理坐标将用于查找纹理贴图在此位置上的颜色值。假设这里我们所使用的砖墙纹理分辨率为 256 × 256,因此使用转换函数,将纹理坐标 (u, v)各自乘以 256,即 (81.92, 74.24)。在丢弃小数部分之后,我们在砖墙图像中进行检索,找到索引值为 (81, 74)的颜色值,这里假设这个颜色值为(0.9, 0.8, 0.7)。同时,我们所使用的纹理颜色位于 sRGB 颜色空间中,因此如果要在着色方程中使用这个颜色值,还需要将其转换到线性空间中,即(0.787、0.604、0.448)。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/rtr4-chapter06-texture/%E7%BA%B9%E7%90%86%E7%AE%A1%E7%BA%BF%E7%A4%BA%E4%BE%8B.png"
+width="1002"
+height="449"
+srcset="https://foth0626.github.io/article/rtr4-chapter06-texture/%E7%BA%B9%E7%90%86%E7%AE%A1%E7%BA%BF%E7%A4%BA%E4%BE%8B_hu_ddcf65d816479f96.png 480w, https://foth0626.github.io/article/rtr4-chapter06-texture/%E7%BA%B9%E7%90%86%E7%AE%A1%E7%BA%BF%E7%A4%BA%E4%BE%8B_hu_9d54a9481a9314d3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="223"
+data-flex-basis="535px"
+&gt;&lt;/p&gt;
+&lt;h2 id="投影函数projection-function"&gt;投影函数（Projection function）
+&lt;/h2&gt;&lt;p&gt;纹理处理的第一步是获取表面的位置，并将其投影到纹理坐标空间（texture coordinate space）中，这个纹理坐标空间中通常是二维（u,v)的，常见的建模软件允许艺术家定义每个顶点的uv坐标，这些坐标可以从投影函数或者网格展开算法中进行初始化，艺术家也可以编辑uv坐标。&lt;/p&gt;
+&lt;p&gt;投影函数的作用通常是将空间中的三维坐标转换为二维纹理坐标，在建模软件中常见的投影包括球面投影，柱面投影，平面投影等。还有一些投影函数根本不是投影操作，而是隐含在表面创建和曲面细分中。例如，参数化生成的曲面定义本身就包含了一组天生的uv坐标。投影函数的最终目标只是生成纹理坐标，将其作为一个与位置有关的函数来进行推导只是一种方法。有时候单个投影函数就可以用于整个模型的投影操作，但是艺术家通常一些工具将模型进行细分，并单独应用不同的投影函数。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/rtr4-chapter06-texture/%E6%8A%95%E5%BD%B1%E5%87%BD%E6%95%B01.png"
+width="1169"
+height="701"
+srcset="https://foth0626.github.io/article/rtr4-chapter06-texture/%E6%8A%95%E5%BD%B1%E5%87%BD%E6%95%B01_hu_38d9e8f58c11b38f.png 480w, https://foth0626.github.io/article/rtr4-chapter06-texture/%E6%8A%95%E5%BD%B1%E5%87%BD%E6%95%B01_hu_e55a93735c8f7388.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="166"
+data-flex-basis="400px"
+&gt;&lt;/p&gt;
+&lt;p&gt;在实时渲染领域，通常在建模时就会使用投影函数，将结果存储在顶点上。但是并不是总是如此，有时在顶点着色器或者像素着色器中应用投影函数会带来一些好处，比如提高精度，有助于实现动画在内的各种效果。有时候一些渲染方法有着独特的投影函数，会进行逐像素的计算，比如环境映射。与投影方向相近的表面会产生严重的扭曲，所以艺术家经常需要手动将模型分解为小块（即建模过程中的展uv）。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/rtr4-chapter06-texture/%E6%8A%95%E5%BD%B1%E5%87%BD%E6%95%B02.png"
+width="1101"
+height="694"
+srcset="https://foth0626.github.io/article/rtr4-chapter06-texture/%E6%8A%95%E5%BD%B1%E5%87%BD%E6%95%B02_hu_4517753a2bebc79f.png 480w, https://foth0626.github.io/article/rtr4-chapter06-texture/%E6%8A%95%E5%BD%B1%E5%87%BD%E6%95%B02_hu_6c25725c18b9d52e.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="158"
+data-flex-basis="380px"
+&gt;&lt;/p&gt;
+&lt;p&gt;纹理坐标空间并不总是一个二维平面，有时候也可以是一个三维体积，这时纹理坐标有三个分量（u，v，w）。部分情况甚至会用四个坐标（即齐次坐标描述）（s，t，r，q）。&lt;/p&gt;
+&lt;p&gt;还有一种重要的纹理坐标空间是方向性的，纹理空间的每个点都通过输入方向来访问。每个点位置上的法线代表了访问该纹理的输入方向。使用这种方向性的纹理最常见的纹理类型就是立方体贴图（cube map）。&lt;/p&gt;
+&lt;p&gt;值得注意的是，一维的纹理也有各自的用途。例如：对于一个地形模型而言，颜色可以由高度决定。或者作为一个一维查找表。&lt;/p&gt;
+&lt;h2 id="转换函数corresponder-function"&gt;转换函数（Corresponder function）
+&lt;/h2&gt;&lt;p&gt;转换函数用于将纹理坐标转换为纹理空间的具体位置，它们提高了在表面上应用纹理的灵活性。其中一个例子是：使用API选择现有纹理的一部分来显示，并且在后续的操作都只会使用这个子图像。&lt;br&gt;
+另一类转换函数则是矩阵变换，应用于顶点着色器或片元着色器中，他们允许对表面上的纹理进行平移、旋转、缩放、剪切或者投影操作。&lt;br&gt;
+另一类转换控制图像的应用方式。纹理坐标uv只有在（0，1）这个范围才是有意义的的。但是如果纹理坐标位于范围之外时，它应该如何取值呢？转换函数决定了会发生什么。在OpenGL中，这种类型的转换函数被称为包装模式（wrapping mode），在DirectX中被称为纹理寻址模式（texture addressing mode）。&lt;br&gt;
+常见的转换函数包括如下类型：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;wrap（directX），repeat（OpenGL）或者tile：图像表面会不断重复。&lt;/li&gt;
+&lt;li&gt;mirror：图像会不断重复，但是每重复一次就会被镜像翻转一次。&lt;/li&gt;
+&lt;li&gt;clamp（directX）或者clamp to edge（opengl）：位于（0，1）范围之外的纹理坐标会被限制在这个范围内。这种模式会导致图像边缘的不断重复，优点在于在纹理附近发生双线性插值时，可以避免从纹理的相反边缘进行采样。&lt;/li&gt;
+&lt;li&gt;border（directX）或者clamp to border（OpenGL）：位于（0，1）范围之外的纹理坐标会被映射成同一个值。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/rtr4-chapter06-texture/%E5%8C%85%E5%9B%B4%E6%A8%A1%E5%BC%8F.png"
+width="1276"
+height="576"
+srcset="https://foth0626.github.io/article/rtr4-chapter06-texture/%E5%8C%85%E5%9B%B4%E6%A8%A1%E5%BC%8F_hu_1befc5a7e2250433.png 480w, https://foth0626.github.io/article/rtr4-chapter06-texture/%E5%8C%85%E5%9B%B4%E6%A8%A1%E5%BC%8F_hu_8c8767d03356321d.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="221"
+data-flex-basis="531px"
+&gt;&lt;/p&gt;
+&lt;p&gt;纹理的重复平铺是一种为场景添加更多视觉细节的廉价方法。但是人眼能识别出这种不自然的重复。一个常见的解决方法与另一个非重复平铺的的纹理结合。另一个方法是，使用着色器实现一些特殊的转换函数，从而将纹理图案和瓦片贴图进行随机重组。&lt;br&gt;
+最后一种被应用的转换函数是隐式的，并且与图像的大小有关。纹理通常会应用在uv坐标的（0，1）范围内。例如砖墙的例子，通过将该范围内的纹理坐标乘以分辨率得到对应的像素位置。这种将纹理坐标限制在（0，1）范围内的优势是不需要对不同分辨率的纹理在顶点内存储不同的纹理坐标值。&lt;/p&gt;
+&lt;h2 id="纹理值"&gt;纹理值
+&lt;/h2&gt;&lt;p&gt;生成纹理坐标空间后，便可以用这个坐标获取对应的纹理值。对于图像纹理中，这是通过检索图像中的纹素得到的。实时渲染的绝大多数函数都是图像纹理。但也有程序生成的纹理，这种情况下便不涉及内存查找，而是变成了一个函数值的计算。&lt;br&gt;
+最常见最直接的纹理值便是RGB三元组，它可以用于替换或者修改表面的颜色。另一种类型是RGBA，A（alpha）通道代表了纹理的不透明度。纹理贴图中不仅仅可以存储颜色数据，也可以存储其他类型的数据，比如表面粗糙度等。&lt;br&gt;
+纹理中返回的值可以在使用前进行转换。一个常见的例子是把（0.0,1.0）这个无符号范围映射回（-1.0,1.0）这个范围，用这个方法可以在纹理内存储法线数据。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/rtr4-chapter06-texture/%E6%B3%95%E7%BA%BF%E8%B4%B4%E5%9B%BE.png"
+width="640"
+height="640"
+srcset="https://foth0626.github.io/article/rtr4-chapter06-texture/%E6%B3%95%E7%BA%BF%E8%B4%B4%E5%9B%BE_hu_18d1e6c013fb4809.png 480w, https://foth0626.github.io/article/rtr4-chapter06-texture/%E6%B3%95%E7%BA%BF%E8%B4%B4%E5%9B%BE_hu_8e3eb40ad18935b3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="100"
+data-flex-basis="240px"
+&gt;&lt;/p&gt;
+&lt;h1 id="图像纹理"&gt;图像纹理
+&lt;/h1&gt;&lt;p&gt;像素着色器可以通过纹理坐标传给texture2D等函数，并调用他们来访问纹理，在不同的图形API有两个主要区别。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;在DirectX中，纹理的左上角对应的（0，0），右下角对应（1，1）。而在OpenGL中左下角的位置对应了（0，0）。这正好是DirectX翻转y轴得到的结果。&lt;/li&gt;
+&lt;li&gt;纹素具有整数类型的坐标，但是我们经常会有访问两个纹素中间的值，并在它们之间进行插值，这就引出了一个问题：像素中心的浮点坐标是什么？但是我们会经常想要访问两个纹素之间的位置,并在它们之间进行插值,这就引出了一个问题：像素中心的浮点坐标是什么？Heckbert讨论了两种可能的模式:截断(truncate)和舍入(round)。DirectX 9 将每个纹素的中心定义在(0.0, 0.0)处,它采用了舍入方法。但是这个系统稍微有点混乱,因为对于 DirectX左上角像素(原点)而言,该像素的左上角坐标为 (−0.5, −0.5) 。DirectX 10 学习了 OpenGL 的纹理坐标系统,让每个纹素的中心值为 (0.5, 0.5),即使用了截断方法,或者更准确地说是向下取整(floor),即小数部分会被丢弃。向下取整是一个更加直观的系统,它可以很好的用语言进行表述,例如:当我们说一个像素位于坐标(5, 9)时,实际上我们指的是沿 u轴方向上从 5.0-6.0 的范围,以及沿 v 轴方向上从 9.0-10.0 的范围。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;依赖纹理读取&lt;/strong&gt;(dependent texture read)是一个值得解释的术语,它包含两个定义。&lt;br&gt;
+第一个定义是对于移动设备而言的，当我们使用texture2D或者类似方式访问纹理并在片元着色器内手动计算纹理坐标，而不是使用顶点着色器传入的、未修改的纹理坐标时，就会发生依赖纹理读取。手动计算纹理甚至包括交换uv这种简单操作！对于老旧的不支持OpengGL ES 3.0的移动设备GPU来说，不发生依赖纹理读取会有更高的效率。因为可以预读取。&lt;br&gt;
+另一个定义则是一个纹理坐标依赖之前的纹理值。比如法线贴图改变了表面法线，而cube map访问又依赖于法线。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;纹理尺寸&lt;/strong&gt; 通常为 $2^m \times 2^n$，这样的纹理被称为2次幂（power of two ,POT)纹理，现代GPU可以处理任意大小的非2次幂（non power of two ，NPOT)纹理。但是老旧设备可能不支持NOPT的mipmap。不同的图形API对于纹理尺寸有着不同的上限。 DirectX12 允许一张16384 *16384分辨力的纹理。&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;设想一下，纹理被放大和缩小后，这时我们又会看到什么样的图像？这个问题的答案取决于我们使用什么样的采样和过滤方法。&lt;/p&gt;
+&lt;h2 id="放大magnification"&gt;放大（magnification）
+&lt;/h2&gt;&lt;p&gt;&lt;img src="https://foth0626.github.io/article/rtr4-chapter06-texture/%E6%94%BE%E5%A4%A7%E6%BB%A4%E6%B3%A2.png"
+width="1189"
+height="744"
+srcset="https://foth0626.github.io/article/rtr4-chapter06-texture/%E6%94%BE%E5%A4%A7%E6%BB%A4%E6%B3%A2_hu_67434f03f6f78b38.png 480w, https://foth0626.github.io/article/rtr4-chapter06-texture/%E6%94%BE%E5%A4%A7%E6%BB%A4%E6%B3%A2_hu_ff57a88c1e52145a.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="159"
+data-flex-basis="383px"
+&gt;&lt;/p&gt;
+&lt;p&gt;在图 6.8 的最左侧,我们使用了邻近过滤的方法。这种放大技术的一个特点是,单个纹素可能会变得十分明显。这种效果被称为像素化(pixelation);因为该方法在放大的时候,会选取距离每个像素中心最近的纹素,从而产生了块状外观。虽然这种方法的质量有时会很差,但是它的好处在于,只需要为每个像素获取一个纹素即可。&lt;br&gt;
+在图 6.8 的中间,我们使用了双线性插值(有时也会叫做线性插值)方法。对于每个像素而言,这种过滤方法需要找到四个相邻的纹素,并在二维上进行线性插值,从而获得混合后的像素值。虽然双线性插值的结果是比较模糊的,但是它并不会像邻近过滤那样出现锯齿。你可以做一个简单的小实验,尝试眯着眼睛来看左边的图像,你就会发现图像的锯齿也消失了,因为这样做(眯着眼睛观察)的效果其实和低通滤波器是大致相同的,并且更能展示面部的特征。&lt;br&gt;
+在图 6.8 的右侧,我们使用了双三次插值(bicubic filter),它大幅去除了剩余的方块感。需要注意的是,双三次插值比双线性插值的计算成本更高,但是许多的高阶滤波器都可以被表示为重复的线性插值,因此可以通过若干次简单的线性插值,来充分利用纹理单元中用于线性插值操作的 GPU 硬件。&lt;/p&gt;
+&lt;h3 id="双线性插值"&gt;双线性插值
+&lt;/h3&gt;&lt;p&gt;这里我们回到本章一开始提到的砖块纹理例子:在不舍弃小数的情况下,我们会获得坐标 (pu , pv ) = (81.92, 74.24)。这里我们使用与 OpenGL 同样的纹理坐标系,其原点位于左下角,它与标准的笛卡尔坐标系是相匹配的。我们的目标是在四个最近的纹素中心之间,建立一个局部坐标系,并在这四个纹素中心之间进行插值,最终获得该点的像素值,如图 6.9 所示。为了找到 4 个最近的相邻像素,我们从采样位置减去像素中心的分数部分 (0.5, 0.5),得到 (81.42, 73.74)。在去掉中心的小数部分之后,距离最近的 4 个像素范围即为 (x, y) = (81, 73)到 (x + 1, y + 1) = (82, 74)。在这个例子中,分数部分 (0.42, 0.74)是该采样点在这个局部坐标系(由相邻的四个纹素中心构成)中的位置,我们将这个位置表示为 (u′ , v′ )。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/rtr4-chapter06-texture/%E5%8F%8C%E7%BA%BF%E6%80%A7%E6%8F%92%E5%80%BC.png"
+width="1085"
+height="466"
+srcset="https://foth0626.github.io/article/rtr4-chapter06-texture/%E5%8F%8C%E7%BA%BF%E6%80%A7%E6%8F%92%E5%80%BC_hu_62d0092ab746782c.png 480w, https://foth0626.github.io/article/rtr4-chapter06-texture/%E5%8F%8C%E7%BA%BF%E6%80%A7%E6%8F%92%E5%80%BC_hu_3e0a92725d9ffbf0.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="232"
+data-flex-basis="558px"
+&gt;&lt;/p&gt;
+&lt;p&gt;这里我们将纹理访问函数定义为 t(x, y),该函数会返回对应纹素的颜色,其中 x和y 是整数。那么任意位置 (u′ , v ′ )的双线性插值颜色可以按照以下两步进行计算:首先,使用下方的两个纹素颜色 t(x, y)和 t(x + 1, y),按照参数 u′ 进行插值,即&lt;/p&gt;
+$$(1−u')\ast t(x,y)+u'\ast t(x+1,y) $$&lt;p&gt;;再使用上方的两个纹素颜色 t(x, y + 1)和t(x + 1, y + 1),按照参数 u′ 进行插值,即&lt;/p&gt;
+$$(1−u')\ast t(x,y+1)+u' \ast t(x+1,y+1)$$&lt;p&gt;,如图 6.9 左侧的绿色圆圈。然后对这两个值在竖直方向上,按照参数 v′进行插值,即将上述过程结合起来,最终 (pu , pv )处的双线性插值颜色 b为:&lt;/p&gt;
+$$b(p_u,p_v) = (1-v')((1−u') t(x,y)+u' t(x+1,y)) + v'((1−u') t(x,y+1)+u' t(x+1,y+1)) $$&lt;p&gt;&lt;br&gt;
+&lt;/p&gt;
+$$= (1-u')(1-v')t(x,y) + u'(1-v')t(x+1,y）+（1-u')v't(x,y+1)+u'v't(x+1,y+1)$$&lt;p&gt;从直观上说，距离采样位置越近的纹素，对于颜色的影响就越大，注意到：右上角纹素的影响力和左下角的矩形面积相同。&lt;/p&gt;
+&lt;h3 id="双三次插值"&gt;双三次插值
+&lt;/h3&gt;&lt;p&gt;在刚才那张图的右侧，我们使用了双三次插值（bicubic filter)，需要注意的是，双三次插值比双线性插值的计算成本更高。还有一种更简单的技术，使用一个简单的平滑曲线进行插值。最常见的是smoothstop和quintic曲线&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Smoothstep： $x^2(3-2x)$&lt;/li&gt;
+&lt;li&gt;Quintic： $x^3(6x^2-15x+10)$&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;其中，smoothstep函数具有 $s&amp;rsquo;(0) = s&amp;rsquo;(1)=0$ 的性质（ $C^1$ 连续），quintic曲线具有类似的性质，唯一不同的是 $q&amp;rsquo;&amp;rsquo;(0)=q&amp;rsquo;&amp;rsquo;(1)=0$ ( $C^2$连续）。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/rtr4-chapter06-texture/smoothstep.png"
+width="956"
+height="395"
+srcset="https://foth0626.github.io/article/rtr4-chapter06-texture/smoothstep_hu_864af23d28cf4b2a.png 480w, https://foth0626.github.io/article/rtr4-chapter06-texture/smoothstep_hu_df077a0503463c8f.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="242"
+data-flex-basis="580px"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/rtr4-chapter06-texture/%E7%BA%B9%E7%90%86%E6%8F%92%E5%80%BC.png"
+width="1132"
+height="436"
+srcset="https://foth0626.github.io/article/rtr4-chapter06-texture/%E7%BA%B9%E7%90%86%E6%8F%92%E5%80%BC_hu_64011b20d194a3dd.png 480w, https://foth0626.github.io/article/rtr4-chapter06-texture/%E7%BA%B9%E7%90%86%E6%8F%92%E5%80%BC_hu_9a91ff151addc607.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="259"
+data-flex-basis="623px"
+&gt;&lt;/p&gt;
+&lt;h2 id="缩小minificatioin"&gt;缩小（minificatioin）
+&lt;/h2&gt;&lt;p&gt;当纹理被压缩时,平面上的一个像素单元格可能会占据好几个纹素。为了正确获得这个像素的颜色值,我们应当将这几个纹素对像素的影响整合起来。然而,精确确定某个像素附近所有纹素对其的影响是很难的,而且想要以实时的速度来完美地实现这一点几乎是不可能的。&lt;br&gt;
+&lt;img src="https://foth0626.github.io/article/rtr4-chapter06-texture/%E7%BA%B9%E7%90%86%E7%BC%A9%E5%B0%8F.png"
+width="1231"
+height="530"
+srcset="https://foth0626.github.io/article/rtr4-chapter06-texture/%E7%BA%B9%E7%90%86%E7%BC%A9%E5%B0%8F_hu_b54d1b162a43268b.png 480w, https://foth0626.github.io/article/rtr4-chapter06-texture/%E7%BA%B9%E7%90%86%E7%BC%A9%E5%B0%8F_hu_6700109ffde82a47.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="232"
+data-flex-basis="557px"
+&gt;&lt;br&gt;
+最简单的方法是使用邻近过滤（nearest neighbor）这个方法会产生严重的锯齿问题.&lt;br&gt;
+&lt;img src="https://foth0626.github.io/article/rtr4-chapter06-texture/%E6%9C%80%E8%BF%91%E9%82%BB%E8%BF%87%E6%BB%A4.png"
+width="924"
+height="238"
+srcset="https://foth0626.github.io/article/rtr4-chapter06-texture/%E6%9C%80%E8%BF%91%E9%82%BB%E8%BF%87%E6%BB%A4_hu_4d4c591fceb16a81.png 480w, https://foth0626.github.io/article/rtr4-chapter06-texture/%E6%9C%80%E8%BF%91%E9%82%BB%E8%BF%87%E6%BB%A4_hu_43049b3c05a2f1a2.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="388"
+data-flex-basis="931px"
+&gt;
+当表面相对于相机发生移动时，这种瑕疵会变得更加明显，这种在运动中所产生的瑕疵被称为时域锯齿（temporal aliasing）。另一个常用的手法是双线性插值，但是当一个像素受到超过四个像素的影响时，双线性插值就会失效并开始产生锯齿。&lt;br&gt;
+走样根据之前的讨论，走样问题可以通过采样技术和滤波技术来解决。为了实现这个目标，我们要么提高像素的采样频率要么降低纹理的信号频率。但是采样频率的提高总是有限的，我们需要一些技术来降低纹理的频率。&lt;/p&gt;
+&lt;h3 id="mipmap"&gt;Mipmap
+&lt;/h3&gt;&lt;p&gt;mipmap是最流行的纹理抗锯齿方法，现如今所有的图形加速器都支持这种方法。
+mip是拉丁语multum in parvo 的缩写，意思是一个很小的地方有很多东西。这揭示了mipmap的工作原理：将原始图像反复过滤为更小的图像。
+在使用 mipmap 滤波器的时候,在实际渲染发生之前,原始纹理图像会生成一系列较小尺寸的版本。原始纹理(第 0 级)会被下采样到原始尺寸的四分之一,每个新生成的纹素值,通常为原始纹理中四个相邻纹素的平均值,这个新生成的纹理(第 1 级)有时也会被叫做原始纹理的子纹理(subtexture)。这个下采样的过程会被递归执行,直到最终生成的某个纹理的维度为 1。这组图片的集合通常被称为一个 mipmap 链(mipmap chain)。
+&lt;img src="https://foth0626.github.io/article/rtr4-chapter06-texture/mipmap%E9%87%91%E5%AD%97%E5%A1%94.png"
+width="1118"
+height="801"
+srcset="https://foth0626.github.io/article/rtr4-chapter06-texture/mipmap%E9%87%91%E5%AD%97%E5%A1%94_hu_324630b19d77a2da.png 480w, https://foth0626.github.io/article/rtr4-chapter06-texture/mipmap%E9%87%91%E5%AD%97%E5%A1%94_hu_7cef3c447433ee58.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="139"
+data-flex-basis="334px"
+&gt;&lt;br&gt;
+生成高质量 mipmap 的两个重要因素分别是:使用良好的过滤和伽马校正。生成mipmap 的常用方法是将每 2 × 2的纹素进行平均,从而获得下一级 mip 所对应的纹素值。具体使用的是一个 box 滤波器,虽然这可能是最糟糕的一个滤波器,使用box 滤波器可能会导致较差的质量,因为它会对低频信息进行模糊,同时保留一些会产生锯齿的高频信息。最好是使用高斯、Lanczos、Kaiser 或者类似的滤波器,这些滤波器的源代码基本都有免费高效的开源实现,同时有一些 API 还支持在 GPU 上进行过滤操作。&lt;/p&gt;
+&lt;p&gt;在靠近纹理边缘进行过滤的时候的地方,需要注意纹理的包装模式(wrapping mode)。&lt;/p&gt;
+&lt;p&gt;对于在非线性颜色空间中进行编码的纹理(例如大多数的彩色纹理),在过滤时忽略伽玛校正会修改该层级 mipmap 的感知亮度。如果使用了未校正的mipmap,相机距离物体越远,物体整体看起来就会越暗,对比度和表面细节也会受到影响。由于这个原因,因此将这种纹理(例如颜色纹理)&lt;strong&gt;从 sRGB 颜色空间转换到线性颜色空间&lt;/strong&gt;是十分重要的,我们会在线性空间中完成 mipmap 的生成和过滤,然后将生产的结果转换回 sRGB 颜色空间中并进行存储。大多数图形 API 都支持 sRGB 纹理,因此可以在线性空间中正确生成 mipmap,并将结果存储在 sRGB中。当访问 sRGB 纹理的时候,它们首先会被转换到线性空间中,以便正确地执行放大(magnification)和缩小(minification)操作。&lt;/p&gt;
+&lt;p&gt;mipmap 的好处在于,它并不是去单独计算每个纹素对像素的影响,而是对预先生成的纹素集合进行访问和插值,无论纹理压缩的程度如何,这个过程的时间开销是固定的。然而,mipmap 也存在几个缺陷,其中一个主要的问题就是过度模糊(overblurring)。我们假设现在有一个像素单元格,它在 u方向上覆盖了大量的纹素,而在 v方向上只覆盖了少量的纹素,这种情况通常发生在相机以一个掠射角度来观察纹理表面的时候。在这种情况下,需要沿着纹理的其中一个轴进行缩小,沿着另一个轴进行放大,这会导致像素在纹理上的投影区域是一个长宽比很大的矩形;而我们在访问 mipmap 时,只能检索纹理上的正方形投影区域,无法检索矩形投影区域。为了避免走样,我们会选择较长的那个边所形成的正方形,来作为对像素单元格覆盖率的近似度量,这导致检索到的样本往往会相对模糊。这种现象可以在图中看到,图片右侧向远处延伸的线条会变得过度模糊。
+&lt;img src="https://foth0626.github.io/article/rtr4-chapter06-texture/mipmap%E8%BF%87%E6%BB%A4.png"
+width="919"
+height="213"
+srcset="https://foth0626.github.io/article/rtr4-chapter06-texture/mipmap%E8%BF%87%E6%BB%A4_hu_25dfa9ba18632ae0.png 480w, https://foth0626.github.io/article/rtr4-chapter06-texture/mipmap%E8%BF%87%E6%BB%A4_hu_a32e477afaf89808.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="431"
+data-flex-basis="1035px"
+&gt;&lt;/p&gt;
+&lt;h3 id="summed-area-表sat"&gt;Summed-Area 表(SAT)
+&lt;/h3&gt;&lt;p&gt;另一种能够避免过度模糊的方法是面积积分表(summed-area table,SAT,也可以叫做求和面积表),后文中我们会简称为 SAT。想要使用这种方法,首先要创建一个尺寸与纹理相同的数组,但是颜色存储的精度要更高(例如:每个红绿蓝颜色分量都会占据 16 个 bit)。在数组中的每个位置上,该位置上的纹素会和 (0, 0)处的纹素(原点)构成一个矩形,计算并存储区域中所有纹素值的总和。在纹理化的过程中,屏幕上像素在纹理上的投影区域是一个矩形;然后会通过 SAT 来确定这个矩形区域的平均颜色,并将其作为该像素的纹理颜色。这个计算过程如图 6.17 所示,具体的平均颜色计算公式如下:&lt;/p&gt;
+$$c = \frac{s[x_{ur},y_{ur}]-s[x_{ur},y_{ll}]-s[x_{ll},y_{ur}]+s[x_{ll},y_{ll}]}{(x_{ur}-x_{ll})(y_{ur}-y_{ll})}$$&lt;p&gt;&lt;img src="https://foth0626.github.io/article/rtr4-chapter06-texture/SAT%E8%BF%87%E6%BB%A4.png"
+width="918"
+height="217"
+srcset="https://foth0626.github.io/article/rtr4-chapter06-texture/SAT%E8%BF%87%E6%BB%A4_hu_9edc4a4fa4a9a0b3.png 480w, https://foth0626.github.io/article/rtr4-chapter06-texture/SAT%E8%BF%87%E6%BB%A4_hu_576dc732cb524454.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="423"
+data-flex-basis="1015px"
+&gt;&lt;/p&gt;
+&lt;p&gt;图像右侧向远处地平线延申的线条变得更加清晰了,但是中间对角相交的线条仍然是很模糊的。这个问题的原因在于,当我们沿着对角线观察纹理的时候,像素投影所生成的区域是一个沿对角线的细长矩形,该矩形对应的包围盒中包含了大量无关的纹素,例如:在图中,想象此时像素的投影区域是一个横跨纹理对角线的细长区域,它所对应的包围盒几乎会占据整个纹理,而真正位于像素投影区域内的纹素数量则很少。此时这种方法会对整个纹理矩形进行平均,这个结果包含了大量的无关纹素值,从而导致模糊的产生。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/rtr4-chapter06-texture/SAT%E7%A4%BA%E4%BE%8B.png"
+width="1065"
+height="555"
+srcset="https://foth0626.github.io/article/rtr4-chapter06-texture/SAT%E7%A4%BA%E4%BE%8B_hu_955a36a760980983.png 480w, https://foth0626.github.io/article/rtr4-chapter06-texture/SAT%E7%A4%BA%E4%BE%8B_hu_11ecee0b5e71621d.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="191"
+data-flex-basis="460px"
+&gt;&lt;/p&gt;
+&lt;p&gt;SAT 是各向异性过滤(anisotropic filtering)算法的其中一个例子,这类算法用于检索非正方形投影区域的纹理值,SAT 对于接近水平方向或者竖直方向的投影区域最为有效。还需要注意的是,对于 16 × 16或者尺寸更小的纹理,SAT 需要至少两倍的内存;而对于尺寸更大的纹理,则需要更高的存储精度,因为像素值的和会很大,精度过低可能会导致数值溢出。&lt;br&gt;
+SAT 可以提供更好的质量,并且额外的内存开销还算合理,因此它在现代的 GPU 上也被广泛应用。高质量的过滤方法对于高级渲染技术的质量而言至关重要。例如,Hensley 等人提出了一个高效的实现,并展示了使用 SAT 采样来改善glossy 反射的方法。其他使用区域采样的算法也可以通过 SAT 方法进行改进,例如如景深,阴影贴图,和模糊反射等。&lt;/p&gt;
+&lt;h4 id="无约束的各向异性过滤"&gt;无约束的各向异性过滤
+&lt;/h4&gt;&lt;p&gt;&lt;img src="https://foth0626.github.io/article/rtr4-chapter06-texture/%E5%90%84%E5%90%91%E5%BC%82%E6%80%A7%E8%BF%87%E6%BB%A4.png"
+width="1116"
+height="482"
+srcset="https://foth0626.github.io/article/rtr4-chapter06-texture/%E5%90%84%E5%90%91%E5%BC%82%E6%80%A7%E8%BF%87%E6%BB%A4_hu_bed2c34fbc1aa385.png 480w, https://foth0626.github.io/article/rtr4-chapter06-texture/%E5%90%84%E5%90%91%E5%BC%82%E6%80%A7%E8%BF%87%E6%BB%A4_hu_1bdbb94e19c1706f.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="231"
+data-flex-basis="555px"
+&gt;&lt;/p&gt;
+&lt;p&gt;在之前我们所提到的方法中,会在 mipmap 中的一个正方形区域内进行采样,这可能会导致采样到很多无关纹素,使得表面变得模糊。这里我们将要介绍的算法,并不是使用单个 mipmap 采样区域来对该投影形成四边形进行近似,而是会使用多个正方形来进行近似。我们使用四边形中较短的那个边来确定 d的值(而在原始的 mipmap中,通常会使用较长的边来确定 d),这样做会使得每个 mipmap 样本的平均面积更小(包含了更少的无关像素,因此会减少模糊的出现)。而四边形的长边则被用来创建一条与其平行,并且穿过四边形中点的各向异性线(line of anisotropy)。当各向异性的比例在 1 : 1和 2 : 1之间时,我们会沿着这条线取两个样本(如图 6.18 所示);各向异性的比例越高,沿轴采集的样本就越多。&lt;/p&gt;
+&lt;h2 id="体积纹理volume-texture"&gt;体积纹理（volume texture）
+&lt;/h2&gt;&lt;p&gt;对图像纹理直接进行扩展可以得到三维图像数据,它通过坐标 (u, v, w)或者 (s, t, r)来进行访问,例如:医学成像数据可以生成三维网格,通过在网格中移动成像平面,可以看到这些数据的二维切片。&lt;br&gt;
+如今大部分 GPU 都支持体积纹理(volume texture)的 mipmap,由于在体积纹理的单个 mipmap 级别内,需要使用三线性插值来进行过滤,因此在不同 mipmap 级别之间,需要四线性插值(quadrilinear interpolation)来进行过滤。由于需要对 16个纹素的结果进行求平均,因此可能会导致一些精度不足的问题,这可以通过使用更高精度的体积纹理来进行解决。&lt;br&gt;
+虽然体积纹理对于存储空间的要求比较高,并且过滤的计算成本也比较高,但它确实具有一些特殊的优势。由于可以直接使用纹理坐标来表示三维的空间位置,因此可以跳过为三维网格寻找一个良好二维参数化表示的复杂过程(UV 拆分)。这避免了二维参数化时经常出现的扭曲和接缝问题。体积纹理也可以用来表示木材或者大理石等材质的体积结构,具有这种纹理的模型,看起来就像是使用这种材料雕刻出来的一样。&lt;br&gt;
+使用体积纹理来对表面进行纹理化操作是非常低效的,因为体积纹理中的绝大部分样本都没有被使用。Benson 和 Davis 以及 DeBry 等人，讨论了将纹理数据存储在稀疏八叉树中的方法,这种方法非常适合交互式的三维绘画系统,因为我们在创建表面的时候,不需要显式地指定它的纹理坐标,同时八叉树结构可以将纹理细节保留到任何我们想要的级别。Lefebvre 等人讨论了在现代 GPU 上实现八叉树纹理的细节;Lefebvre 和 Hoppe提出了一种将稀疏体积数据打包成较小纹理的方法。&lt;/p&gt;
+&lt;h2 id="立方体贴图cube-map"&gt;立方体贴图（cube map）
+&lt;/h2&gt;&lt;p&gt;另一种类型的纹理叫做立方体纹理(cube texture)或者立方体贴图(cube map),它具有六个正方形的纹理,立方体的六个面分别对应了这个六个正方形纹理。访问立方体贴图需要使用一个包含三个分量的纹理坐标向量,这个向量代表了从立方体中心向外发射的射线方向。这个射线与立方体交点的计算过程如下:向量中绝对值最大的那个分量,决定了射线会射向哪个立方体表面(例如:向量(−3.2, 5.1, −8.4)代表了射线会射向 −z面)。将剩余的两个坐标分量分别除以最大分量的绝对值(即 8.4),此时这两个分量的大小位于 [−1, 1]内,然后再将其重新映射到 [0, 1]中以计算纹理坐标,例如:坐标 (−3.2, 5.1)会被映射为((−3.2/8.4 + 1)/2,(5.1/8.4 + 1)/2) ≈ (0.31, 0.80)。立方体贴图对于表示方向函数的值而言非常有用;它们最常用于环境映射中。&lt;/p&gt;
+&lt;h1 id="程序化纹理"&gt;程序化纹理
+&lt;/h1&gt;&lt;h2 id="adobe-substance-3d-designer"&gt;&lt;a class="link" href="https://www.youtube.com/watch?v=At3FoFcuN6k&amp;amp;t=6s" target="_blank" rel="noopener"
+&gt;Adobe Substance 3D Designer&lt;/a&gt;
+&lt;/h2&gt;&lt;p&gt;&lt;img src="https://foth0626.github.io/article/rtr4-chapter06-texture/SD%E7%AA%97%E5%B8%98.png"
+width="1280"
+height="703"
+srcset="https://foth0626.github.io/article/rtr4-chapter06-texture/SD%E7%AA%97%E5%B8%98_hu_600c43f98a748320.png 480w, https://foth0626.github.io/article/rtr4-chapter06-texture/SD%E7%AA%97%E5%B8%98_hu_468528600ec95b26.png 1024w"
+loading="lazy"
+alt="个人的程序化生成纹理"
+class="gallery-image"
+data-flex-grow="182"
+data-flex-basis="436px"
+&gt;
+个人的入门教程，程序化生成丝绸材质。&lt;br&gt;
+程序化背后的本质是算法和编程思维，以及对现实世界的拆分和再理解。&lt;/p&gt;
+&lt;h1 id="纹理动画"&gt;纹理动画
+&lt;/h1&gt;&lt;p&gt;纹理坐标也不一定是静态的。无论是在网格数据本身对纹理坐标进行修改,还是通过顶点着色器或者像素着色器中的函数,来对纹理坐标进行修改,应用程序设计人员都可以显式地改变帧与帧之间的纹理坐标。想象一下,现在我们有了一个已经建模好的瀑布模型,并且它已经被一个图像纹理化了,使得它看起来很像瀑布。假设纹理坐标v是水流的方向,为了让水流动起来,必须从每一帧的坐标 v 中减去一定的数值。纹理坐标的减法操作会使得纹理本身看起来正在向前移动。&lt;/p&gt;
+&lt;p&gt;可以通过对纹理坐标应用变换矩阵来生成更加精细的效果。除了平移之外,它还允许其他的线性变换操作,例如缩放、旋转和剪切,图像扭曲(image warping)和变形转换(morphing transforms),以及广义投影等。通过在 CPU 或者着色器中应用变换函数,可以生成更复杂的效果。&lt;/p&gt;
+&lt;p&gt;通过使用纹理混合(texture blending)技术,还可以实现其他的动画效果。例如:从一个大理石纹理出发,将其渐变为一个肉质纹理,从而使得雕像看起来像是活过来一样。&lt;/p&gt;
+&lt;h1 id="纹理映射"&gt;纹理映射
+&lt;/h1&gt;&lt;p&gt;纹理的一个常见用途是对材质属性进行修改,从而影响着色方程的计算结果。现实世界中的物体通常都会具有不同的表面材质属性,为了模拟这样的物体,像素着色器可以从纹理中读取纹理值,并在计算着色方程之前,使用它们来修改材质的参数。纹理最常修改的参数就是表面是颜色,这种纹理通常被称为反照率颜色贴图(albedo color map)或者漫反射颜色贴图(diffuse color map)。但是,理论上任何参数都可以被纹理进行修改,例如:替换、相乘或者以其他方式等。例如在图 6.25 中的表面,应用了三种不同的纹理来替换常量值。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/rtr4-chapter06-texture/%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84.png"
+width="1118"
+height="451"
+srcset="https://foth0626.github.io/article/rtr4-chapter06-texture/%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84_hu_2d5673ada43eae25.png 480w, https://foth0626.github.io/article/rtr4-chapter06-texture/%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84_hu_f2b4fe7f0349f73.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="247"
+data-flex-basis="594px"
+&gt;&lt;/p&gt;</description></item></channel></rss>

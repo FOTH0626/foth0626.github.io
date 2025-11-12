@@ -1,0 +1,408 @@
+<!doctype html><html lang=en dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="Learn and Write Code of tinyrenderer 01 lesson"><title>myLittleRender01-直线与线框</title><link rel=canonical href=https://foth0626.github.io/article/tiny-renderer-01/><link rel=stylesheet href=/scss/style.min.b0e76e98cdd4f7082d1fc36f7af7e0843a81201db2197c03ca426751dc923735.css><meta property='og:title' content="myLittleRender01-直线与线框"><meta property='og:description' content="Learn and Write Code of tinyrenderer 01 lesson"><meta property='og:url' content='https://foth0626.github.io/article/tiny-renderer-01/'><meta property='og:site_name' content='FOTH0626'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='tinyrenderer'><meta property='article:published_time' content='2024-09-28T15:20:01+00:00'><meta property='article:modified_time' content='2024-09-28T15:20:01+00:00'><meta property='og:image' content='https://foth0626.github.io/article/tiny-renderer-01/head.png'><meta name=twitter:title content="myLittleRender01-直线与线框"><meta name=twitter:description content="Learn and Write Code of tinyrenderer 01 lesson"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content='https://foth0626.github.io/article/tiny-renderer-01/head.png'><link rel="shortcut icon" href=/heart-code.png></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label="Toggle Menu">
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/><img src=/img/foth_hu_4eff4256c12406c3.jpg width=300 height=300 class=site-logo loading=lazy alt=Avatar>
+</a><span class=emoji>🍥</span></figure><div class=site-meta><h1 class=site-name><a href=/>FOTH0626</a></h1><h2 class=site-description>小小的人偶，想要摘月亮</h2></div></header><ol class=menu-social><li><a href=https://space.bilibili.com/351177307 target=_blank title=Bilibili rel=me><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-brand-bilibili"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 10a4 4 0 014-4h10a4 4 0 014 4v6a4 4 0 01-4 4H7a4 4 0 01-4-4v-6z"/><path d="M8 3l2 3"/><path d="M16 3l-2 3"/><path d="M9 13v-2"/><path d="M15 11v2"/></svg></a></li><li><a href=https://github.com/FOTH0626 target=_blank title=GitHub rel=me><svg class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li><li><a href=mailto:fothli0626@gmail.com target=_blank title=Gmail rel=me><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-mail"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 7a2 2 0 012-2h14a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/><path d="M3 7l9 6 9-6"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/archives/><svg class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+<span>Archives</span></a></li><li><a href=/search/><svg class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+<span>Search</span></a></li><li><a href=/links/><svg class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M10 14a3.5 3.5.0 005 0l4-4a3.5 3.5.0 00-5-5l-.5.5"/><path d="M14 10a3.5 3.5.0 00-5 0l-4 4a3.5 3.5.0 005 5l.5-.5"/></svg>
+<span>Links</span></a></li><li class=menu-bottom-section><ol class=menu><li id=dark-mode-toggle><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>Dark Mode</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">Table of contents</h2><div class=widget--toc><nav id=TableOfContents><ul><li><a href=#前言>前言</a></li><li><a href=#基础设施建设>基础设施建设</a><ul><li><a href=#向量类>向量类</a></li><li><a href=#model类>Model类</a></li><li><a href=#头文件定义>头文件定义</a></li><li><a href=#构造函数>构造函数</a></li></ul></li><li><a href=#布雷森汉姆直线算法>布雷森汉姆直线算法</a></li><li><a href=#绘图>绘图</a></li></ul></nav></div></section></aside><main class="main full-width"><article class="has-image main-article"><header class=article-header><div class=article-image><a href=/article/tiny-renderer-01/><img src=/article/tiny-renderer-01/head_hu_e23e35fe5070cb14.png srcset="/article/tiny-renderer-01/head_hu_e23e35fe5070cb14.png 800w, /article/tiny-renderer-01/head_hu_e1de48804360bfb2.png 1600w" width=800 height=801 loading=lazy alt="Featured image of post myLittleRender01-直线与线框"></a></div><div class=article-details><header class=article-category><a href=/categories/graphics/>Graphics</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/article/tiny-renderer-01/>myLittleRender01-直线与线框</a></h2><h3 class=article-subtitle>Learn and Write Code of tinyrenderer 01 lesson</h3></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published datetime=2024-09-28T15:20:01Z>2024-09-28</time></div><div><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>4 minute read</time></div></footer></div></header><section class=article-content><h1 id=前言>前言</h1><p>本人打算提高个人的C++基础编程水平和图形学理解，所以再再再次启动了<a class=link href=https://github.com/ssloy/tinyrenderer target=_blank rel=noopener>tinyrenderer</a>的程序编写，相较于之前被动的抄写代码，我准备选择直接观察他的代码结果后根据自己的理解进行编写，并进行结果比较。
+开始编写前，思考出如图所示的基础架构（如果这可以称为架构的话）<img src=/article/tiny-renderer-01/relation.png width=1249 height=941 srcset="/article/tiny-renderer-01/relation_hu_4425aeecf19f1e37.png 480w, /article/tiny-renderer-01/relation_hu_e19c3164d46e4eee.png 1024w" loading=lazy alt=relation.png class=gallery-image data-flex-grow=132 data-flex-basis=318px>
+项目结构如下</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-txt data-lang=txt><span class=line><span class=cl>.
+</span></span><span class=line><span class=cl>├── CMakeLists.txt
+</span></span><span class=line><span class=cl>├── geometry.cpp
+</span></span><span class=line><span class=cl>├── geometry.h
+</span></span><span class=line><span class=cl>├── main.cpp
+</span></span><span class=line><span class=cl>├── model.cpp
+</span></span><span class=line><span class=cl>├── model.h
+</span></span><span class=line><span class=cl>├── obj
+</span></span><span class=line><span class=cl>│   └── african_head.obj
+</span></span><span class=line><span class=cl>├── rasterizer.cpp
+</span></span><span class=line><span class=cl>├── rasterizer.h
+</span></span><span class=line><span class=cl>├── README.md
+</span></span><span class=line><span class=cl>├── sandbox.cpp
+</span></span><span class=line><span class=cl>├── tgaimage.cpp
+</span></span><span class=line><span class=cl>└── tgaimage.h
+</span></span></code></pre></td></tr></table></div></div><p>源码可以在<a class=link href=https://github.com/FOTH0626/myLittleRenderer/tree/51ee96966ca9b34c1c311414ce73846cd04d1103 target=_blank rel=noopener>这里</a>看到
+tgaimage.h和tgaimage.cpp复制自ssloy的初始提交，可以在lesson01的wiki看到，在此不多赘述。</p><h1 id=基础设施建设>基础设施建设</h1><h2 id=向量类>向量类</h2><p>在GAMES101的作业中，使用了线性代数库 <code>Eigen</code>，但是对于本环境的代码来说，并不需要这么强大的功能，所以参考原仓库手搓了一份向量类</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-C++ data-lang=C++><span class=line><span class=cl><span class=k>template</span> <span class=o>&lt;</span><span class=k>typename</span> <span class=n>T</span><span class=o>&gt;</span>  
+</span></span><span class=line><span class=cl><span class=k>struct</span> <span class=nc>Vec2</span><span class=p>{</span>  
+</span></span><span class=line><span class=cl>    <span class=k>union</span><span class=p>{</span>  
+</span></span><span class=line><span class=cl>        <span class=k>struct</span><span class=p>{</span><span class=n>T</span> <span class=n>x</span><span class=p>,</span> <span class=n>y</span><span class=p>;};</span>  
+</span></span><span class=line><span class=cl>        <span class=k>struct</span><span class=p>{</span><span class=n>T</span> <span class=n>u</span><span class=p>,</span> <span class=n>v</span><span class=p>;};</span>  
+</span></span><span class=line><span class=cl>    <span class=p>};</span>  
+</span></span><span class=line><span class=cl>    <span class=n>Vec2</span><span class=p>()</span><span class=o>:</span> <span class=n>x</span><span class=p>(</span><span class=mi>0</span><span class=p>),</span> <span class=n>y</span><span class=p>(</span><span class=mi>0</span><span class=p>)</span> <span class=p>{}</span>  
+</span></span><span class=line><span class=cl>    <span class=n>Vec2</span><span class=p>(</span><span class=n>T</span> <span class=n>_x</span><span class=p>,</span> <span class=n>T</span> <span class=n>_y</span><span class=p>)</span><span class=o>:</span> <span class=n>x</span><span class=p>(</span><span class=n>_x</span><span class=p>),</span> <span class=n>y</span><span class=p>(</span><span class=n>_y</span><span class=p>)</span> <span class=p>{}</span>  
+</span></span><span class=line><span class=cl><span class=p>};</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>template</span> <span class=o>&lt;</span><span class=k>typename</span> <span class=n>T</span><span class=o>&gt;</span>  
+</span></span><span class=line><span class=cl><span class=k>struct</span> <span class=nc>Matrix4</span><span class=p>{</span>  
+</span></span><span class=line><span class=cl>    <span class=n>std</span><span class=o>::</span><span class=n>array</span><span class=o>&lt;</span><span class=n>T</span><span class=p>,</span><span class=mi>16</span><span class=o>&gt;</span> <span class=n>data</span><span class=p>;</span>  
+</span></span><span class=line><span class=cl>    <span class=n>Matrix4</span><span class=p>()</span><span class=o>:</span><span class=n>data</span><span class=p>({</span><span class=mi>0</span><span class=p>}){}</span>  
+</span></span><span class=line><span class=cl>    <span class=n>T</span> <span class=nf>get_index</span><span class=p>(</span><span class=kt>int</span> <span class=n>i</span><span class=p>,</span> <span class=kt>int</span> <span class=n>j</span><span class=p>)</span> <span class=k>const</span><span class=p>{</span>  
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=n>data</span><span class=p>[</span><span class=n>i</span> <span class=o>*</span> <span class=mi>4</span> <span class=o>+</span> <span class=n>j</span><span class=p>];</span>  
+</span></span><span class=line><span class=cl>    <span class=p>}</span>      
+</span></span><span class=line><span class=cl>    <span class=n>Matrix4</span><span class=p>(</span><span class=n>std</span><span class=o>::</span><span class=n>initializer_list</span><span class=o>&lt;</span><span class=n>T</span><span class=o>&gt;</span> <span class=n>list</span><span class=p>)</span> <span class=k>requires</span> <span class=k>requires</span><span class=p>{</span><span class=n>list</span><span class=p>.</span><span class=n>size</span><span class=p>()</span> <span class=o>==</span> <span class=mi>16</span><span class=p>;}{</span>  
+</span></span><span class=line><span class=cl>        <span class=kt>int</span> <span class=n>i</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span>  
+</span></span><span class=line><span class=cl>        <span class=k>for</span><span class=p>(</span><span class=k>auto</span> <span class=n>it</span> <span class=o>=</span> <span class=n>list</span><span class=p>.</span><span class=n>begin</span><span class=p>();</span> <span class=n>it</span> <span class=o>!=</span> <span class=n>list</span><span class=p>.</span><span class=n>end</span><span class=p>();</span> <span class=n>it</span><span class=o>++</span><span class=p>){</span>  
+</span></span><span class=line><span class=cl>            <span class=n>data</span><span class=p>[</span><span class=n>i</span><span class=o>++</span><span class=p>]</span> <span class=o>=</span> <span class=o>*</span><span class=n>it</span><span class=p>;</span>  
+</span></span><span class=line><span class=cl>        <span class=p>}</span>  
+</span></span><span class=line><span class=cl>    <span class=p>}</span>  
+</span></span><span class=line><span class=cl><span class=p>};</span>
+</span></span></code></pre></td></tr></table></div></div><p>仅做举例，关于重载运算符等操作不多赘述。<br>其中，使用 <code>union</code> 内的 匿名 <code>struct</code> 达到了<code>.x</code> 与<code>.u</code> 访问同一内存的效果。
+<code>Matrix4(std::initializer_list&lt;T> list) requires requires{list.size() == 16;</code> 的写法来自软研C++组的支持， <code>requires requires{list.size() == 16}</code> 表明在构造函数时必须调用一个16个元素的列表。<br><code>Matrix</code> 结构体尚未经过测试，可能存在bug。</p><h2 id=model类>Model类</h2><h2 id=头文件定义>头文件定义</h2><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-C++ data-lang=C++><span class=line><span class=cl><span class=k>class</span> <span class=nc>Model</span><span class=p>{</span>  
+</span></span><span class=line><span class=cl>  <span class=k>public</span><span class=o>:</span>  
+</span></span><span class=line><span class=cl>    <span class=n>Model</span><span class=p>()</span> <span class=o>=</span> <span class=k>delete</span><span class=p>;</span>  
+</span></span><span class=line><span class=cl>    <span class=k>explicit</span> <span class=nf>Model</span><span class=p>(</span><span class=k>const</span> <span class=n>std</span><span class=o>::</span><span class=n>string</span><span class=o>&amp;</span> <span class=n>filename</span><span class=p>);</span>  
+</span></span><span class=line><span class=cl>    <span class=na>[[nodiscard]]</span> <span class=n>std</span><span class=o>::</span><span class=n>vector</span><span class=o>&lt;</span><span class=n>Vec3f</span><span class=o>&gt;</span> <span class=n>getVerts</span><span class=p>()</span> <span class=k>const</span> <span class=p>{</span><span class=k>return</span> <span class=n>verts_</span><span class=p>;}</span>  
+</span></span><span class=line><span class=cl>    <span class=na>[[nodiscard]]</span> <span class=n>std</span><span class=o>::</span><span class=n>vector</span><span class=o>&lt;</span><span class=n>Vec2f</span><span class=o>&gt;</span> <span class=n>getUV</span><span class=p>()</span> <span class=k>const</span> <span class=p>{</span><span class=k>return</span> <span class=n>uv_</span><span class=p>;}</span>  
+</span></span><span class=line><span class=cl>    <span class=na>[[nodiscard]]</span> <span class=n>std</span><span class=o>::</span><span class=n>vector</span><span class=o>&lt;</span><span class=n>Vec3f</span><span class=o>&gt;</span> <span class=n>getNorms</span><span class=p>()</span> <span class=k>const</span> <span class=p>{</span><span class=k>return</span> <span class=n>norms_</span><span class=p>;}</span>  
+</span></span><span class=line><span class=cl>    <span class=na>[[nodiscard]]</span> <span class=n>std</span><span class=o>::</span><span class=n>vector</span><span class=o>&lt;</span><span class=n>std</span><span class=o>::</span><span class=n>array</span><span class=o>&lt;</span><span class=n>std</span><span class=o>::</span><span class=n>array</span><span class=o>&lt;</span><span class=kt>unsigned</span> <span class=kt>short</span><span class=p>,</span><span class=mi>3</span><span class=o>&gt;</span>
+</span></span><span class=line><span class=cl><span class=p>,</span> <span class=mi>3</span><span class=o>&gt;&gt;</span> <span class=n>getFaces</span><span class=p>()</span> <span class=k>const</span> <span class=p>{</span><span class=k>return</span> <span class=n>faces_</span><span class=p>;}</span>  
+</span></span><span class=line><span class=cl>  <span class=k>private</span><span class=o>:</span>  
+</span></span><span class=line><span class=cl>    <span class=n>std</span><span class=o>::</span><span class=n>vector</span><span class=o>&lt;</span><span class=n>Vec3f</span><span class=o>&gt;</span> <span class=n>verts_</span><span class=p>;</span>  
+</span></span><span class=line><span class=cl>    <span class=n>std</span><span class=o>::</span><span class=n>vector</span><span class=o>&lt;</span><span class=n>Vec2f</span><span class=o>&gt;</span> <span class=n>uv_</span><span class=p>;</span>  
+</span></span><span class=line><span class=cl>    <span class=n>std</span><span class=o>::</span><span class=n>vector</span><span class=o>&lt;</span><span class=n>Vec3f</span><span class=o>&gt;</span> <span class=n>norms_</span><span class=p>;</span>  
+</span></span><span class=line><span class=cl>    <span class=n>std</span><span class=o>::</span><span class=n>vector</span><span class=o>&lt;</span><span class=n>std</span><span class=o>::</span><span class=n>array</span><span class=o>&lt;</span><span class=n>std</span><span class=o>::</span><span class=n>array</span><span class=o>&lt;</span><span class=kt>unsigned</span> <span class=kt>short</span><span class=p>,</span><span class=mi>3</span><span class=o>&gt;</span><span class=p>,</span> <span class=mi>3</span><span class=o>&gt;&gt;</span> <span class=n>faces_</span><span class=p>;</span>  
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl><span class=p>};</span>
+</span></span></code></pre></td></tr></table></div></div><p>wavefront obj 文件是由wavefront 公司所创建的模型格式，受到各类建模软件的广泛支持。该模型会在行首声明数据类型</p><ul><li>v代表vertice，顶点</li><li>vt 代表vertice texcoord，纹理坐标</li><li>vn代表nromal，法线</li><li>f代表face，即面<br>face应该是最特殊的行数，下面是一个示例</li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-txt data-lang=txt><span class=line><span class=cl>f 321/304/321 318/302/318 147/127/147  
+</span></span><span class=line><span class=cl>f 456/446/456 321/304/321 525/517/525  
+</span></span><span class=line><span class=cl>f 456/446/456 525/517/525 457/447/457  
+</span></span></code></pre></td></tr></table></div></div><p>数据每一行分成了三部分，每一部分都代表了一个顶点数据，分别代表顶点索引，贴图索引和法线索引，即</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-txt data-lang=txt><span class=line><span class=cl>vert/texture/normal   vert/texture/normal   vert/texture/normal
+</span></span></code></pre></td></tr></table></div></div><p>所以使用了 <code>std::vector&lt;std::array&lt;std::array&lt;unsigned short, 3>, 3>></code> 这种臃肿的数据结构。</p><h2 id=构造函数>构造函数</h2><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c++ data-lang=c++><span class=line><span class=cl><span class=n>Model</span><span class=o>::</span><span class=n>Model</span><span class=p>(</span><span class=k>const</span> <span class=n>std</span><span class=o>::</span><span class=n>string</span> <span class=o>&amp;</span><span class=n>filename</span><span class=p>)</span> <span class=p>{</span>  
+</span></span><span class=line><span class=cl>  <span class=n>std</span><span class=o>::</span><span class=n>ifstream</span> <span class=n>file</span><span class=p>(</span><span class=n>filename</span><span class=p>);</span>  
+</span></span><span class=line><span class=cl>  <span class=k>if</span> <span class=p>(</span> <span class=o>!</span><span class=n>file</span><span class=p>.</span><span class=n>is_open</span><span class=p>())</span> <span class=p>{</span>  
+</span></span><span class=line><span class=cl>    <span class=n>std</span><span class=o>::</span><span class=n>cerr</span> <span class=o>&lt;&lt;</span> <span class=s>&#34;Error opening file &#34;</span> <span class=o>&lt;&lt;</span> <span class=n>filename</span> <span class=o>&lt;&lt;</span> <span class=n>std</span><span class=o>::</span><span class=n>endl</span><span class=p>;</span>  
+</span></span><span class=line><span class=cl>    <span class=k>return</span><span class=p>;</span>  
+</span></span><span class=line><span class=cl>  <span class=p>}</span>  
+</span></span><span class=line><span class=cl>  <span class=n>std</span><span class=o>::</span><span class=n>string</span> <span class=n>line</span><span class=p>;</span>  
+</span></span><span class=line><span class=cl>  <span class=k>while</span> <span class=p>(</span><span class=n>std</span><span class=o>::</span><span class=n>getline</span><span class=p>(</span><span class=n>file</span><span class=p>,</span> <span class=n>line</span><span class=p>)){</span>  
+</span></span><span class=line><span class=cl>    <span class=n>std</span><span class=o>::</span><span class=n>istringstream</span> <span class=n>iss</span><span class=p>(</span><span class=n>line</span><span class=p>);</span>  
+</span></span><span class=line><span class=cl>    <span class=n>std</span><span class=o>::</span><span class=n>string</span> <span class=n>type</span><span class=p>;</span>  
+</span></span><span class=line><span class=cl>    <span class=n>iss</span> <span class=o>&gt;&gt;</span> <span class=n>type</span><span class=p>;</span>  
+</span></span><span class=line><span class=cl>    <span class=k>if</span><span class=p>(</span><span class=n>type</span> <span class=o>==</span> <span class=s>&#34;v&#34;</span><span class=p>)</span> <span class=p>{</span>  
+</span></span><span class=line><span class=cl>      <span class=n>Vec3f</span> <span class=n>v</span><span class=p>;</span>  
+</span></span><span class=line><span class=cl>      <span class=n>iss</span> <span class=o>&gt;&gt;</span> <span class=n>v</span><span class=p>.</span><span class=n>x</span> <span class=o>&gt;&gt;</span> <span class=n>v</span><span class=p>.</span><span class=n>y</span> <span class=o>&gt;&gt;</span> <span class=n>v</span><span class=p>.</span><span class=n>z</span><span class=p>;</span>  
+</span></span><span class=line><span class=cl>      <span class=n>verts_</span><span class=p>.</span><span class=n>push_back</span><span class=p>(</span><span class=n>v</span><span class=p>);</span>  
+</span></span><span class=line><span class=cl>    <span class=p>}</span><span class=k>else</span> <span class=nf>if</span><span class=p>(</span><span class=n>type</span> <span class=o>==</span> <span class=s>&#34;vt&#34;</span><span class=p>){</span>  
+</span></span><span class=line><span class=cl>        <span class=n>Vec2f</span> <span class=n>vt</span><span class=p>;</span>  
+</span></span><span class=line><span class=cl>        <span class=n>iss</span> <span class=o>&gt;&gt;</span> <span class=n>vt</span><span class=p>.</span><span class=n>x</span> <span class=o>&gt;&gt;</span> <span class=n>vt</span><span class=p>.</span><span class=n>y</span><span class=p>;</span>  
+</span></span><span class=line><span class=cl>        <span class=n>uv_</span><span class=p>.</span><span class=n>push_back</span><span class=p>(</span><span class=n>vt</span><span class=p>);</span>  
+</span></span><span class=line><span class=cl>    <span class=p>}</span>  
+</span></span><span class=line><span class=cl>    <span class=k>else</span> <span class=nf>if</span> <span class=p>(</span><span class=n>type</span> <span class=o>==</span> <span class=s>&#34;vn&#34;</span><span class=p>){</span>  
+</span></span><span class=line><span class=cl>        <span class=n>Vec3f</span> <span class=n>vn</span><span class=p>;</span>  
+</span></span><span class=line><span class=cl>        <span class=n>iss</span> <span class=o>&gt;&gt;</span> <span class=n>vn</span><span class=p>.</span><span class=n>x</span> <span class=o>&gt;&gt;</span> <span class=n>vn</span><span class=p>.</span><span class=n>y</span> <span class=o>&gt;&gt;</span> <span class=n>vn</span><span class=p>.</span><span class=n>z</span><span class=p>;</span>  
+</span></span><span class=line><span class=cl>        <span class=n>norms_</span><span class=p>.</span><span class=n>push_back</span><span class=p>(</span><span class=n>vn</span><span class=p>);</span>  
+</span></span><span class=line><span class=cl>    <span class=p>}</span>  
+</span></span><span class=line><span class=cl>    <span class=k>else</span> <span class=nf>if</span> <span class=p>(</span><span class=n>type</span> <span class=o>==</span> <span class=s>&#34;f&#34;</span><span class=p>){</span>  
+</span></span><span class=line><span class=cl>      <span class=n>std</span><span class=o>::</span><span class=n>array</span><span class=o>&lt;</span><span class=n>std</span><span class=o>::</span><span class=n>array</span><span class=o>&lt;</span><span class=kt>unsigned</span> <span class=kt>short</span><span class=p>,</span> <span class=mi>3</span><span class=o>&gt;</span><span class=p>,</span> <span class=mi>3</span><span class=o>&gt;</span> <span class=n>face</span><span class=p>{};</span>  
+</span></span><span class=line><span class=cl>      <span class=kt>char</span> <span class=n>slash</span><span class=p>;</span>  
+</span></span><span class=line><span class=cl>      <span class=k>for</span> <span class=p>(</span><span class=kt>int</span> <span class=n>i</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span> <span class=n>i</span> <span class=o>&lt;</span> <span class=mi>3</span><span class=p>;</span> <span class=n>i</span><span class=o>++</span><span class=p>)</span> <span class=p>{</span>  
+</span></span><span class=line><span class=cl>        <span class=n>iss</span> <span class=o>&gt;&gt;</span> <span class=n>face</span><span class=p>[</span><span class=n>i</span><span class=p>][</span><span class=mi>0</span><span class=p>]</span> <span class=o>&gt;&gt;</span> <span class=n>slash</span> <span class=o>&gt;&gt;</span> <span class=n>face</span><span class=p>[</span><span class=n>i</span><span class=p>][</span><span class=mi>1</span><span class=p>]</span> <span class=o>&gt;&gt;</span> <span class=n>slash</span> <span class=o>&gt;&gt;</span> <span class=n>face</span><span class=p>[</span><span class=n>i</span><span class=p>][</span><span class=mi>2</span><span class=p>];</span>  
+</span></span><span class=line><span class=cl>      <span class=p>}</span>  
+</span></span><span class=line><span class=cl>      <span class=n>faces_</span><span class=p>.</span><span class=n>push_back</span><span class=p>(</span><span class=n>face</span><span class=p>);</span>  
+</span></span><span class=line><span class=cl>    <span class=p>}</span>  
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl>  <span class=p>}</span>  
+</span></span><span class=line><span class=cl>  <span class=n>file</span><span class=p>.</span><span class=n>close</span><span class=p>();</span>  
+</span></span><span class=line><span class=cl>  <span class=n>std</span><span class=o>::</span><span class=n>cout</span> <span class=o>&lt;&lt;</span> <span class=s>&#34;Loaded&#34;</span> <span class=o>&lt;&lt;</span> <span class=n>verts_</span><span class=p>.</span><span class=n>size</span><span class=p>()</span> <span class=o>&lt;&lt;</span> <span class=s>&#34; vertices&#34;</span> <span class=o>&lt;&lt;</span> <span class=n>std</span><span class=o>::</span><span class=n>endl</span><span class=p>;</span>  
+</span></span><span class=line><span class=cl>  <span class=n>std</span><span class=o>::</span><span class=n>cout</span> <span class=o>&lt;&lt;</span> <span class=s>&#34;Loaded&#34;</span> <span class=o>&lt;&lt;</span> <span class=n>uv_</span><span class=p>.</span><span class=n>size</span><span class=p>()</span> <span class=o>&lt;&lt;</span> <span class=s>&#34; uv&#34;</span> <span class=o>&lt;&lt;</span> <span class=n>std</span><span class=o>::</span><span class=n>endl</span><span class=p>;</span>  
+</span></span><span class=line><span class=cl>  <span class=n>std</span><span class=o>::</span><span class=n>cout</span> <span class=o>&lt;&lt;</span> <span class=s>&#34;Loaded&#34;</span> <span class=o>&lt;&lt;</span> <span class=n>norms_</span><span class=p>.</span><span class=n>size</span><span class=p>()</span> <span class=o>&lt;&lt;</span> <span class=s>&#34; normals&#34;</span> <span class=o>&lt;&lt;</span> <span class=n>std</span><span class=o>::</span><span class=n>endl</span><span class=p>;</span>  
+</span></span><span class=line><span class=cl>  <span class=n>std</span><span class=o>::</span><span class=n>cout</span> <span class=o>&lt;&lt;</span> <span class=s>&#34;Loaded&#34;</span> <span class=o>&lt;&lt;</span> <span class=n>faces_</span><span class=p>.</span><span class=n>size</span><span class=p>()</span> <span class=o>&lt;&lt;</span> <span class=s>&#34; faces&#34;</span> <span class=o>&lt;&lt;</span> <span class=n>std</span><span class=o>::</span><span class=n>endl</span><span class=p>;</span>  
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>构造函数会打开文件后按行读取，根据行首的类型压入对应的动态数组，并在读取完后输出消息读取数量。（不知道为什么，switch语句不支持string类型，所以使用连续的 <code>ifelse</code> 进行逻辑判断。）</p><h1 id=布雷森汉姆直线算法>布雷森汉姆直线算法</h1><p>布雷森汉姆的核心思想是通过整形的计算代替浮点数的计算，获得更好的性能。<br>对于斜率大于1或斜率为负数这类情况，布雷森汉姆算法会交换起始点，由x步进改为y步进等方法保证适用于各种情况。算法实现来自GAMES101的作业实现。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span><span class=lnt>59
+</span><span class=lnt>60
+</span><span class=lnt>61
+</span><span class=lnt>62
+</span><span class=lnt>63
+</span><span class=lnt>64
+</span><span class=lnt>65
+</span><span class=lnt>66
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-C++ data-lang=C++><span class=line><span class=cl><span class=kt>void</span> <span class=nf>line</span><span class=p>(</span><span class=k>const</span> <span class=n>Vec2i</span> <span class=n>p1</span><span class=p>,</span> <span class=k>const</span> <span class=n>Vec2i</span> <span class=n>p2</span><span class=p>,</span> <span class=n>TGAImage</span> <span class=o>&amp;</span><span class=n>image</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>		  <span class=k>const</span> <span class=n>TGAColor</span><span class=o>&amp;</span> <span class=n>color</span><span class=p>)</span> <span class=p>{</span>  
+</span></span><span class=line><span class=cl>  <span class=kt>int</span> <span class=n>x1</span> <span class=o>=</span> <span class=n>p1</span><span class=p>.</span><span class=n>x</span><span class=p>;</span>  
+</span></span><span class=line><span class=cl>  <span class=kt>int</span> <span class=n>y1</span> <span class=o>=</span> <span class=n>p1</span><span class=p>.</span><span class=n>y</span><span class=p>;</span>  
+</span></span><span class=line><span class=cl>  <span class=kt>int</span> <span class=n>x2</span> <span class=o>=</span> <span class=n>p2</span><span class=p>.</span><span class=n>x</span><span class=p>;</span>  
+</span></span><span class=line><span class=cl>  <span class=kt>int</span> <span class=n>y2</span> <span class=o>=</span> <span class=n>p2</span><span class=p>.</span><span class=n>y</span><span class=p>;</span>  
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl>  <span class=kt>int</span> <span class=n>x</span><span class=p>,</span> <span class=n>y</span><span class=p>,</span> <span class=n>xe</span><span class=p>,</span> <span class=n>ye</span> <span class=p>;</span>  
+</span></span><span class=line><span class=cl>  <span class=kt>int</span> <span class=n>dx</span> <span class=o>=</span> <span class=n>x2</span> <span class=o>-</span> <span class=n>x1</span><span class=p>;</span>  
+</span></span><span class=line><span class=cl>  <span class=kt>int</span> <span class=n>dy</span> <span class=o>=</span> <span class=n>y2</span> <span class=o>-</span> <span class=n>y1</span><span class=p>;</span>  
+</span></span><span class=line><span class=cl>  <span class=kt>int</span> <span class=n>dx1</span> <span class=o>=</span> <span class=n>std</span><span class=o>::</span><span class=n>abs</span><span class=p>(</span><span class=n>dx</span><span class=p>);</span>  
+</span></span><span class=line><span class=cl>  <span class=kt>int</span> <span class=n>dy1</span> <span class=o>=</span> <span class=n>std</span><span class=o>::</span><span class=n>abs</span><span class=p>(</span><span class=n>dy</span><span class=p>);</span>  
+</span></span><span class=line><span class=cl>  <span class=kt>int</span> <span class=n>px</span> <span class=o>=</span> <span class=mi>2</span> <span class=o>*</span> <span class=n>dy1</span> <span class=o>-</span> <span class=n>dx1</span><span class=p>;</span>  
+</span></span><span class=line><span class=cl>  <span class=kt>int</span> <span class=n>py</span> <span class=o>=</span> <span class=mi>2</span> <span class=o>*</span> <span class=n>dx1</span> <span class=o>-</span> <span class=n>dy1</span><span class=p>;</span>  
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=p>(</span><span class=n>dy1</span> <span class=o>&lt;=</span> <span class=n>dx1</span><span class=p>)</span> <span class=p>{</span>  
+</span></span><span class=line><span class=cl>      <span class=k>if</span> <span class=p>(</span><span class=n>dx</span> <span class=o>&gt;=</span> <span class=mi>0</span><span class=p>)</span> <span class=p>{</span>  
+</span></span><span class=line><span class=cl>        <span class=n>x</span> <span class=o>=</span> <span class=n>x1</span><span class=p>;</span>  
+</span></span><span class=line><span class=cl>        <span class=n>y</span> <span class=o>=</span> <span class=n>y1</span><span class=p>;</span>  
+</span></span><span class=line><span class=cl>        <span class=n>xe</span> <span class=o>=</span><span class=n>x2</span><span class=p>;</span>  
+</span></span><span class=line><span class=cl>      <span class=p>}</span><span class=k>else</span> <span class=p>{</span>  
+</span></span><span class=line><span class=cl>        <span class=n>x</span> <span class=o>=</span><span class=n>x2</span><span class=p>;</span>  
+</span></span><span class=line><span class=cl>        <span class=n>y</span> <span class=o>=</span> <span class=n>y2</span><span class=p>;</span>  
+</span></span><span class=line><span class=cl>        <span class=n>xe</span> <span class=o>=</span> <span class=n>x1</span><span class=p>;</span>  
+</span></span><span class=line><span class=cl>      <span class=p>}</span>  
+</span></span><span class=line><span class=cl>      <span class=n>image</span><span class=p>.</span><span class=n>set</span><span class=p>(</span><span class=n>x</span><span class=p>,</span> <span class=n>y</span><span class=p>,</span> <span class=n>color</span><span class=p>);</span>  
+</span></span><span class=line><span class=cl>      <span class=k>for</span> <span class=p>(</span><span class=kt>int</span> <span class=n>i</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span> <span class=n>x</span> <span class=o>&lt;</span> <span class=n>xe</span><span class=p>;</span> <span class=n>i</span><span class=o>++</span><span class=p>)</span> <span class=p>{</span>  
+</span></span><span class=line><span class=cl>        <span class=n>x</span> <span class=o>=</span> <span class=n>x</span> <span class=o>+</span> <span class=mi>1</span><span class=p>;</span>  
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=p>(</span><span class=n>px</span> <span class=o>&lt;</span> <span class=mi>0</span><span class=p>)</span> <span class=p>{</span>  
+</span></span><span class=line><span class=cl>          <span class=n>px</span> <span class=o>=</span> <span class=n>px</span> <span class=o>+</span> <span class=mi>2</span> <span class=o>*</span> <span class=n>dy1</span><span class=p>;</span>  
+</span></span><span class=line><span class=cl>        <span class=p>}</span><span class=k>else</span> <span class=p>{</span>  
+</span></span><span class=line><span class=cl>          <span class=k>if</span> <span class=p>((</span><span class=n>dx</span> <span class=o>&lt;</span> <span class=mi>0</span> <span class=o>&amp;&amp;</span> <span class=n>dy</span> <span class=o>&lt;</span> <span class=mi>0</span><span class=p>)</span> <span class=o>||</span> <span class=p>(</span><span class=n>dx</span> <span class=o>&gt;</span> <span class=mi>0</span> <span class=o>&amp;&amp;</span> <span class=n>dy</span> <span class=o>&gt;</span> <span class=mi>0</span><span class=p>))</span> <span class=p>{</span>  
+</span></span><span class=line><span class=cl>            <span class=n>y</span> <span class=o>=</span> <span class=n>y</span> <span class=o>+</span> <span class=mi>1</span><span class=p>;</span>  
+</span></span><span class=line><span class=cl>          <span class=p>}</span><span class=k>else</span> <span class=p>{</span>  
+</span></span><span class=line><span class=cl>            <span class=n>y</span> <span class=o>=</span> <span class=n>y</span> <span class=o>-</span> <span class=mi>1</span><span class=p>;</span>  
+</span></span><span class=line><span class=cl>          <span class=p>}</span>  
+</span></span><span class=line><span class=cl>          <span class=n>px</span> <span class=o>=</span> <span class=n>px</span> <span class=o>+</span> <span class=mi>2</span> <span class=o>*</span> <span class=p>(</span><span class=n>dy1</span> <span class=o>-</span> <span class=n>dx1</span><span class=p>);</span>  
+</span></span><span class=line><span class=cl>        <span class=p>}</span>  
+</span></span><span class=line><span class=cl>        <span class=n>image</span><span class=p>.</span><span class=n>set</span><span class=p>(</span><span class=n>x</span><span class=p>,</span> <span class=n>y</span><span class=p>,</span> <span class=n>color</span><span class=p>);</span>  
+</span></span><span class=line><span class=cl>      <span class=p>}</span>  
+</span></span><span class=line><span class=cl>    <span class=p>}</span><span class=k>else</span> <span class=p>{</span>  
+</span></span><span class=line><span class=cl>      <span class=k>if</span> <span class=p>(</span><span class=n>dy</span> <span class=o>&gt;=</span> <span class=mi>0</span><span class=p>)</span> <span class=p>{</span>  
+</span></span><span class=line><span class=cl>        <span class=n>x</span> <span class=o>=</span> <span class=n>x1</span><span class=p>;</span>  
+</span></span><span class=line><span class=cl>        <span class=n>y</span> <span class=o>=</span> <span class=n>y1</span><span class=p>;</span>  
+</span></span><span class=line><span class=cl>        <span class=n>ye</span> <span class=o>=</span> <span class=n>y2</span><span class=p>;</span>  
+</span></span><span class=line><span class=cl>      <span class=p>}</span><span class=k>else</span> <span class=p>{</span>  
+</span></span><span class=line><span class=cl>        <span class=n>x</span> <span class=o>=</span> <span class=n>x2</span><span class=p>;</span>  
+</span></span><span class=line><span class=cl>        <span class=n>y</span> <span class=o>=</span> <span class=n>y2</span><span class=p>;</span>  
+</span></span><span class=line><span class=cl>        <span class=n>ye</span> <span class=o>=</span> <span class=n>y1</span><span class=p>;</span>  
+</span></span><span class=line><span class=cl>      <span class=p>}</span>  
+</span></span><span class=line><span class=cl>      <span class=n>image</span><span class=p>.</span><span class=n>set</span><span class=p>(</span><span class=n>x</span><span class=p>,</span> <span class=n>y</span><span class=p>,</span> <span class=n>color</span><span class=p>);</span>  
+</span></span><span class=line><span class=cl>      <span class=k>for</span> <span class=p>(</span><span class=kt>int</span> <span class=n>i</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span> <span class=n>y</span> <span class=o>&lt;</span> <span class=n>ye</span><span class=p>;</span> <span class=n>i</span><span class=o>++</span><span class=p>)</span> <span class=p>{</span>  
+</span></span><span class=line><span class=cl>        <span class=n>y</span> <span class=o>=</span> <span class=n>y</span> <span class=o>+</span> <span class=mi>1</span><span class=p>;</span>  
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=p>(</span><span class=n>py</span> <span class=o>&lt;=</span> <span class=mi>0</span><span class=p>)</span> <span class=p>{</span>  
+</span></span><span class=line><span class=cl>          <span class=n>py</span> <span class=o>=</span> <span class=n>py</span> <span class=o>+</span> <span class=mi>2</span> <span class=o>*</span> <span class=n>dx1</span><span class=p>;</span>  
+</span></span><span class=line><span class=cl>        <span class=p>}</span><span class=k>else</span> <span class=p>{</span>  
+</span></span><span class=line><span class=cl>          <span class=k>if</span> <span class=p>((</span><span class=n>dx</span> <span class=o>&lt;</span> <span class=mi>0</span> <span class=o>&amp;&amp;</span> <span class=n>dy</span> <span class=o>&lt;</span> <span class=mi>0</span><span class=p>)</span> <span class=o>||</span> <span class=p>(</span><span class=n>dx</span> <span class=o>&gt;</span> <span class=mi>0</span> <span class=o>&amp;&amp;</span> <span class=n>dy</span> <span class=o>&gt;</span> <span class=mi>0</span><span class=p>))</span> <span class=p>{</span>  
+</span></span><span class=line><span class=cl>            <span class=n>x</span> <span class=o>=</span> <span class=n>x</span> <span class=o>+</span> <span class=mi>1</span><span class=p>;</span>  
+</span></span><span class=line><span class=cl>          <span class=p>}</span><span class=k>else</span> <span class=p>{</span>  
+</span></span><span class=line><span class=cl>            <span class=n>x</span> <span class=o>=</span> <span class=n>x</span> <span class=o>-</span> <span class=mi>1</span><span class=p>;</span>  
+</span></span><span class=line><span class=cl>          <span class=p>}</span>  
+</span></span><span class=line><span class=cl>          <span class=n>py</span> <span class=o>=</span> <span class=n>py</span> <span class=o>+</span> <span class=mi>2</span> <span class=o>*</span> <span class=p>(</span><span class=n>dx1</span> <span class=o>-</span> <span class=n>dy1</span><span class=p>);</span>  
+</span></span><span class=line><span class=cl>        <span class=p>}</span>  
+</span></span><span class=line><span class=cl>        <span class=n>image</span><span class=p>.</span><span class=n>set</span><span class=p>(</span><span class=n>x</span><span class=p>,</span> <span class=n>y</span><span class=p>,</span> <span class=n>color</span><span class=p>);</span>  
+</span></span><span class=line><span class=cl>      <span class=p>}</span>  
+</span></span><span class=line><span class=cl>    <span class=p>}</span>  
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h1 id=绘图>绘图</h1><p>此时我们已经准备好了所有基本设备，准备好测试文件 <code>sandbox.cpp</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-C++ data-lang=C++><span class=line><span class=cl><span class=cp>#include</span> <span class=cpf>&#34;rasterizer.h&#34;</span><span class=cp>  
+</span></span></span><span class=line><span class=cl><span class=cp>#include</span> <span class=cpf>&#34;tgaimage.h&#34;</span><span class=cp>  
+</span></span></span><span class=line><span class=cl><span class=cp>#include</span> <span class=cpf>&#34;common.h&#34;</span><span class=cp>  
+</span></span></span><span class=line><span class=cl><span class=cp>#include</span> <span class=cpf>&#34;model.h&#34;</span><span class=cp>  
+</span></span></span><span class=line><span class=cl><span class=cp></span>  
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl><span class=kt>int</span> <span class=nf>main</span><span class=p>()</span> <span class=p>{</span>  
+</span></span><span class=line><span class=cl>  <span class=n>TGAImage</span> <span class=n>image</span><span class=p>(</span><span class=mi>800</span><span class=p>,</span> <span class=mi>800</span><span class=p>,</span> <span class=n>TGAImage</span><span class=o>::</span><span class=n>RGB</span><span class=p>);</span>  
+</span></span><span class=line><span class=cl>  <span class=k>const</span> <span class=n>Model</span> <span class=n>model</span><span class=p>(</span><span class=s>&#34;../../obj/african_head.obj&#34;</span><span class=p>);</span>  
+</span></span><span class=line><span class=cl>  <span class=k>const</span> <span class=k>auto</span> <span class=n>modelFace</span> <span class=o>=</span> <span class=n>model</span><span class=p>.</span><span class=n>getFaces</span><span class=p>();</span>  
+</span></span><span class=line><span class=cl>  <span class=k>const</span> <span class=k>auto</span> <span class=n>modelVerts</span> <span class=o>=</span> <span class=n>model</span><span class=p>.</span><span class=n>getVerts</span><span class=p>();</span>  
+</span></span><span class=line><span class=cl>  <span class=k>for</span> <span class=p>(</span><span class=kt>int</span> <span class=n>i</span><span class=o>=</span><span class=mi>0</span><span class=p>;</span> <span class=n>i</span><span class=o>&lt;</span><span class=n>model</span><span class=p>.</span><span class=n>getFaces</span><span class=p>().</span><span class=n>size</span><span class=p>();</span> <span class=o>++</span><span class=n>i</span><span class=p>)</span> <span class=p>{</span>  
+</span></span><span class=line><span class=cl>    <span class=k>auto</span> <span class=n>face</span> <span class=o>=</span> <span class=n>modelFace</span><span class=p>[</span><span class=n>i</span><span class=p>];</span>  
+</span></span><span class=line><span class=cl>    <span class=k>for</span> <span class=p>(</span><span class=kt>int</span> <span class=n>j</span><span class=o>=</span><span class=mi>0</span><span class=p>;</span> <span class=n>j</span><span class=o>&lt;</span><span class=mi>3</span><span class=p>;</span> <span class=o>++</span><span class=n>j</span><span class=p>)</span> <span class=p>{</span>  
+</span></span><span class=line><span class=cl>      <span class=n>Vec3f</span> <span class=n>v0</span> <span class=o>=</span> <span class=n>modelVerts</span><span class=p>[</span><span class=n>face</span><span class=p>[</span><span class=n>j</span><span class=p>][</span><span class=mi>0</span><span class=p>]</span><span class=o>-</span><span class=mi>1</span><span class=p>];</span>  
+</span></span><span class=line><span class=cl>      <span class=n>Vec3f</span> <span class=n>v1</span> <span class=o>=</span> <span class=n>modelVerts</span><span class=p>[</span><span class=n>face</span><span class=p>[(</span><span class=n>j</span><span class=o>+</span><span class=mi>1</span><span class=p>)</span><span class=o>%</span><span class=mi>3</span><span class=p>][</span><span class=mi>0</span><span class=p>]</span><span class=o>-</span><span class=mi>1</span><span class=p>];</span>  
+</span></span><span class=line><span class=cl>      <span class=n>line</span><span class=p>({(</span><span class=kt>int</span><span class=p>)((</span><span class=n>v0</span><span class=p>.</span><span class=n>x</span><span class=o>+</span><span class=mf>1.</span><span class=p>)</span><span class=o>*</span><span class=n>image</span><span class=p>.</span><span class=n>get_width</span><span class=p>()</span><span class=o>/</span><span class=mf>2.</span><span class=p>),</span> <span class=p>(</span><span class=kt>int</span><span class=p>)((</span><span class=n>v0</span><span class=p>.</span><span class=n>y</span><span class=o>+</span><span class=mf>1.</span><span class=p>)</span><span class=o>*</span><span class=n>image</span><span class=p>.</span><span class=n>get_height</span><span class=p>()</span><span class=o>/</span><span class=mf>2.</span><span class=p>)},</span>  
+</span></span><span class=line><span class=cl>           <span class=p>{(</span><span class=kt>int</span><span class=p>)((</span><span class=n>v1</span><span class=p>.</span><span class=n>x</span><span class=o>+</span><span class=mf>1.</span><span class=p>)</span><span class=o>*</span><span class=n>image</span><span class=p>.</span><span class=n>get_width</span><span class=p>()</span><span class=o>/</span><span class=mf>2.</span><span class=p>),</span> <span class=p>(</span><span class=kt>int</span><span class=p>)((</span><span class=n>v1</span><span class=p>.</span><span class=n>y</span><span class=o>+</span><span class=mf>1.</span><span class=p>)</span><span class=o>*</span><span class=n>image</span><span class=p>.</span><span class=n>get_height</span><span class=p>()</span><span class=o>/</span><span class=mf>2.</span><span class=p>)},</span>  
+</span></span><span class=line><span class=cl>           <span class=n>image</span><span class=p>,</span> <span class=n>white</span><span class=p>);</span>  
+</span></span><span class=line><span class=cl>    <span class=p>}</span>  
+</span></span><span class=line><span class=cl>  <span class=p>}</span>  
+</span></span><span class=line><span class=cl>  <span class=n>image</span><span class=p>.</span><span class=n>flip_vertically</span><span class=p>();</span>  
+</span></span><span class=line><span class=cl>  <span class=n>image</span><span class=p>.</span><span class=n>write_tga_file</span><span class=p>(</span><span class=s>&#34;lesson1.tga&#34;</span><span class=p>);</span>  
+</span></span><span class=line><span class=cl>  <span class=k>return</span> <span class=mi>0</span><span class=p>;</span>  
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>画出封面图<img src=/article/tiny-renderer-01/head.png width=1598 height=1599 srcset="/article/tiny-renderer-01/head_hu_c53a25c3d08990be.png 480w, /article/tiny-renderer-01/head_hu_9f7fc21b0644ce88.png 1024w" loading=lazy alt=head class=gallery-image data-flex-grow=99 data-flex-basis=239px></p></section><footer class=article-footer><section class=article-tags><a href=/tags/tinyrenderer/>Tinyrenderer</a></section><section class=article-copyright><svg class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg>
+<span>Licensed under CC BY-NC-SA 4.0</span></section></footer><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css integrity=sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV crossorigin=anonymous><script src=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js integrity=sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8 crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js integrity=sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05 crossorigin=anonymous defer></script><script>window.addEventListener("DOMContentLoaded",()=>{const e=[".main-article",".widget--toc"];e.forEach(e=>{const t=document.querySelector(e);t&&renderMathInElement(t,{delimiters:[{left:"$$",right:"$$",display:!0},{left:"$",right:"$",display:!1},{left:"\\(",right:"\\)",display:!1},{left:"\\[",right:"\\]",display:!0}],ignoredClasses:["gist"]})})})</script></article><aside class=related-content--wrapper><h2 class=section-title>Related content</h2><div class=related-content><div class="flex article-list--tile"><article class=has-image><a href=/article/tiny-renderer-02/><div class=article-image><img src=/article/tiny-renderer-02/cover.31384756d5a693426b2e17b41a2bb010_hu_e5def38e7028b80c.png width=250 height=150 loading=lazy alt="Featured image of post myLittleRenderer02 - 三角面" data-key=tiny-renderer-02 data-hash="md5-MThHVtWmk0JrLhe0GiuwEA=="></div><div class=article-details><h2 class=article-title>myLittleRenderer02 - 三角面</h2></div></a></article><article class=has-image><a href=/article/gdc-2024-hifirush-toonrendering-notes/><div class=article-image><img src=/article/gdc-2024-hifirush-toonrendering-notes/face2.8fcdef04559fcb0b080d86d98034a419_hu_41ddbcf4c78d3186.png width=250 height=150 loading=lazy alt="Featured image of post [GDC]3D Toon Rendering in 'Hi-Fi Rush'" data-key=gdc-2024-hifirush-toonrendering-notes data-hash="md5-j83vBFWfywsIDYbZgDSkGQ=="></div><div class=article-details><h2 class=article-title>[GDC]3D Toon Rendering in 'Hi-Fi Rush'</h2></div></a></article><article><a href=/article/urp-shader-template/><div class=article-details><h2 class=article-title>URP Shader 模板</h2></div></a></article><article class=has-image><a href=/article/disney-pbr/><div class=article-image><img src=/article/disney-pbr/aglina.10cd6345a1ae0ee94fa6778aeb71bc8f_hu_5d7c93cda234e287.png width=250 height=150 loading=lazy alt="Featured image of post 迪士尼原则的BRDF" data-key=disney-pbr data-hash="md5-EM1jRaGuDulPpneK63G8jw=="></div><div class=article-details><h2 class=article-title>迪士尼原则的BRDF</h2></div></a></article><article><a href=/article/performance-optimization/><div class=article-details><h2 class=article-title>a brief discussion of performance optimization</h2></div></a></article></div></div></aside><script src=//unpkg.com/@waline/client@v2/dist/waline.js></script><link href=//unpkg.com/@waline/client@v2/dist/waline.css rel=stylesheet><div id=waline class=waline-container></div><style>.waline-container{background-color:var(--card-background);border-radius:var(--card-border-radius);box-shadow:var(--shadow-l1);padding:var(--card-padding);--waline-font-size:var(--article-font-size)}.waline-container .wl-count{color:var(--card-text-color-main)}</style><script>Waline.init({avatar:"",dark:'html[data-scheme="dark"]',el:"#waline",emoji:[],lang:"zh-CN",locale:{admin:"Admin",placeholder:null},placeholder:"leave a comment",requiredMeta:["name","email","url"],serverURL:"https://comment.foth.top",visitor:"Anonymous"})</script><footer class=site-footer><section class=copyright>&copy;
+2020 -
+2025 FOTH0626</section><section class=powerby>Built with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a><br>Theme <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.32.0>Stack</a></b> designed by <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a></section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.c922af694cc257bf1ecc41c0dd7b0430f9114ec280ccf67cd2c6ad55f5316c4e.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>

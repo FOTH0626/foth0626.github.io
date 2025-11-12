@@ -1,0 +1,648 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>RTR4 on FOTH0626</title><link>https://foth0626.github.io/tags/rtr4/</link><description>Recent content in RTR4 on FOTH0626</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Mon, 21 Apr 2025 10:34:19 +0800</lastBuildDate><atom:link href="https://foth0626.github.io/tags/rtr4/index.xml" rel="self" type="application/rss+xml"/><item><title>a brief discussion of performance optimization</title><link>https://foth0626.github.io/article/performance-optimization/</link><pubDate>Mon, 21 Apr 2025 10:34:19 +0800</pubDate><guid>https://foth0626.github.io/article/performance-optimization/</guid><description>&lt;p&gt;本文为RTR4 18章管线优化总结。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Donald Knuth——“We should forget about small efficiencies, say about 97% of the time:Premature optimization is the root of all evil.”&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;图形渲染是基于流水线架构的，因此效率取决于管线中的最慢的一个步骤。值得注意的是，当最慢的步骤无法继续优化时，可以将其他步骤使用额外的计算提高画面的质量。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;KNOW YOUR ARCHITECTURE&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;优化是需要针对特定硬件而言的。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;MEASURE , MEASURE , MEASURE.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;实际的性能测试才能反映你的优化是否有效。&lt;/p&gt;
+&lt;h1 id="性能瓶颈定位"&gt;性能瓶颈定位
+&lt;/h1&gt;&lt;p&gt;想要进行性能优化，首先得定位性能瓶颈在哪。&lt;/p&gt;
+&lt;h2 id="应用阶段测试"&gt;应用阶段测试
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;发送让GPU很少工作或根本不工作的数据。或者使用一个空驱动程序。（这个方法可能会导致一些因为驱动程序本身导致的问题。）&lt;/li&gt;
+&lt;li&gt;降低CPU时钟频率。如果性能降低，那么可以说明程序至少在某种程度上与CPU绑定。GPU也可以使用类似的降频（underclock）方法。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="几何处理阶段"&gt;几何处理阶段
+&lt;/h2&gt;&lt;p&gt;这个部分是最难测试的阶段，因为其他一些阶段的工作负载也会发生相应的变化。&lt;/p&gt;
+&lt;p&gt;几何处理阶段的瓶颈通常出现在顶点获取和顶点处理。&lt;/p&gt;
+&lt;p&gt;顶点获取的测试方式：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;增大顶点格式的大小。例如：在每个顶点上发送一些额外的纹理坐标用来增大顶点的数据。&lt;/li&gt;
+&lt;li&gt;顶点处理由顶点着色器（Vertex Shader）完成。通过让Vertex Shader 变得更长更复杂可以测试瓶颈。但需要担心编译器的优化导致额外指令的无效。几何着色器和曲面细分着色器也会在顶点处理阶段导致额外的性能开销。通常来说，可以使用控制变量法，可以帮助我们确定这些元素是否是性能瓶颈。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="光栅化阶段"&gt;光栅化阶段
+&lt;/h2&gt;&lt;p&gt;光栅化一共包含两个阶段，三角形设置和三角形遍历。三角形设置会计算三角形的微分，边界方程和其他数据，并将这些数据用于三角形遍历。&lt;/p&gt;
+&lt;p&gt;在如生成shadow map 时，由于像素着色器相当简单，所以可能导致光栅化阶段成为瓶颈。
+如果场景内的微小三角形过多，会因为三角形会以2 $\times$ 2 的四边形为一组进行光栅化，导致辅助像素的数量过多，出现 overshading 的情况。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;为了确定光栅化阶段是否为瓶颈，可以通过增加Vertex Shader 和 Fragment Shader 的大小，如果时间不变，那么瓶颈可能位于光栅化阶段。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="像素处理阶段"&gt;像素处理阶段
+&lt;/h2&gt;&lt;p&gt;可以通过改变屏幕分辨率来进行测试，但是如果软件系统设计良好，低分辨率会同时导致使用简化模型，导致几何处理的负载变化。还可能会影响三角形遍历、深度测试、混合和纹理访问等方面的开销。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;可以增大Fragment Shader的复杂度，并观察渲染时间的变化。&lt;/li&gt;
+&lt;li&gt;此外，还可以将像素着色器简化到最少（这在Vertex Shader 中通常很难做到）。&lt;/li&gt;
+&lt;li&gt;纹理缓存未命中导致的开销也是十分高的，如果使用一个 1 $\times$ 1 的纹理导致了性能的提高，那么纹理访问是一个瓶颈。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="合并阶段测试"&gt;合并阶段测试
+&lt;/h2&gt;&lt;p&gt;这个阶段会进行深度测试和模板测试，并进行混合操作。这个阶段可能会成为后处理 pass、阴影、粒子系统渲染的瓶颈。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;改变这些缓冲区的输出 bit 深度是一种改变此阶段带宽成本的方法,这样可以帮助我们查看这个阶段是否会成为瓶颈。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id="优化手段"&gt;优化手段
+&lt;/h1&gt;&lt;h2 id="应用阶段"&gt;应用阶段
+&lt;/h2&gt;&lt;h3 id="内存问题"&gt;内存问题
+&lt;/h3&gt;&lt;p&gt;在很多年前,算术指令的数量是衡量算法效率的关键指标,而如今则是内存访问模式(memory access pattern) 。处理器的速度在过去的很多年间快速增长,而 DRAM 的数据传输速度则增长有限,因为 DRAM会受到引脚数量的限制。
+因此，尽量确保需要读取的数据在缓存（cache）上，可以显著的增加程序的效率。从CPU的寄存器，到L1,L2,L3级缓存，再到DRAM（dynamic random access memory , 即大家常说的内存），再到SSD和HDD，再到云盘/网盘/服务器数据。自顶向下，呈现出从昂贵到廉价，从小容量到大容量，从高速到低速的趋势，值得一提的是，高速到低速的差距通常而言是指数级别的。
+内存中的相邻位置通常而言会被依次访问（空间局部性）。而同一位置往往也会被重复访问（时间局部性）。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;代码中按顺序访问的数据,也应当按顺序存储在内存中。&lt;/li&gt;
+&lt;li&gt;避免间接指针、跳转和函数调用&lt;/li&gt;
+&lt;li&gt;将经常使用的数据结构和缓存行大小的倍数进行对齐，可以显著提升性能。&lt;/li&gt;
+&lt;li&gt;在启动的时候,为相同大小的对象分配一个较大的内存池,然后使用我们自行编写的分配程序和释放程序来管理这个内存池中的内存。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="图形api调用"&gt;图形API调用
+&lt;/h3&gt;&lt;h4 id="状态改变"&gt;状态改变
+&lt;/h4&gt;&lt;p&gt;一个常见的图形操作是对管线进行准备来绘制一个网格，这个操作会涉及一些状态改变，例如：设置着色器和uniform变量，附加的纹理，更改混合状态，更改所使用的颜色缓冲等。提高应用程序性能的一个主要方法是将具有相似渲染状态的对象进行分组，从而最小化状态更改所带来的开销。
+不同类型的状态改变有着不同的开销，这里是一个例子：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;GPU 的渲染模式和计算着色器模式之间进行切换&lt;/li&gt;
+&lt;li&gt;渲染目标(render target)(framebuffer 对象),大约 60k/秒。&lt;/li&gt;
+&lt;li&gt;着色器程序,大约 300k/秒。&lt;/li&gt;
+&lt;li&gt;混合模式(ROP),例如透明度。&lt;/li&gt;
+&lt;li&gt;纹理绑定,1.5M/秒。&lt;/li&gt;
+&lt;li&gt;顶点格式。&lt;/li&gt;
+&lt;li&gt;统一缓冲区对象(uniform buffer object,UBO)绑定。&lt;/li&gt;
+&lt;li&gt;顶点绑定。&lt;/li&gt;
+&lt;li&gt;统一变量更新,大约 10M/秒。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;p&gt;可以对要显示的对象按照着色器类型进行分组,然后按照使用的纹理进行分组,以此类推(按照成本顺序)进行排序分组。按照状态进行排序有时会被称为批处理(batching) 。
+另一种策略是重构对象的数据组织方式。如使用纹理数组，或者在API支持的情况下使用无绑定纹理。&lt;/p&gt;
+&lt;p&gt;由于对着色器的修改成本比修改uniform变量/纹理的开销高得多。因此同一种材质的变化可以使用&amp;quot;if&amp;quot;进行切换。也可以通过共享一个着色器来实现更大的批次，不过，更复杂的shader也会导致性能下降，所以实事求是地测试是唯一万无一失的方法。&lt;/p&gt;
+&lt;p&gt;将多个uniform 变量打包成一个组比绑定单个统一缓冲区对象的效率要高得多，这在DX中称为Constant Buffer。&lt;/p&gt;
+&lt;p&gt;在每次 draw call 之后都返回一个基本状态可能会变得成本很高。例如:当我们要绘制一个对象时,我们可能会假设状态 X默认是关闭的。实现这一目标的一种方法是“启用( X );绘制( M1​); 禁用( X) ”,然后再“启用( X);绘制( M2); ​禁用( X) ”,即在每次绘制操作之后都会恢复初始状态。然而,在两次 draw call 之间对状态进行再次设置很可能会浪费大量时间,即使它们之间并没有发生实际的状态改变。&lt;/p&gt;
+&lt;h4 id="合并和实例化"&gt;合并和实例化
+&lt;/h4&gt;&lt;p&gt;一个被三角形填充的网格,渲染起来要比大量小而简单的网格更加高效。这是因为无论这个图元的大小如何,每个 draw call 都有固定的成本开销(即处理图元的成本) 。
+早在 2003 年,Wloka 就指出,每个批次仅仅绘制两个(尺寸相对较小的)三角形,其效率距离GPU 的最大吞吐量还差 375 倍。对于那些由许多小而简单的物体所组成的场景,这些物体只包含很少的几个三角形,其渲染性能完全受 API 的 CPU 限制,GPU 的能力再强也没法增加渲染效率。也就是说,这些 draw call 在 CPU 上的处理时间,要大于 GPU 实际渲染网格所需的时间,即 GPU 没有被充分利用。
+减少 draw call 次数的一种方法是将多个物体合并到一个网格中,这样就只需要一次 draw call 来渲染该集合即可。因为这些静态物体在同一个网格中是没有区别的，物体选择是一个合并导致的问题。一个典型的解决方案是,在网格的每个顶点中都存储一个对象标识符来进行标记。
+另一种最小化应用程序和API成本的方法是使用Instancing。即在一次draw call中对同一个物体绘制多次。这通常是指定一个基础模型，并提供一个单独的数据结构，并在其中包含了每个特定示例的所需要的信息。除了位置和朝向之外，还可以指定其他的如树叶的颜色或者由风所引起的曲率变化等等任何可以被shader用来影响模型的数据。LOD也可以与Instance技术一起使用，&lt;/p&gt;
+&lt;h3 id="几何处理阶段-1"&gt;几何处理阶段
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;高效的三角形网格存储方式、模型简化和顶点数据压缩&lt;/li&gt;
+&lt;li&gt;截锥体剔除和遮挡剔除&lt;/li&gt;
+&lt;li&gt;烘焙以减少运行时计算。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="光栅化阶段-1"&gt;光栅化阶段
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;背面剔除&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="像素处理阶段-1"&gt;像素处理阶段
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;避免过小的三角形，较小的三角形会生成大量部分覆盖的的四边形，而且，那些只覆盖几个像素的纹理网格通常会导致warp的占用率较低，导致纹理采样的延迟的隐藏效果较差。&lt;/li&gt;
+&lt;li&gt;而如果是需要使用大量寄存器的复杂着色器，也会导致同一时间内的线程数量减少，这种情况被称为寄存器压力（register pressure）。&lt;/li&gt;
+&lt;li&gt;使用原生的纹理格式和像素格式，从而避免格式之间的转换。&lt;/li&gt;
+&lt;li&gt;只加载需要的mipmap层级。&lt;/li&gt;
+&lt;li&gt;使用纹理压缩技术。&lt;/li&gt;
+&lt;li&gt;通过LOD技术，对于不同的距离使用不同的fragment shader。可以简化远处的模型的计算，甚至可以简化高光甚至完全移除高光。&lt;/li&gt;
+&lt;li&gt;GPU的early-z测试可以提前剔除不可见的片元。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="帧缓冲"&gt;帧缓冲
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;压缩颜色精度，如从16bit压缩到8bit。或者使用Yuv有损压缩。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id="多处理"&gt;多处理
+&lt;/h1&gt;&lt;p&gt;多处理系统分为multiprocessor pipelining（多处理器流水线），即时间并行（temporal parallelism），以及parallel processing（并行处理），空间并行（spatial parallelism）。在理想情况下n个处理器均可提升 n倍的处理速度。&lt;/p&gt;
+&lt;h2 id="时间并行"&gt;时间并行
+&lt;/h2&gt;&lt;p&gt;举例：一个应用程序分为APP,CULL,DRAW三个阶段。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;APP：APP 阶段是流水线中的第一个阶段,它控制着其他的后续阶段。在这个阶段中,开发人员可以添加额外的代码,例如进行碰撞检测等。同时 APP 阶段还会对视点进行更新。&lt;/li&gt;
+&lt;li&gt;CULL：视锥体剔除，LOD选择，状态排序，生成渲染的所有物体的列表。&lt;/li&gt;
+&lt;li&gt;DRAW：获取CULL的物体列表，执行图形调用，向GPU发送数据。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;这种技术可以提高吞吐量与渲染速度，但是从轮询用户操作，到显示最终的图像的操作的延迟被加大了。&lt;/p&gt;
+&lt;h2 id="空间并行"&gt;空间并行
+&lt;/h2&gt;&lt;p&gt;使用这种并行处理必须需要程序的任务必须拥有并行性，可以将任务并行地进行，每个处理器都负责处理一个工作，当所有的CPU完成各自的工作时，将结果合并。
+比如一个单CPU需要30ms完成的任务，可以分解成3个CPU耗费10ms完成，并将最终的结果合并一起发送到GPU绘制。这种情况下，会显著地降低任务的延迟。&lt;/p&gt;
+&lt;h2 id="基于任务的多处理"&gt;基于任务的多处理
+&lt;/h2&gt;&lt;p&gt;考虑到许多 CPU 上都有很多核心,现在的技术趋势是使用基于任务的多处理方法。就像是可以为一个并行化进程创建多个任务(也称为作业)一样,这种思想也可以扩展到流水线上。由任何核心生成的任何任务,首先都会被放入工作池中,任何处于空闲状态的处理器都会获取一个任务来进行处理。转换为多处理的一种方法是,获取应用程序的工作流程,并确定其中哪些系统需要依赖于其他系统。&lt;/p&gt;
+&lt;p&gt;注意到有：有时 GPU 内核也会处于空闲状态,例如在生成阴影贴图或者进行深度 prepass 的时候,很多 GPU 核心并未被充分利用。在这样的空闲时间中,可以使用计算着色器来计算其他任务。&lt;/p&gt;</description></item><item><title>PBR1：辐射度量学和色度学</title><link>https://foth0626.github.io/article/radiometry-and-colorimetry/</link><pubDate>Sun, 24 Nov 2024 10:47:33 +0800</pubDate><guid>https://foth0626.github.io/article/radiometry-and-colorimetry/</guid><description>&lt;img src="https://foth0626.github.io/article/radiometry-and-colorimetry/%E7%94%B5%E7%A3%81%E6%B3%A2%E8%B0%B1.png" alt="Featured image of post PBR1：辐射度量学和色度学" /&gt;&lt;p&gt;&lt;strong&gt;本文为Graphics组授课留档记录&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;“Unweave a ranibow ,as it erewhile made. The tender-person'd Lamia melt into shade.” ——John Keats
+“如刚才拆解彩虹那般，让光线娇嫩的Lamia黯然失色。” ——约翰 · 济慈
+&lt;/code&gt;&lt;/pre&gt;
+&lt;blockquote&gt;
+&lt;p&gt;参考资料&lt;br&gt;
+RTR4-CN第八章&lt;br&gt;
+&lt;a class="link" href="https://www.youtube.com/watch?v=gnUYoQ1pwes" target="_blank" rel="noopener"
+&gt;The Amazing Math behind Colors!&lt;/a&gt; &lt;br&gt;
+&lt;a class="link" href="https://www.bilibili.com/video/av308811244?t=1619" target="_blank" rel="noopener"
+&gt; 客观与认知——色度学与颜色感知【中科院科学公开课S03E09】&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;任何基于物理的渲染方法,其第一步都是以一种精确的方式,来对光进行量化(quantify)。在本小节中,我们首先会介绍辐射度量学(radiometry),因为它与光线的物理传输过程紧密相关。
+然后我们紧接着会讨论光度学(photometry),它会根据人眼的灵敏度,对光线值进行加权。&lt;/p&gt;
+&lt;h1 id="光"&gt;光
+&lt;/h1&gt;&lt;p&gt;在物理光学(physical optic)中,光被认为是一种电磁横波(electromagnetic transverse wave),它使得电场(electric field)和磁场(magnetic field)在其传播方向的垂直面上来回振荡。电场和磁场的振荡是耦合的,二者的矢量相互垂直,并且长度之比也是固定的.&lt;/p&gt;
+&lt;p&gt;光以电磁波的形式存在，光和电子的相互作用十分密切：原子的能级跃迁会吸收/释放 光子。在自然界中，电磁波的波长范围相当广，有波长不到百分之一纳米的伽马波，也有波长长达数万公里的极低频无线电波。可见光是整个电磁波谱的一小部分，是波长为380nm ~ 760 nm的电磁波。牛顿著名的三棱镜分光实验将白光分解为七个颜色（据说是因为牛顿对于音乐的喜爱所以按七个音阶对应成了七个颜色。）&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/radiometry-and-colorimetry/%E7%94%B5%E7%A3%81%E6%B3%A2%E8%B0%B1.png"
+width="863"
+height="409"
+srcset="https://foth0626.github.io/article/radiometry-and-colorimetry/%E7%94%B5%E7%A3%81%E6%B3%A2%E8%B0%B1_hu_be8b37fafe60951.png 480w, https://foth0626.github.io/article/radiometry-and-colorimetry/%E7%94%B5%E7%A3%81%E6%B3%A2%E8%B0%B1_hu_37bc4837c2ba941d.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="211"
+data-flex-basis="506px"
+&gt;&lt;/p&gt;
+&lt;h1 id="辐射度量学radiometry"&gt;辐射度量学（Radiometry）
+&lt;/h1&gt;&lt;p&gt;各个辐射量（radiometric quantity）的存在是为了对电磁辐射的各个方面进行测量和度量，例如：总能量、功率（随时间变化的能量）以及相对于面积、方向或者二者的功率密度等。&lt;/p&gt;
+&lt;h2 id="radiant-flux辐射通量"&gt;Radiant flux（辐射通量）
+&lt;/h2&gt;&lt;p&gt;在辐射度量学中，最基本的单位是辐射通量（radiant flux) $\phi$ ，辐射通量是指辐射能量随时间的流动变化，又叫做功率（power），其单位为瓦特(watts，W)。&lt;/p&gt;
+&lt;h2 id="irradiance辐照度"&gt;Irradiance（辐照度）
+&lt;/h2&gt;&lt;p&gt;辐照度（irradiance）是辐射通量相对于面积的密度，即 ( $d\phi/dA$ )。irradiance 是相对于一个面积来进行定义的，这个面积可能是空间中的一个假想区域，但是在渲染中一般都是物体的表面。irradiance 的单位是瓦特每平方米（$W/m^2$ ）。&lt;/p&gt;
+&lt;h2 id="radiant-intensity辐射强度"&gt;Radiant Intensity（辐射强度）
+&lt;/h2&gt;&lt;h3 id="立体角solid-angle"&gt;立体角（Solid Angle）
+&lt;/h3&gt;&lt;p&gt;在二维空间中，我们将角度定义为弧的长度与半径的比值，只需要 $2\pi$ 就可以表示整个单位圆的角度，在三维空间中，我们使用单位球来定义立体角，即立体角形成的一组方向与单位球所相交的面片的面积。立体弧度为 $4\pi$ 的立体角可以覆盖整个单位球。
+现在我们可以引入辐射强度(radiant intensity) $I$，即辐射通量相对于方向的密度，更准确地说，是相对于立体角的密度( $d\Phi/d\omega$ )。它的单位是瓦特每立体弧度（$W/sr$）。&lt;/p&gt;
+&lt;h2 id="radiance辐射度"&gt;Radiance(辐射度)
+&lt;/h2&gt;&lt;p&gt;最后，辐射度（radiance） L是对单条光线中电磁辐射的度量。更精确地说，它是辐射通量相对于面积和立体角的密度（ $d^2\Phi/dAd\omega$ ）。这里的面积位于垂直于光线的平面上，如果想要在其他方向上对表面施加辐射，则必须使用余弦因子进行校正。我们可能还会遇到一些其他对于 radiance 的定义，它们使用了术语“投影面积”来代表这个校正因子。&lt;br&gt;
+radiance 是传感器（例如眼睛或者相机）所直接测量的对象，因此它对渲染而言至关重要。计算着色方程的目的就是沿着给定的光线，计算从着色点到相机的radiance；沿着这条光线计算出来的结果 L，与第 5 章中的$c_{shaded}$ 在物理上是等价的。radiance的公制单位是瓦特每平方米每立体弧度（ $W/m^2sr$ ）。
+环境中的 radiance 可以被认为是五个变量（或者六个变量，将波长考虑在内）的函数，它被称为辐射分布（radiance distribution）；其中有三个变量指定了位置，另外两个变量指定了方向，这个分布函数描述了在空间中任何地方传播的任何光线。根据上面的描述，我们可以这样来理解渲染过程：将眼睛和屏幕定义为一个点和一组方向（例如从眼睛出发，穿过每个像素的光线），然后使用这个函数，在这组方向上对眼睛所在的位置进行评估。&lt;/p&gt;
+&lt;h1 id="光度学photometry"&gt;光度学（Photometry）
+&lt;/h1&gt;&lt;p&gt;辐射度量学仅仅对物理量进行了研究，它完全没有考虑人眼的感知。与此相关的一个领域被称为光度学（photometry），它与辐射度量学类似，不同之处在于，它会根据人眼的敏感度，对辐射度量学中的一切事物进行加权处理。通过乘以 CIE 光度曲线（CIE photometric curve），辐射度量学中的计算结果可以被转换为相应的光度单位。CIE 光度曲线是一条以 555 纳米为中心的钟形曲线，它代表了人眼对各种波长光线的响应程度。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/radiometry-and-colorimetry/CIE%E5%85%89%E5%BA%A6%E6%9B%B2%E7%BA%BF.png"
+width="660"
+height="294"
+srcset="https://foth0626.github.io/article/radiometry-and-colorimetry/CIE%E5%85%89%E5%BA%A6%E6%9B%B2%E7%BA%BF_hu_9d0147f42d688074.png 480w, https://foth0626.github.io/article/radiometry-and-colorimetry/CIE%E5%85%89%E5%BA%A6%E6%9B%B2%E7%BA%BF_hu_f963b032a9826bca.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="224"
+data-flex-basis="538px"
+&gt;&lt;/p&gt;
+&lt;p&gt;这个转换曲线与测量单位，是光度学理论和辐射度量学理论之间的唯一区别。每个辐射物理量都有一个对应的光度学物理量，下表给出了它们的名称和单位。这些光度学物理量的单位都有预期的对应关系（例如：lux 的单位是 lumen 每平方米）。虽然逻辑上来讲，lumen（流明）应该是个基本单位，但是在历史上，candela（坎德拉）则被定义为基本单位，而其他单位都是从坎德拉中派生出来的。在北美，照明设计师仍然会使用已被废弃的英制测量单位，而不是使用 lux（勒克斯），这个英制单位叫做英尺烛光（foot-candle，fc）。无论哪种情况，大多数测光仪都会对illuminance 进行测量，这个单位在照明工程（illumination engineering）中十分重要。&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Radiometry Quantity&lt;/th&gt;
+&lt;th&gt;Units&lt;/th&gt;
+&lt;th&gt;Photometric Quantity&lt;/th&gt;
+&lt;th&gt;Units&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;Radiant flux&lt;/td&gt;
+&lt;td&gt;watt (W)&lt;/td&gt;
+&lt;td&gt;Luminous flux&lt;/td&gt;
+&lt;td&gt;lumen (lm)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Irradiance&lt;/td&gt;
+&lt;td&gt;W/m^2&lt;/td&gt;
+&lt;td&gt;Illuminance&lt;/td&gt;
+&lt;td&gt;lux (lx)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Radiant intensity&lt;/td&gt;
+&lt;td&gt;W/sr&lt;/td&gt;
+&lt;td&gt;Luminous intensity&lt;/td&gt;
+&lt;td&gt;candela (cd)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Radiance&lt;/td&gt;
+&lt;td&gt;W/(m^2·sr)&lt;/td&gt;
+&lt;td&gt;Luminance&lt;/td&gt;
+&lt;td&gt;cd/m^2 (nit)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Luminance 通常用来描述平面的亮度。例如：高动态范围（high dynamic range，HDR）电视屏幕的峰值亮度通常在 500 到 1000 尼特（nit）之间。相比之下，晴朗天空的亮度大约为 8000 尼特，60 瓦的电灯泡约为 12 万尼特，地平线上的太阳约为60 万尼特。&lt;/p&gt;
+&lt;h1 id="色度学colorimetry"&gt;色度学（Colorimetry）
+&lt;/h1&gt;&lt;p&gt;真正关键的特性是波长，眼睛捕捉到波长通过向大脑发送信号，我们将其感知为颜色。因此色彩并非光的固有属性，而是一种心理现象，它与波长有关，本质上是间接的。所以色彩并不仅仅是不同波长的直接对应，因为还有眼镜将光转换成大脑可识别信号。&lt;/p&gt;
+&lt;h2 id="眼睛的结构"&gt;眼睛的结构
+&lt;/h2&gt;&lt;p&gt;&lt;img src="https://foth0626.github.io/article/radiometry-and-colorimetry/%E7%9C%BC%E7%9D%9B%E7%9A%84%E7%BB%93%E6%9E%841.png"
+width="1064"
+height="532"
+srcset="https://foth0626.github.io/article/radiometry-and-colorimetry/%E7%9C%BC%E7%9D%9B%E7%9A%84%E7%BB%93%E6%9E%841_hu_ab1ba76de3f01678.png 480w, https://foth0626.github.io/article/radiometry-and-colorimetry/%E7%9C%BC%E7%9D%9B%E7%9A%84%E7%BB%93%E6%9E%841_hu_38c73b46682b8751.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="200"
+data-flex-basis="480px"
+&gt;&lt;/p&gt;
+&lt;p&gt;外界物体经过折射后，成像到视网膜上。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/radiometry-and-colorimetry/%E7%9C%BC%E7%9D%9B%E7%9A%84%E7%BB%93%E6%9E%842.png"
+width="597"
+height="595"
+srcset="https://foth0626.github.io/article/radiometry-and-colorimetry/%E7%9C%BC%E7%9D%9B%E7%9A%84%E7%BB%93%E6%9E%842_hu_48eb58b0ec74d065.png 480w, https://foth0626.github.io/article/radiometry-and-colorimetry/%E7%9C%BC%E7%9D%9B%E7%9A%84%E7%BB%93%E6%9E%842_hu_ba319a6c1546ddb0.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="100"
+data-flex-basis="240px"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/radiometry-and-colorimetry/%E7%9C%BC%E7%9D%9B%E7%9A%84%E7%BB%93%E6%9E%843.png"
+width="600"
+height="600"
+srcset="https://foth0626.github.io/article/radiometry-and-colorimetry/%E7%9C%BC%E7%9D%9B%E7%9A%84%E7%BB%93%E6%9E%843_hu_a29e43f27e9f9ef6.png 480w, https://foth0626.github.io/article/radiometry-and-colorimetry/%E7%9C%BC%E7%9D%9B%E7%9A%84%E7%BB%93%E6%9E%843_hu_dda078bae4a9583c.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="100"
+data-flex-basis="240px"
+&gt;&lt;/p&gt;
+&lt;p&gt;人类的眼睛血管与神经在感光细胞之前，这是进化史上的遗留问题，为了减弱这种影响，中央的部分血管和神经更薄以减弱影响，就有了中央凹这种结构。盲点则是血管神经穿透眼球连接到大脑，导致该区域没有视觉细胞。
+黄斑区聚集了大量的视觉细胞，主要分为两种，分别是视锥细胞（Cones cells）和视杆细胞（Rod cells）。视锥细胞主要负责对颜色的感知，视杆细胞主要负责对亮度的感知。视锥细胞大约数量为600w，每种负责检测对应的波长。
+视锥细胞一共有三种，分别对短波长(400 ~ 550nm,响应曲线峰值在440nm），中等波长（400nm ~ 650nm，响应峰值在540nm），长波长（430nm ~ 700nm，响应峰值在570nm）敏感。
+&lt;img src="https://foth0626.github.io/article/radiometry-and-colorimetry/%E8%A7%86%E8%A7%89%E7%BB%86%E8%83%9E%E5%93%8D%E5%BA%94%E6%9B%B2%E7%BA%BF.png"
+width="1280"
+height="717"
+srcset="https://foth0626.github.io/article/radiometry-and-colorimetry/%E8%A7%86%E8%A7%89%E7%BB%86%E8%83%9E%E5%93%8D%E5%BA%94%E6%9B%B2%E7%BA%BF_hu_ad6b4b2ba99f6436.png 480w, https://foth0626.github.io/article/radiometry-and-colorimetry/%E8%A7%86%E8%A7%89%E7%BB%86%E8%83%9E%E5%93%8D%E5%BA%94%E6%9B%B2%E7%BA%BF_hu_33c401fc01249494.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="178"
+data-flex-basis="428px"
+&gt;&lt;/p&gt;
+&lt;p&gt;把三个视锥细胞的响应曲线绘画出来，大约长这个样子，值得注意的是短波长的绝对响应曲线峰值强度远远低于其他两条响应曲线的峰值强度。因此常会把这些曲线归一化。&lt;/p&gt;
+&lt;p&gt;人眼会把短波长，中等波长，长波长的光线识别为蓝色，绿色，红色。这有一些道理，但不准确，长波响应视锥细胞被完全激活时（570nm）时，其实仍然处于绿色范围内。所以根据波长划分才更准确。
+&lt;img src="https://foth0626.github.io/article/radiometry-and-colorimetry/%E9%A2%9C%E8%89%B2%E4%B8%8E%E7%9B%B8%E5%BA%94%E6%9B%B2%E7%BA%BF.png"
+width="1280"
+height="811"
+srcset="https://foth0626.github.io/article/radiometry-and-colorimetry/%E9%A2%9C%E8%89%B2%E4%B8%8E%E7%9B%B8%E5%BA%94%E6%9B%B2%E7%BA%BF_hu_77e1e9f44d43dcb6.png 480w, https://foth0626.github.io/article/radiometry-and-colorimetry/%E9%A2%9C%E8%89%B2%E4%B8%8E%E7%9B%B8%E5%BA%94%E6%9B%B2%E7%BA%BF_hu_2a9d646dd4cfbc52.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="157"
+data-flex-basis="378px"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/radiometry-and-colorimetry/%E9%A2%9C%E8%89%B2%E4%B8%8E%E5%93%8D%E5%BA%94%E5%80%BC.png"
+width="1280"
+height="684"
+srcset="https://foth0626.github.io/article/radiometry-and-colorimetry/%E9%A2%9C%E8%89%B2%E4%B8%8E%E5%93%8D%E5%BA%94%E5%80%BC_hu_a8d47493cbdba517.png 480w, https://foth0626.github.io/article/radiometry-and-colorimetry/%E9%A2%9C%E8%89%B2%E4%B8%8E%E5%93%8D%E5%BA%94%E5%80%BC_hu_f87bb9ec1d79fc1a.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="187"
+data-flex-basis="449px"
+&gt;&lt;/p&gt;
+&lt;h1 id="色彩空间"&gt;色彩空间
+&lt;/h1&gt;&lt;p&gt;由于人类只有三种颜色感受器，所以只用三个数字就可以精确的表示任何颜色。但是如何确定颜色之间的对应关系呢？CIE（Commission Internationale d&amp;rsquo;Eclairag）提出了一套标准，并根据标准进行了配色实验。
+当时使用汞灯，汞的原子光谱中的700nm,546nm,436nm可以做的比较纯，然后将三个颜色叠加，再另一侧使用分光计或这光栅等设备得到连续的颜色。通过调节三种颜色的权重获得相同的颜色。就得到了颜色匹配函数（color-matching function)。
+&lt;img src="https://foth0626.github.io/article/radiometry-and-colorimetry/%E9%A2%9C%E8%89%B2%E5%8C%B9%E9%85%8D%E5%87%BD%E6%95%B0.png"
+width="488"
+height="310"
+srcset="https://foth0626.github.io/article/radiometry-and-colorimetry/%E9%A2%9C%E8%89%B2%E5%8C%B9%E9%85%8D%E5%87%BD%E6%95%B0_hu_e6408e370da31ecc.png 480w, https://foth0626.github.io/article/radiometry-and-colorimetry/%E9%A2%9C%E8%89%B2%E5%8C%B9%E9%85%8D%E5%87%BD%E6%95%B0_hu_f7975c454c107eb4.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="157"
+data-flex-basis="377px"
+&gt;&lt;br&gt;
+有一段曲线的值是负的，这意味我们无法通过混合三色光得到这种颜色，而是需要把对应的光源添加到待测颜色的色块中才能使人眼的感知相同。&lt;/p&gt;
+&lt;p&gt;如果把所有波长对应的光显示出来，我们不难发现一些问题：许多颜色有缺失，比如粉色，品红，棕色，米黄？最重要的是：白色和黑色？
+&lt;img src="https://foth0626.github.io/article/radiometry-and-colorimetry/%E6%B3%A2%E9%95%BF%E5%92%8C%E9%A2%9C%E8%89%B2.png"
+width="1280"
+height="526"
+srcset="https://foth0626.github.io/article/radiometry-and-colorimetry/%E6%B3%A2%E9%95%BF%E5%92%8C%E9%A2%9C%E8%89%B2_hu_ea8522e713f1817b.png 480w, https://foth0626.github.io/article/radiometry-and-colorimetry/%E6%B3%A2%E9%95%BF%E5%92%8C%E9%A2%9C%E8%89%B2_hu_1459aa20ce4eb1f9.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="243"
+data-flex-basis="584px"
+&gt;&lt;/p&gt;
+&lt;p&gt;黑色是无光环境下的颜色，除此之外，亮度也是一个需要考虑的问题：眼睛的视锥细胞数量大约有600w，在低亮度的情况下，不可能所有的视锥细胞都能被激活。只有部分视锥细胞被激活的情况下，大脑会把黑色和原色进行混合，形成变体。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/radiometry-and-colorimetry/%E9%A2%9C%E8%89%B2%E4%B8%8E%E4%BA%AE%E5%BA%A6.png"
+width="1280"
+height="698"
+srcset="https://foth0626.github.io/article/radiometry-and-colorimetry/%E9%A2%9C%E8%89%B2%E4%B8%8E%E4%BA%AE%E5%BA%A6_hu_c4957495627c3a3c.png 480w, https://foth0626.github.io/article/radiometry-and-colorimetry/%E9%A2%9C%E8%89%B2%E4%B8%8E%E4%BA%AE%E5%BA%A6_hu_2a1624321389598d.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="183"
+data-flex-basis="440px"
+&gt;&lt;/p&gt;
+&lt;p&gt;而对于橙色，黄色这种鲜亮的颜色，当变暗后与原来的颜色差别过于明显，我们把它们视为新颜色，
+&lt;img src="https://foth0626.github.io/article/radiometry-and-colorimetry/%E6%B3%A2%E9%95%BF%E5%92%8C%E9%A2%9C%E8%89%B22.png"
+width="1280"
+height="775"
+srcset="https://foth0626.github.io/article/radiometry-and-colorimetry/%E6%B3%A2%E9%95%BF%E5%92%8C%E9%A2%9C%E8%89%B22_hu_5a15e1a589d4bdc2.png 480w, https://foth0626.github.io/article/radiometry-and-colorimetry/%E6%B3%A2%E9%95%BF%E5%92%8C%E9%A2%9C%E8%89%B22_hu_c2251644d8e88d20.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="165"
+data-flex-basis="396px"
+&gt;&lt;/p&gt;
+&lt;p&gt;使用亮度和波长，即可表现出一个二维的色彩空间。
+&lt;img src="https://foth0626.github.io/article/radiometry-and-colorimetry/%E6%B3%A2%E9%95%BF%E4%B8%8E%E4%BA%AE%E5%BA%A6%E4%BA%8C%E7%BB%B4%E8%89%B2%E5%BD%A9.png"
+width="1280"
+height="708"
+srcset="https://foth0626.github.io/article/radiometry-and-colorimetry/%E6%B3%A2%E9%95%BF%E4%B8%8E%E4%BA%AE%E5%BA%A6%E4%BA%8C%E7%BB%B4%E8%89%B2%E5%BD%A9_hu_f80a752a53cad098.png 480w, https://foth0626.github.io/article/radiometry-and-colorimetry/%E6%B3%A2%E9%95%BF%E4%B8%8E%E4%BA%AE%E5%BA%A6%E4%BA%8C%E7%BB%B4%E8%89%B2%E5%BD%A9_hu_acf221b6bafe9a10.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="180"
+data-flex-basis="433px"
+&gt;&lt;/p&gt;
+&lt;p&gt;现在有一些之前遗漏的颜色可以找到了，但是仍然有很多颜色没有找到：比如品红，粉色。为了解决这个问题，我们需要引入色彩空间的概念，我们把短波长，中波长，长波长作为坐标系的三个轴，然后我们就可以在空间中得到这样一条曲线：&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/radiometry-and-colorimetry/%E8%89%B2%E5%BD%A9%E7%A9%BA%E9%97%B4%E4%B8%AD%E7%9A%84%E5%93%8D%E5%BA%94%E6%9B%B2%E7%BA%BF.png"
+width="1280"
+height="703"
+srcset="https://foth0626.github.io/article/radiometry-and-colorimetry/%E8%89%B2%E5%BD%A9%E7%A9%BA%E9%97%B4%E4%B8%AD%E7%9A%84%E5%93%8D%E5%BA%94%E6%9B%B2%E7%BA%BF_hu_988c5ce361e72c4e.png 480w, https://foth0626.github.io/article/radiometry-and-colorimetry/%E8%89%B2%E5%BD%A9%E7%A9%BA%E9%97%B4%E4%B8%AD%E7%9A%84%E5%93%8D%E5%BA%94%E6%9B%B2%E7%BA%BF_hu_988f140561dc350e.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="182"
+data-flex-basis="436px"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/radiometry-and-colorimetry/%E7%BC%BA%E5%A4%B1%E7%9A%84%E9%A2%9C%E8%89%B2.png"
+width="1280"
+height="907"
+srcset="https://foth0626.github.io/article/radiometry-and-colorimetry/%E7%BC%BA%E5%A4%B1%E7%9A%84%E9%A2%9C%E8%89%B2_hu_5218dd467d303c68.png 480w, https://foth0626.github.io/article/radiometry-and-colorimetry/%E7%BC%BA%E5%A4%B1%E7%9A%84%E9%A2%9C%E8%89%B2_hu_38b1652f9eb8be6a.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="141"
+data-flex-basis="338px"
+&gt;&lt;/p&gt;
+&lt;p&gt;通过对不同的光线进行混合，就可以在现实中得到这些颜色。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/radiometry-and-colorimetry/LMS%E5%92%8CCIE%E8%89%B2%E5%BD%A9%E7%A9%BA%E9%97%B4.png"
+width="1280"
+height="738"
+srcset="https://foth0626.github.io/article/radiometry-and-colorimetry/LMS%E5%92%8CCIE%E8%89%B2%E5%BD%A9%E7%A9%BA%E9%97%B4_hu_17d4828a0ff76ef8.png 480w, https://foth0626.github.io/article/radiometry-and-colorimetry/LMS%E5%92%8CCIE%E8%89%B2%E5%BD%A9%E7%A9%BA%E9%97%B4_hu_a6ced1e8ae86419f.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="173"
+data-flex-basis="416px"
+&gt;&lt;/p&gt;
+&lt;p&gt;刚才讲的色彩空间叫做LMS空间，它对于响应曲线是归一化的，如果我们把真正响应曲线进行加权，那么便会得到CIE色彩空间。&lt;/p&gt;
+&lt;p&gt;好的，但是这个空间是三维的，如果我想总览所有颜色，就会不太方便。回想之前的内容，降低颜色的亮度会逐渐变成黑色，但是颜色本身的色调是没有改变的，我们把同一色调但是不同亮度的颜色可以在这个空间坐标中连成一条线，这条线被称为色度线，色度线与平面 $x+y+z=1$ 的交点，就可以认为是这个点在平面上的位置。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/radiometry-and-colorimetry/CIE%E8%89%B2%E5%BA%A6%E5%9B%BE.png"
+width="1280"
+height="947"
+srcset="https://foth0626.github.io/article/radiometry-and-colorimetry/CIE%E8%89%B2%E5%BA%A6%E5%9B%BE_hu_6d1d2fb468e5d779.png 480w, https://foth0626.github.io/article/radiometry-and-colorimetry/CIE%E8%89%B2%E5%BA%A6%E5%9B%BE_hu_4aa117e72c43c09e.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="135"
+data-flex-basis="324px"
+&gt;&lt;/p&gt;</description></item><item><title>RTR4-CN 第六章 纹理（Texture）</title><link>https://foth0626.github.io/article/rtr4-chapter06-texture/</link><pubDate>Tue, 12 Nov 2024 20:51:56 +0800</pubDate><guid>https://foth0626.github.io/article/rtr4-chapter06-texture/</guid><description>&lt;img src="https://foth0626.github.io/article/rtr4-chapter06-texture/%E7%BA%B9%E7%90%86%E7%AE%A1%E7%BA%BF.png" alt="Featured image of post RTR4-CN 第六章 纹理（Texture）" /&gt;&lt;p&gt;&lt;strong&gt;本文为Graphics组授课留档&lt;/strong&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&amp;ldquo;All it takes is for the rendered image to look right.&amp;rdquo; ——Jim Blinn&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;blockquote&gt;
+&lt;p&gt;本节课参考资料：RTR4-CN 第六章&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;表面纹理(texture)是指其外观和给人的视觉感受,就像是一幅油画的图案一样。
+而在计算机图形学中,纹理化则指的是一个过程,即通过使用一些图像、函数或者其他数据,来对每个表面位置的外观表现进行修改。例如:我们可以将一张砖墙的彩色图像应用于由两个三角形组成的矩形上,而不是去精确表现砖墙的几何结构。当我们观察这个砖墙矩形的时候,对应的彩色图像将会显示在这个矩形所在的位置上,这样可以使得这个矩形看起来很像真实的砖墙。除非相机十分靠近墙壁的话,否则砖墙几何细节的缺乏并不会带来明显的视觉瑕疵。&lt;/p&gt;
+&lt;h1 id="纹理管线"&gt;纹理管线
+&lt;/h1&gt;&lt;p&gt;纹理化（texturing）是一种用于描述表面材质以及对表面进行修饰加工的有效技术。纹理的工作原理是通过修改着色方程的中的参数，对最终结果产生影响。比如说，对于刚才的那个例子，通过替换点的位置，将顶点颜色为纹理颜色。或者粗糙度纹理修改了表面的粗糙度值，凹凸纹理修改了表面着色法线的方向。&lt;/p&gt;
+&lt;p&gt;为了与屏幕上的像素（pixel）有所区别，纹理上的像素通常被称为纹素（texel）。&lt;/p&gt;
+&lt;p&gt;纹理化的起点是一个空间中的具体位置，这个位置可以在世界空间中，但是通常是基于模型空间参考系的，因为纹理会随着模型移动而移动。这个空间点会使用一个投影函数（projection function）获得一组数字，它被称为纹理坐标，纹理坐标可以用于访问采样纹理，这个过程称为纹理映射。&lt;/p&gt;
+&lt;p&gt;在使用纹理坐标访问纹理之前，还需要使用一个或多个转换函数（corresponder funcion)，来将纹理坐标转换到纹理空间中，用来在纹理中获取像素值。例如：纹理空间位置是图像纹理的数组索引，从而检索到对应的位置的值。检索到的像素值可能还要使用一个值转换函数（value transform function)进行转换，最终这些新值会用于对表面的某些属性进行修改。值得注意的是，并不是每次纹理应用都需要激活管线中的所有步骤。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/rtr4-chapter06-texture/%E7%BA%B9%E7%90%86%E7%AE%A1%E7%BA%BF.png"
+width="1064"
+height="267"
+srcset="https://foth0626.github.io/article/rtr4-chapter06-texture/%E7%BA%B9%E7%90%86%E7%AE%A1%E7%BA%BF_hu_fba74e2d9a4faf8a.png 480w, https://foth0626.github.io/article/rtr4-chapter06-texture/%E7%BA%B9%E7%90%86%E7%AE%A1%E7%BA%BF_hu_3b3763439dfc4308.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="398"
+data-flex-basis="956px"
+&gt;&lt;/p&gt;
+&lt;p&gt;例如:对于一个具有砖墙纹理的三角形,我们在其表面上进行采样时会发生如下情况(112如图 6.3 所示):首先我们会在该物体的局部参考系中,找到对应的采样位置(x, y, z),这里假设它是 (−2.3, 7.1, 88.2)。然后会对这个位置坐标应用一个投影函数,就像世界地图是三维地球的二维投影那样,这里的投影函数通常会将一个三维向量 (x, y, z)转换为一个二维向量 (u, v)。本例中所使用的投影函数,实际上与正交投影是等价的(章节 2.3.1),它就像幻灯片放映机一样,将砖墙图像投影到三角形表面上;并且为了最后能将图象值返回到墙面上,其表面上的点都会被转换为一个0-1 范围内的数值对,这里我们假设转换后的值是 (0.32, 0.29),这个数值对也被称为纹理坐标或者 UV 坐标。这个纹理坐标将用于查找纹理贴图在此位置上的颜色值。假设这里我们所使用的砖墙纹理分辨率为 256 × 256,因此使用转换函数,将纹理坐标 (u, v)各自乘以 256,即 (81.92, 74.24)。在丢弃小数部分之后,我们在砖墙图像中进行检索,找到索引值为 (81, 74)的颜色值,这里假设这个颜色值为(0.9, 0.8, 0.7)。同时,我们所使用的纹理颜色位于 sRGB 颜色空间中,因此如果要在着色方程中使用这个颜色值,还需要将其转换到线性空间中,即(0.787、0.604、0.448)。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/rtr4-chapter06-texture/%E7%BA%B9%E7%90%86%E7%AE%A1%E7%BA%BF%E7%A4%BA%E4%BE%8B.png"
+width="1002"
+height="449"
+srcset="https://foth0626.github.io/article/rtr4-chapter06-texture/%E7%BA%B9%E7%90%86%E7%AE%A1%E7%BA%BF%E7%A4%BA%E4%BE%8B_hu_ddcf65d816479f96.png 480w, https://foth0626.github.io/article/rtr4-chapter06-texture/%E7%BA%B9%E7%90%86%E7%AE%A1%E7%BA%BF%E7%A4%BA%E4%BE%8B_hu_9d54a9481a9314d3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="223"
+data-flex-basis="535px"
+&gt;&lt;/p&gt;
+&lt;h2 id="投影函数projection-function"&gt;投影函数（Projection function）
+&lt;/h2&gt;&lt;p&gt;纹理处理的第一步是获取表面的位置，并将其投影到纹理坐标空间（texture coordinate space）中，这个纹理坐标空间中通常是二维（u,v)的，常见的建模软件允许艺术家定义每个顶点的uv坐标，这些坐标可以从投影函数或者网格展开算法中进行初始化，艺术家也可以编辑uv坐标。&lt;/p&gt;
+&lt;p&gt;投影函数的作用通常是将空间中的三维坐标转换为二维纹理坐标，在建模软件中常见的投影包括球面投影，柱面投影，平面投影等。还有一些投影函数根本不是投影操作，而是隐含在表面创建和曲面细分中。例如，参数化生成的曲面定义本身就包含了一组天生的uv坐标。投影函数的最终目标只是生成纹理坐标，将其作为一个与位置有关的函数来进行推导只是一种方法。有时候单个投影函数就可以用于整个模型的投影操作，但是艺术家通常一些工具将模型进行细分，并单独应用不同的投影函数。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/rtr4-chapter06-texture/%E6%8A%95%E5%BD%B1%E5%87%BD%E6%95%B01.png"
+width="1169"
+height="701"
+srcset="https://foth0626.github.io/article/rtr4-chapter06-texture/%E6%8A%95%E5%BD%B1%E5%87%BD%E6%95%B01_hu_38d9e8f58c11b38f.png 480w, https://foth0626.github.io/article/rtr4-chapter06-texture/%E6%8A%95%E5%BD%B1%E5%87%BD%E6%95%B01_hu_e55a93735c8f7388.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="166"
+data-flex-basis="400px"
+&gt;&lt;/p&gt;
+&lt;p&gt;在实时渲染领域，通常在建模时就会使用投影函数，将结果存储在顶点上。但是并不是总是如此，有时在顶点着色器或者像素着色器中应用投影函数会带来一些好处，比如提高精度，有助于实现动画在内的各种效果。有时候一些渲染方法有着独特的投影函数，会进行逐像素的计算，比如环境映射。与投影方向相近的表面会产生严重的扭曲，所以艺术家经常需要手动将模型分解为小块（即建模过程中的展uv）。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/rtr4-chapter06-texture/%E6%8A%95%E5%BD%B1%E5%87%BD%E6%95%B02.png"
+width="1101"
+height="694"
+srcset="https://foth0626.github.io/article/rtr4-chapter06-texture/%E6%8A%95%E5%BD%B1%E5%87%BD%E6%95%B02_hu_4517753a2bebc79f.png 480w, https://foth0626.github.io/article/rtr4-chapter06-texture/%E6%8A%95%E5%BD%B1%E5%87%BD%E6%95%B02_hu_6c25725c18b9d52e.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="158"
+data-flex-basis="380px"
+&gt;&lt;/p&gt;
+&lt;p&gt;纹理坐标空间并不总是一个二维平面，有时候也可以是一个三维体积，这时纹理坐标有三个分量（u，v，w）。部分情况甚至会用四个坐标（即齐次坐标描述）（s，t，r，q）。&lt;/p&gt;
+&lt;p&gt;还有一种重要的纹理坐标空间是方向性的，纹理空间的每个点都通过输入方向来访问。每个点位置上的法线代表了访问该纹理的输入方向。使用这种方向性的纹理最常见的纹理类型就是立方体贴图（cube map）。&lt;/p&gt;
+&lt;p&gt;值得注意的是，一维的纹理也有各自的用途。例如：对于一个地形模型而言，颜色可以由高度决定。或者作为一个一维查找表。&lt;/p&gt;
+&lt;h2 id="转换函数corresponder-function"&gt;转换函数（Corresponder function）
+&lt;/h2&gt;&lt;p&gt;转换函数用于将纹理坐标转换为纹理空间的具体位置，它们提高了在表面上应用纹理的灵活性。其中一个例子是：使用API选择现有纹理的一部分来显示，并且在后续的操作都只会使用这个子图像。&lt;br&gt;
+另一类转换函数则是矩阵变换，应用于顶点着色器或片元着色器中，他们允许对表面上的纹理进行平移、旋转、缩放、剪切或者投影操作。&lt;br&gt;
+另一类转换控制图像的应用方式。纹理坐标uv只有在（0，1）这个范围才是有意义的的。但是如果纹理坐标位于范围之外时，它应该如何取值呢？转换函数决定了会发生什么。在OpenGL中，这种类型的转换函数被称为包装模式（wrapping mode），在DirectX中被称为纹理寻址模式（texture addressing mode）。&lt;br&gt;
+常见的转换函数包括如下类型：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;wrap（directX），repeat（OpenGL）或者tile：图像表面会不断重复。&lt;/li&gt;
+&lt;li&gt;mirror：图像会不断重复，但是每重复一次就会被镜像翻转一次。&lt;/li&gt;
+&lt;li&gt;clamp（directX）或者clamp to edge（opengl）：位于（0，1）范围之外的纹理坐标会被限制在这个范围内。这种模式会导致图像边缘的不断重复，优点在于在纹理附近发生双线性插值时，可以避免从纹理的相反边缘进行采样。&lt;/li&gt;
+&lt;li&gt;border（directX）或者clamp to border（OpenGL）：位于（0，1）范围之外的纹理坐标会被映射成同一个值。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/rtr4-chapter06-texture/%E5%8C%85%E5%9B%B4%E6%A8%A1%E5%BC%8F.png"
+width="1276"
+height="576"
+srcset="https://foth0626.github.io/article/rtr4-chapter06-texture/%E5%8C%85%E5%9B%B4%E6%A8%A1%E5%BC%8F_hu_1befc5a7e2250433.png 480w, https://foth0626.github.io/article/rtr4-chapter06-texture/%E5%8C%85%E5%9B%B4%E6%A8%A1%E5%BC%8F_hu_8c8767d03356321d.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="221"
+data-flex-basis="531px"
+&gt;&lt;/p&gt;
+&lt;p&gt;纹理的重复平铺是一种为场景添加更多视觉细节的廉价方法。但是人眼能识别出这种不自然的重复。一个常见的解决方法与另一个非重复平铺的的纹理结合。另一个方法是，使用着色器实现一些特殊的转换函数，从而将纹理图案和瓦片贴图进行随机重组。&lt;br&gt;
+最后一种被应用的转换函数是隐式的，并且与图像的大小有关。纹理通常会应用在uv坐标的（0，1）范围内。例如砖墙的例子，通过将该范围内的纹理坐标乘以分辨率得到对应的像素位置。这种将纹理坐标限制在（0，1）范围内的优势是不需要对不同分辨率的纹理在顶点内存储不同的纹理坐标值。&lt;/p&gt;
+&lt;h2 id="纹理值"&gt;纹理值
+&lt;/h2&gt;&lt;p&gt;生成纹理坐标空间后，便可以用这个坐标获取对应的纹理值。对于图像纹理中，这是通过检索图像中的纹素得到的。实时渲染的绝大多数函数都是图像纹理。但也有程序生成的纹理，这种情况下便不涉及内存查找，而是变成了一个函数值的计算。&lt;br&gt;
+最常见最直接的纹理值便是RGB三元组，它可以用于替换或者修改表面的颜色。另一种类型是RGBA，A（alpha）通道代表了纹理的不透明度。纹理贴图中不仅仅可以存储颜色数据，也可以存储其他类型的数据，比如表面粗糙度等。&lt;br&gt;
+纹理中返回的值可以在使用前进行转换。一个常见的例子是把（0.0,1.0）这个无符号范围映射回（-1.0,1.0）这个范围，用这个方法可以在纹理内存储法线数据。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/rtr4-chapter06-texture/%E6%B3%95%E7%BA%BF%E8%B4%B4%E5%9B%BE.png"
+width="640"
+height="640"
+srcset="https://foth0626.github.io/article/rtr4-chapter06-texture/%E6%B3%95%E7%BA%BF%E8%B4%B4%E5%9B%BE_hu_18d1e6c013fb4809.png 480w, https://foth0626.github.io/article/rtr4-chapter06-texture/%E6%B3%95%E7%BA%BF%E8%B4%B4%E5%9B%BE_hu_8e3eb40ad18935b3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="100"
+data-flex-basis="240px"
+&gt;&lt;/p&gt;
+&lt;h1 id="图像纹理"&gt;图像纹理
+&lt;/h1&gt;&lt;p&gt;像素着色器可以通过纹理坐标传给texture2D等函数，并调用他们来访问纹理，在不同的图形API有两个主要区别。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;在DirectX中，纹理的左上角对应的（0，0），右下角对应（1，1）。而在OpenGL中左下角的位置对应了（0，0）。这正好是DirectX翻转y轴得到的结果。&lt;/li&gt;
+&lt;li&gt;纹素具有整数类型的坐标，但是我们经常会有访问两个纹素中间的值，并在它们之间进行插值，这就引出了一个问题：像素中心的浮点坐标是什么？但是我们会经常想要访问两个纹素之间的位置,并在它们之间进行插值,这就引出了一个问题：像素中心的浮点坐标是什么？Heckbert讨论了两种可能的模式:截断(truncate)和舍入(round)。DirectX 9 将每个纹素的中心定义在(0.0, 0.0)处,它采用了舍入方法。但是这个系统稍微有点混乱,因为对于 DirectX左上角像素(原点)而言,该像素的左上角坐标为 (−0.5, −0.5) 。DirectX 10 学习了 OpenGL 的纹理坐标系统,让每个纹素的中心值为 (0.5, 0.5),即使用了截断方法,或者更准确地说是向下取整(floor),即小数部分会被丢弃。向下取整是一个更加直观的系统,它可以很好的用语言进行表述,例如:当我们说一个像素位于坐标(5, 9)时,实际上我们指的是沿 u轴方向上从 5.0-6.0 的范围,以及沿 v 轴方向上从 9.0-10.0 的范围。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;依赖纹理读取&lt;/strong&gt;(dependent texture read)是一个值得解释的术语,它包含两个定义。&lt;br&gt;
+第一个定义是对于移动设备而言的，当我们使用texture2D或者类似方式访问纹理并在片元着色器内手动计算纹理坐标，而不是使用顶点着色器传入的、未修改的纹理坐标时，就会发生依赖纹理读取。手动计算纹理甚至包括交换uv这种简单操作！对于老旧的不支持OpengGL ES 3.0的移动设备GPU来说，不发生依赖纹理读取会有更高的效率。因为可以预读取。&lt;br&gt;
+另一个定义则是一个纹理坐标依赖之前的纹理值。比如法线贴图改变了表面法线，而cube map访问又依赖于法线。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;纹理尺寸&lt;/strong&gt; 通常为 $2^m \times 2^n$，这样的纹理被称为2次幂（power of two ,POT)纹理，现代GPU可以处理任意大小的非2次幂（non power of two ，NPOT)纹理。但是老旧设备可能不支持NOPT的mipmap。不同的图形API对于纹理尺寸有着不同的上限。 DirectX12 允许一张16384 *16384分辨力的纹理。&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;设想一下，纹理被放大和缩小后，这时我们又会看到什么样的图像？这个问题的答案取决于我们使用什么样的采样和过滤方法。&lt;/p&gt;
+&lt;h2 id="放大magnification"&gt;放大（magnification）
+&lt;/h2&gt;&lt;p&gt;&lt;img src="https://foth0626.github.io/article/rtr4-chapter06-texture/%E6%94%BE%E5%A4%A7%E6%BB%A4%E6%B3%A2.png"
+width="1189"
+height="744"
+srcset="https://foth0626.github.io/article/rtr4-chapter06-texture/%E6%94%BE%E5%A4%A7%E6%BB%A4%E6%B3%A2_hu_67434f03f6f78b38.png 480w, https://foth0626.github.io/article/rtr4-chapter06-texture/%E6%94%BE%E5%A4%A7%E6%BB%A4%E6%B3%A2_hu_ff57a88c1e52145a.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="159"
+data-flex-basis="383px"
+&gt;&lt;/p&gt;
+&lt;p&gt;在图 6.8 的最左侧,我们使用了邻近过滤的方法。这种放大技术的一个特点是,单个纹素可能会变得十分明显。这种效果被称为像素化(pixelation);因为该方法在放大的时候,会选取距离每个像素中心最近的纹素,从而产生了块状外观。虽然这种方法的质量有时会很差,但是它的好处在于,只需要为每个像素获取一个纹素即可。&lt;br&gt;
+在图 6.8 的中间,我们使用了双线性插值(有时也会叫做线性插值)方法。对于每个像素而言,这种过滤方法需要找到四个相邻的纹素,并在二维上进行线性插值,从而获得混合后的像素值。虽然双线性插值的结果是比较模糊的,但是它并不会像邻近过滤那样出现锯齿。你可以做一个简单的小实验,尝试眯着眼睛来看左边的图像,你就会发现图像的锯齿也消失了,因为这样做(眯着眼睛观察)的效果其实和低通滤波器是大致相同的,并且更能展示面部的特征。&lt;br&gt;
+在图 6.8 的右侧,我们使用了双三次插值(bicubic filter),它大幅去除了剩余的方块感。需要注意的是,双三次插值比双线性插值的计算成本更高,但是许多的高阶滤波器都可以被表示为重复的线性插值,因此可以通过若干次简单的线性插值,来充分利用纹理单元中用于线性插值操作的 GPU 硬件。&lt;/p&gt;
+&lt;h3 id="双线性插值"&gt;双线性插值
+&lt;/h3&gt;&lt;p&gt;这里我们回到本章一开始提到的砖块纹理例子:在不舍弃小数的情况下,我们会获得坐标 (pu , pv ) = (81.92, 74.24)。这里我们使用与 OpenGL 同样的纹理坐标系,其原点位于左下角,它与标准的笛卡尔坐标系是相匹配的。我们的目标是在四个最近的纹素中心之间,建立一个局部坐标系,并在这四个纹素中心之间进行插值,最终获得该点的像素值,如图 6.9 所示。为了找到 4 个最近的相邻像素,我们从采样位置减去像素中心的分数部分 (0.5, 0.5),得到 (81.42, 73.74)。在去掉中心的小数部分之后,距离最近的 4 个像素范围即为 (x, y) = (81, 73)到 (x + 1, y + 1) = (82, 74)。在这个例子中,分数部分 (0.42, 0.74)是该采样点在这个局部坐标系(由相邻的四个纹素中心构成)中的位置,我们将这个位置表示为 (u′ , v′ )。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/rtr4-chapter06-texture/%E5%8F%8C%E7%BA%BF%E6%80%A7%E6%8F%92%E5%80%BC.png"
+width="1085"
+height="466"
+srcset="https://foth0626.github.io/article/rtr4-chapter06-texture/%E5%8F%8C%E7%BA%BF%E6%80%A7%E6%8F%92%E5%80%BC_hu_62d0092ab746782c.png 480w, https://foth0626.github.io/article/rtr4-chapter06-texture/%E5%8F%8C%E7%BA%BF%E6%80%A7%E6%8F%92%E5%80%BC_hu_3e0a92725d9ffbf0.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="232"
+data-flex-basis="558px"
+&gt;&lt;/p&gt;
+&lt;p&gt;这里我们将纹理访问函数定义为 t(x, y),该函数会返回对应纹素的颜色,其中 x和y 是整数。那么任意位置 (u′ , v ′ )的双线性插值颜色可以按照以下两步进行计算:首先,使用下方的两个纹素颜色 t(x, y)和 t(x + 1, y),按照参数 u′ 进行插值,即&lt;/p&gt;
+$$(1−u')\ast t(x,y)+u'\ast t(x+1,y) $$&lt;p&gt;;再使用上方的两个纹素颜色 t(x, y + 1)和t(x + 1, y + 1),按照参数 u′ 进行插值,即&lt;/p&gt;
+$$(1−u')\ast t(x,y+1)+u' \ast t(x+1,y+1)$$&lt;p&gt;,如图 6.9 左侧的绿色圆圈。然后对这两个值在竖直方向上,按照参数 v′进行插值,即将上述过程结合起来,最终 (pu , pv )处的双线性插值颜色 b为:&lt;/p&gt;
+$$b(p_u,p_v) = (1-v')((1−u') t(x,y)+u' t(x+1,y)) + v'((1−u') t(x,y+1)+u' t(x+1,y+1)) $$&lt;p&gt;&lt;br&gt;
+&lt;/p&gt;
+$$= (1-u')(1-v')t(x,y) + u'(1-v')t(x+1,y）+（1-u')v't(x,y+1)+u'v't(x+1,y+1)$$&lt;p&gt;从直观上说，距离采样位置越近的纹素，对于颜色的影响就越大，注意到：右上角纹素的影响力和左下角的矩形面积相同。&lt;/p&gt;
+&lt;h3 id="双三次插值"&gt;双三次插值
+&lt;/h3&gt;&lt;p&gt;在刚才那张图的右侧，我们使用了双三次插值（bicubic filter)，需要注意的是，双三次插值比双线性插值的计算成本更高。还有一种更简单的技术，使用一个简单的平滑曲线进行插值。最常见的是smoothstop和quintic曲线&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Smoothstep： $x^2(3-2x)$&lt;/li&gt;
+&lt;li&gt;Quintic： $x^3(6x^2-15x+10)$&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;其中，smoothstep函数具有 $s&amp;rsquo;(0) = s&amp;rsquo;(1)=0$ 的性质（ $C^1$ 连续），quintic曲线具有类似的性质，唯一不同的是 $q&amp;rsquo;&amp;rsquo;(0)=q&amp;rsquo;&amp;rsquo;(1)=0$ ( $C^2$连续）。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/rtr4-chapter06-texture/smoothstep.png"
+width="956"
+height="395"
+srcset="https://foth0626.github.io/article/rtr4-chapter06-texture/smoothstep_hu_864af23d28cf4b2a.png 480w, https://foth0626.github.io/article/rtr4-chapter06-texture/smoothstep_hu_df077a0503463c8f.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="242"
+data-flex-basis="580px"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/rtr4-chapter06-texture/%E7%BA%B9%E7%90%86%E6%8F%92%E5%80%BC.png"
+width="1132"
+height="436"
+srcset="https://foth0626.github.io/article/rtr4-chapter06-texture/%E7%BA%B9%E7%90%86%E6%8F%92%E5%80%BC_hu_64011b20d194a3dd.png 480w, https://foth0626.github.io/article/rtr4-chapter06-texture/%E7%BA%B9%E7%90%86%E6%8F%92%E5%80%BC_hu_9a91ff151addc607.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="259"
+data-flex-basis="623px"
+&gt;&lt;/p&gt;
+&lt;h2 id="缩小minificatioin"&gt;缩小（minificatioin）
+&lt;/h2&gt;&lt;p&gt;当纹理被压缩时,平面上的一个像素单元格可能会占据好几个纹素。为了正确获得这个像素的颜色值,我们应当将这几个纹素对像素的影响整合起来。然而,精确确定某个像素附近所有纹素对其的影响是很难的,而且想要以实时的速度来完美地实现这一点几乎是不可能的。&lt;br&gt;
+&lt;img src="https://foth0626.github.io/article/rtr4-chapter06-texture/%E7%BA%B9%E7%90%86%E7%BC%A9%E5%B0%8F.png"
+width="1231"
+height="530"
+srcset="https://foth0626.github.io/article/rtr4-chapter06-texture/%E7%BA%B9%E7%90%86%E7%BC%A9%E5%B0%8F_hu_b54d1b162a43268b.png 480w, https://foth0626.github.io/article/rtr4-chapter06-texture/%E7%BA%B9%E7%90%86%E7%BC%A9%E5%B0%8F_hu_6700109ffde82a47.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="232"
+data-flex-basis="557px"
+&gt;&lt;br&gt;
+最简单的方法是使用邻近过滤（nearest neighbor）这个方法会产生严重的锯齿问题.&lt;br&gt;
+&lt;img src="https://foth0626.github.io/article/rtr4-chapter06-texture/%E6%9C%80%E8%BF%91%E9%82%BB%E8%BF%87%E6%BB%A4.png"
+width="924"
+height="238"
+srcset="https://foth0626.github.io/article/rtr4-chapter06-texture/%E6%9C%80%E8%BF%91%E9%82%BB%E8%BF%87%E6%BB%A4_hu_4d4c591fceb16a81.png 480w, https://foth0626.github.io/article/rtr4-chapter06-texture/%E6%9C%80%E8%BF%91%E9%82%BB%E8%BF%87%E6%BB%A4_hu_43049b3c05a2f1a2.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="388"
+data-flex-basis="931px"
+&gt;
+当表面相对于相机发生移动时，这种瑕疵会变得更加明显，这种在运动中所产生的瑕疵被称为时域锯齿（temporal aliasing）。另一个常用的手法是双线性插值，但是当一个像素受到超过四个像素的影响时，双线性插值就会失效并开始产生锯齿。&lt;br&gt;
+走样根据之前的讨论，走样问题可以通过采样技术和滤波技术来解决。为了实现这个目标，我们要么提高像素的采样频率要么降低纹理的信号频率。但是采样频率的提高总是有限的，我们需要一些技术来降低纹理的频率。&lt;/p&gt;
+&lt;h3 id="mipmap"&gt;Mipmap
+&lt;/h3&gt;&lt;p&gt;mipmap是最流行的纹理抗锯齿方法，现如今所有的图形加速器都支持这种方法。
+mip是拉丁语multum in parvo 的缩写，意思是一个很小的地方有很多东西。这揭示了mipmap的工作原理：将原始图像反复过滤为更小的图像。
+在使用 mipmap 滤波器的时候,在实际渲染发生之前,原始纹理图像会生成一系列较小尺寸的版本。原始纹理(第 0 级)会被下采样到原始尺寸的四分之一,每个新生成的纹素值,通常为原始纹理中四个相邻纹素的平均值,这个新生成的纹理(第 1 级)有时也会被叫做原始纹理的子纹理(subtexture)。这个下采样的过程会被递归执行,直到最终生成的某个纹理的维度为 1。这组图片的集合通常被称为一个 mipmap 链(mipmap chain)。
+&lt;img src="https://foth0626.github.io/article/rtr4-chapter06-texture/mipmap%E9%87%91%E5%AD%97%E5%A1%94.png"
+width="1118"
+height="801"
+srcset="https://foth0626.github.io/article/rtr4-chapter06-texture/mipmap%E9%87%91%E5%AD%97%E5%A1%94_hu_324630b19d77a2da.png 480w, https://foth0626.github.io/article/rtr4-chapter06-texture/mipmap%E9%87%91%E5%AD%97%E5%A1%94_hu_7cef3c447433ee58.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="139"
+data-flex-basis="334px"
+&gt;&lt;br&gt;
+生成高质量 mipmap 的两个重要因素分别是:使用良好的过滤和伽马校正。生成mipmap 的常用方法是将每 2 × 2的纹素进行平均,从而获得下一级 mip 所对应的纹素值。具体使用的是一个 box 滤波器,虽然这可能是最糟糕的一个滤波器,使用box 滤波器可能会导致较差的质量,因为它会对低频信息进行模糊,同时保留一些会产生锯齿的高频信息。最好是使用高斯、Lanczos、Kaiser 或者类似的滤波器,这些滤波器的源代码基本都有免费高效的开源实现,同时有一些 API 还支持在 GPU 上进行过滤操作。&lt;/p&gt;
+&lt;p&gt;在靠近纹理边缘进行过滤的时候的地方,需要注意纹理的包装模式(wrapping mode)。&lt;/p&gt;
+&lt;p&gt;对于在非线性颜色空间中进行编码的纹理(例如大多数的彩色纹理),在过滤时忽略伽玛校正会修改该层级 mipmap 的感知亮度。如果使用了未校正的mipmap,相机距离物体越远,物体整体看起来就会越暗,对比度和表面细节也会受到影响。由于这个原因,因此将这种纹理(例如颜色纹理)&lt;strong&gt;从 sRGB 颜色空间转换到线性颜色空间&lt;/strong&gt;是十分重要的,我们会在线性空间中完成 mipmap 的生成和过滤,然后将生产的结果转换回 sRGB 颜色空间中并进行存储。大多数图形 API 都支持 sRGB 纹理,因此可以在线性空间中正确生成 mipmap,并将结果存储在 sRGB中。当访问 sRGB 纹理的时候,它们首先会被转换到线性空间中,以便正确地执行放大(magnification)和缩小(minification)操作。&lt;/p&gt;
+&lt;p&gt;mipmap 的好处在于,它并不是去单独计算每个纹素对像素的影响,而是对预先生成的纹素集合进行访问和插值,无论纹理压缩的程度如何,这个过程的时间开销是固定的。然而,mipmap 也存在几个缺陷,其中一个主要的问题就是过度模糊(overblurring)。我们假设现在有一个像素单元格,它在 u方向上覆盖了大量的纹素,而在 v方向上只覆盖了少量的纹素,这种情况通常发生在相机以一个掠射角度来观察纹理表面的时候。在这种情况下,需要沿着纹理的其中一个轴进行缩小,沿着另一个轴进行放大,这会导致像素在纹理上的投影区域是一个长宽比很大的矩形;而我们在访问 mipmap 时,只能检索纹理上的正方形投影区域,无法检索矩形投影区域。为了避免走样,我们会选择较长的那个边所形成的正方形,来作为对像素单元格覆盖率的近似度量,这导致检索到的样本往往会相对模糊。这种现象可以在图中看到,图片右侧向远处延伸的线条会变得过度模糊。
+&lt;img src="https://foth0626.github.io/article/rtr4-chapter06-texture/mipmap%E8%BF%87%E6%BB%A4.png"
+width="919"
+height="213"
+srcset="https://foth0626.github.io/article/rtr4-chapter06-texture/mipmap%E8%BF%87%E6%BB%A4_hu_25dfa9ba18632ae0.png 480w, https://foth0626.github.io/article/rtr4-chapter06-texture/mipmap%E8%BF%87%E6%BB%A4_hu_a32e477afaf89808.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="431"
+data-flex-basis="1035px"
+&gt;&lt;/p&gt;
+&lt;h3 id="summed-area-表sat"&gt;Summed-Area 表(SAT)
+&lt;/h3&gt;&lt;p&gt;另一种能够避免过度模糊的方法是面积积分表(summed-area table,SAT,也可以叫做求和面积表),后文中我们会简称为 SAT。想要使用这种方法,首先要创建一个尺寸与纹理相同的数组,但是颜色存储的精度要更高(例如:每个红绿蓝颜色分量都会占据 16 个 bit)。在数组中的每个位置上,该位置上的纹素会和 (0, 0)处的纹素(原点)构成一个矩形,计算并存储区域中所有纹素值的总和。在纹理化的过程中,屏幕上像素在纹理上的投影区域是一个矩形;然后会通过 SAT 来确定这个矩形区域的平均颜色,并将其作为该像素的纹理颜色。这个计算过程如图 6.17 所示,具体的平均颜色计算公式如下:&lt;/p&gt;
+$$c = \frac{s[x_{ur},y_{ur}]-s[x_{ur},y_{ll}]-s[x_{ll},y_{ur}]+s[x_{ll},y_{ll}]}{(x_{ur}-x_{ll})(y_{ur}-y_{ll})}$$&lt;p&gt;&lt;img src="https://foth0626.github.io/article/rtr4-chapter06-texture/SAT%E8%BF%87%E6%BB%A4.png"
+width="918"
+height="217"
+srcset="https://foth0626.github.io/article/rtr4-chapter06-texture/SAT%E8%BF%87%E6%BB%A4_hu_9edc4a4fa4a9a0b3.png 480w, https://foth0626.github.io/article/rtr4-chapter06-texture/SAT%E8%BF%87%E6%BB%A4_hu_576dc732cb524454.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="423"
+data-flex-basis="1015px"
+&gt;&lt;/p&gt;
+&lt;p&gt;图像右侧向远处地平线延申的线条变得更加清晰了,但是中间对角相交的线条仍然是很模糊的。这个问题的原因在于,当我们沿着对角线观察纹理的时候,像素投影所生成的区域是一个沿对角线的细长矩形,该矩形对应的包围盒中包含了大量无关的纹素,例如:在图中,想象此时像素的投影区域是一个横跨纹理对角线的细长区域,它所对应的包围盒几乎会占据整个纹理,而真正位于像素投影区域内的纹素数量则很少。此时这种方法会对整个纹理矩形进行平均,这个结果包含了大量的无关纹素值,从而导致模糊的产生。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/rtr4-chapter06-texture/SAT%E7%A4%BA%E4%BE%8B.png"
+width="1065"
+height="555"
+srcset="https://foth0626.github.io/article/rtr4-chapter06-texture/SAT%E7%A4%BA%E4%BE%8B_hu_955a36a760980983.png 480w, https://foth0626.github.io/article/rtr4-chapter06-texture/SAT%E7%A4%BA%E4%BE%8B_hu_11ecee0b5e71621d.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="191"
+data-flex-basis="460px"
+&gt;&lt;/p&gt;
+&lt;p&gt;SAT 是各向异性过滤(anisotropic filtering)算法的其中一个例子,这类算法用于检索非正方形投影区域的纹理值,SAT 对于接近水平方向或者竖直方向的投影区域最为有效。还需要注意的是,对于 16 × 16或者尺寸更小的纹理,SAT 需要至少两倍的内存;而对于尺寸更大的纹理,则需要更高的存储精度,因为像素值的和会很大,精度过低可能会导致数值溢出。&lt;br&gt;
+SAT 可以提供更好的质量,并且额外的内存开销还算合理,因此它在现代的 GPU 上也被广泛应用。高质量的过滤方法对于高级渲染技术的质量而言至关重要。例如,Hensley 等人提出了一个高效的实现,并展示了使用 SAT 采样来改善glossy 反射的方法。其他使用区域采样的算法也可以通过 SAT 方法进行改进,例如如景深,阴影贴图,和模糊反射等。&lt;/p&gt;
+&lt;h4 id="无约束的各向异性过滤"&gt;无约束的各向异性过滤
+&lt;/h4&gt;&lt;p&gt;&lt;img src="https://foth0626.github.io/article/rtr4-chapter06-texture/%E5%90%84%E5%90%91%E5%BC%82%E6%80%A7%E8%BF%87%E6%BB%A4.png"
+width="1116"
+height="482"
+srcset="https://foth0626.github.io/article/rtr4-chapter06-texture/%E5%90%84%E5%90%91%E5%BC%82%E6%80%A7%E8%BF%87%E6%BB%A4_hu_bed2c34fbc1aa385.png 480w, https://foth0626.github.io/article/rtr4-chapter06-texture/%E5%90%84%E5%90%91%E5%BC%82%E6%80%A7%E8%BF%87%E6%BB%A4_hu_1bdbb94e19c1706f.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="231"
+data-flex-basis="555px"
+&gt;&lt;/p&gt;
+&lt;p&gt;在之前我们所提到的方法中,会在 mipmap 中的一个正方形区域内进行采样,这可能会导致采样到很多无关纹素,使得表面变得模糊。这里我们将要介绍的算法,并不是使用单个 mipmap 采样区域来对该投影形成四边形进行近似,而是会使用多个正方形来进行近似。我们使用四边形中较短的那个边来确定 d的值(而在原始的 mipmap中,通常会使用较长的边来确定 d),这样做会使得每个 mipmap 样本的平均面积更小(包含了更少的无关像素,因此会减少模糊的出现)。而四边形的长边则被用来创建一条与其平行,并且穿过四边形中点的各向异性线(line of anisotropy)。当各向异性的比例在 1 : 1和 2 : 1之间时,我们会沿着这条线取两个样本(如图 6.18 所示);各向异性的比例越高,沿轴采集的样本就越多。&lt;/p&gt;
+&lt;h2 id="体积纹理volume-texture"&gt;体积纹理（volume texture）
+&lt;/h2&gt;&lt;p&gt;对图像纹理直接进行扩展可以得到三维图像数据,它通过坐标 (u, v, w)或者 (s, t, r)来进行访问,例如:医学成像数据可以生成三维网格,通过在网格中移动成像平面,可以看到这些数据的二维切片。&lt;br&gt;
+如今大部分 GPU 都支持体积纹理(volume texture)的 mipmap,由于在体积纹理的单个 mipmap 级别内,需要使用三线性插值来进行过滤,因此在不同 mipmap 级别之间,需要四线性插值(quadrilinear interpolation)来进行过滤。由于需要对 16个纹素的结果进行求平均,因此可能会导致一些精度不足的问题,这可以通过使用更高精度的体积纹理来进行解决。&lt;br&gt;
+虽然体积纹理对于存储空间的要求比较高,并且过滤的计算成本也比较高,但它确实具有一些特殊的优势。由于可以直接使用纹理坐标来表示三维的空间位置,因此可以跳过为三维网格寻找一个良好二维参数化表示的复杂过程(UV 拆分)。这避免了二维参数化时经常出现的扭曲和接缝问题。体积纹理也可以用来表示木材或者大理石等材质的体积结构,具有这种纹理的模型,看起来就像是使用这种材料雕刻出来的一样。&lt;br&gt;
+使用体积纹理来对表面进行纹理化操作是非常低效的,因为体积纹理中的绝大部分样本都没有被使用。Benson 和 Davis 以及 DeBry 等人，讨论了将纹理数据存储在稀疏八叉树中的方法,这种方法非常适合交互式的三维绘画系统,因为我们在创建表面的时候,不需要显式地指定它的纹理坐标,同时八叉树结构可以将纹理细节保留到任何我们想要的级别。Lefebvre 等人讨论了在现代 GPU 上实现八叉树纹理的细节;Lefebvre 和 Hoppe提出了一种将稀疏体积数据打包成较小纹理的方法。&lt;/p&gt;
+&lt;h2 id="立方体贴图cube-map"&gt;立方体贴图（cube map）
+&lt;/h2&gt;&lt;p&gt;另一种类型的纹理叫做立方体纹理(cube texture)或者立方体贴图(cube map),它具有六个正方形的纹理,立方体的六个面分别对应了这个六个正方形纹理。访问立方体贴图需要使用一个包含三个分量的纹理坐标向量,这个向量代表了从立方体中心向外发射的射线方向。这个射线与立方体交点的计算过程如下:向量中绝对值最大的那个分量,决定了射线会射向哪个立方体表面(例如:向量(−3.2, 5.1, −8.4)代表了射线会射向 −z面)。将剩余的两个坐标分量分别除以最大分量的绝对值(即 8.4),此时这两个分量的大小位于 [−1, 1]内,然后再将其重新映射到 [0, 1]中以计算纹理坐标,例如:坐标 (−3.2, 5.1)会被映射为((−3.2/8.4 + 1)/2,(5.1/8.4 + 1)/2) ≈ (0.31, 0.80)。立方体贴图对于表示方向函数的值而言非常有用;它们最常用于环境映射中。&lt;/p&gt;
+&lt;h1 id="程序化纹理"&gt;程序化纹理
+&lt;/h1&gt;&lt;h2 id="adobe-substance-3d-designer"&gt;&lt;a class="link" href="https://www.youtube.com/watch?v=At3FoFcuN6k&amp;amp;t=6s" target="_blank" rel="noopener"
+&gt;Adobe Substance 3D Designer&lt;/a&gt;
+&lt;/h2&gt;&lt;p&gt;&lt;img src="https://foth0626.github.io/article/rtr4-chapter06-texture/SD%E7%AA%97%E5%B8%98.png"
+width="1280"
+height="703"
+srcset="https://foth0626.github.io/article/rtr4-chapter06-texture/SD%E7%AA%97%E5%B8%98_hu_600c43f98a748320.png 480w, https://foth0626.github.io/article/rtr4-chapter06-texture/SD%E7%AA%97%E5%B8%98_hu_468528600ec95b26.png 1024w"
+loading="lazy"
+alt="个人的程序化生成纹理"
+class="gallery-image"
+data-flex-grow="182"
+data-flex-basis="436px"
+&gt;
+个人的入门教程，程序化生成丝绸材质。&lt;br&gt;
+程序化背后的本质是算法和编程思维，以及对现实世界的拆分和再理解。&lt;/p&gt;
+&lt;h1 id="纹理动画"&gt;纹理动画
+&lt;/h1&gt;&lt;p&gt;纹理坐标也不一定是静态的。无论是在网格数据本身对纹理坐标进行修改,还是通过顶点着色器或者像素着色器中的函数,来对纹理坐标进行修改,应用程序设计人员都可以显式地改变帧与帧之间的纹理坐标。想象一下,现在我们有了一个已经建模好的瀑布模型,并且它已经被一个图像纹理化了,使得它看起来很像瀑布。假设纹理坐标v是水流的方向,为了让水流动起来,必须从每一帧的坐标 v 中减去一定的数值。纹理坐标的减法操作会使得纹理本身看起来正在向前移动。&lt;/p&gt;
+&lt;p&gt;可以通过对纹理坐标应用变换矩阵来生成更加精细的效果。除了平移之外,它还允许其他的线性变换操作,例如缩放、旋转和剪切,图像扭曲(image warping)和变形转换(morphing transforms),以及广义投影等。通过在 CPU 或者着色器中应用变换函数,可以生成更复杂的效果。&lt;/p&gt;
+&lt;p&gt;通过使用纹理混合(texture blending)技术,还可以实现其他的动画效果。例如:从一个大理石纹理出发,将其渐变为一个肉质纹理,从而使得雕像看起来像是活过来一样。&lt;/p&gt;
+&lt;h1 id="纹理映射"&gt;纹理映射
+&lt;/h1&gt;&lt;p&gt;纹理的一个常见用途是对材质属性进行修改,从而影响着色方程的计算结果。现实世界中的物体通常都会具有不同的表面材质属性,为了模拟这样的物体,像素着色器可以从纹理中读取纹理值,并在计算着色方程之前,使用它们来修改材质的参数。纹理最常修改的参数就是表面是颜色,这种纹理通常被称为反照率颜色贴图(albedo color map)或者漫反射颜色贴图(diffuse color map)。但是,理论上任何参数都可以被纹理进行修改,例如:替换、相乘或者以其他方式等。例如在图 6.25 中的表面,应用了三种不同的纹理来替换常量值。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://foth0626.github.io/article/rtr4-chapter06-texture/%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84.png"
+width="1118"
+height="451"
+srcset="https://foth0626.github.io/article/rtr4-chapter06-texture/%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84_hu_2d5673ada43eae25.png 480w, https://foth0626.github.io/article/rtr4-chapter06-texture/%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84_hu_f2b4fe7f0349f73.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="247"
+data-flex-basis="594px"
+&gt;&lt;/p&gt;</description></item></channel></rss>

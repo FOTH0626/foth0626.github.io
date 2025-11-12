@@ -1,0 +1,513 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Git on FOTH0626</title><link>https://foth0626.github.io/tags/git/</link><description>Recent content in Git on FOTH0626</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Sat, 18 Oct 2025 15:47:07 +0800</lastBuildDate><atom:link href="https://foth0626.github.io/tags/git/index.xml" rel="self" type="application/rss+xml"/><item><title>ProGit Learn Record 2：Git基础</title><link>https://foth0626.github.io/article/progit-book-2/</link><pubDate>Sat, 18 Oct 2025 15:47:07 +0800</pubDate><guid>https://foth0626.github.io/article/progit-book-2/</guid><description>&lt;blockquote&gt;
+&lt;p&gt;本系列文章基于《Pro Git》一书，作为本人学习记录&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h1 id="获取git仓库"&gt;获取Git仓库
+&lt;/h1&gt;&lt;ol&gt;
+&lt;li&gt;将一个没有版本控制的本地目录转换为Git仓库&lt;/li&gt;
+&lt;li&gt;从服务器克隆(clone)一个已存在的仓库&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="从本地目录初始化"&gt;从本地目录初始化
+&lt;/h2&gt;&lt;p&gt;首先，&lt;code&gt;cd /path/to/your/project&lt;/code&gt; ，然后执行 &lt;code&gt;git init&lt;/code&gt; ，这会创建 &lt;code&gt;.git&lt;/code&gt; 的一个子目录。&lt;br&gt;
+如果此时这个目录非空，那么应该开始追踪并进行初始提交。 使用 &lt;code&gt;git add&lt;/code&gt; 指定需要追踪的文件，然后 &lt;code&gt;git commit&lt;/code&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git add *.cpp
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git add LICENSE
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git commit -m &lt;span class="s1"&gt;&amp;#39;inital project version&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id="克隆已有仓库"&gt;克隆已有仓库
+&lt;/h2&gt;&lt;p&gt;从服务器上克隆已有的数据（包括所有的历史数据）
+&lt;code&gt;git clone https://github.com/libgit2/libgit2&lt;/code&gt; &lt;br&gt;
+这会在当前目录创建一个libgit2的目录，并创建 &lt;code&gt;.git&lt;/code&gt; 目录，将数据存放进去。&lt;br&gt;
+如果你想要使用自定义的目录名那么&lt;br&gt;
+&lt;code&gt;git clone https://github.com/libgit2/libgit2 mylibgit&lt;/code&gt;&lt;br&gt;
+除了使用https，git也可以使用git:// 或者 ssh 协议。&lt;/p&gt;
+&lt;h1 id="记录更新到仓库"&gt;记录更新到仓库
+&lt;/h1&gt;&lt;p&gt;通常，你会对文件做些修改，并在完成修改后提交到仓库以记录下修改。&lt;br&gt;
+工作目录下的所有文件只存在两种状态： &lt;strong&gt;已跟踪&lt;/strong&gt; 和 &lt;strong&gt;未跟踪&lt;/strong&gt; 。
+已跟踪的文件就是那些已经被纳入版本控制的文件，它们的状态是未修改，已修改或已暂存。&lt;br&gt;
+所以有如下关系:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;未跟踪&lt;/strong&gt;文件被添加到版本控制后，会进入&lt;strong&gt;已暂存&lt;/strong&gt;状态。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;未修改&lt;/strong&gt;文件在修改后变为&lt;strong&gt;已修改&lt;/strong&gt;文件，移除文件变为&lt;strong&gt;未跟踪&lt;/strong&gt; 。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;已修改&lt;/strong&gt;文件在暂存后变为&lt;strong&gt;已暂存&lt;/strong&gt;文件&lt;/li&gt;
+&lt;li&gt;暂存文件在commit变为&lt;strong&gt;未修改&lt;/strong&gt;文件&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="检查文件状态"&gt;检查文件状态
+&lt;/h2&gt;&lt;p&gt;使用 &lt;code&gt;git status&lt;/code&gt; 查看文件处于什么状态。对于刚克隆的仓库，应该是&amp;quot;everything is up to date&amp;quot; 的。&lt;br&gt;
+新建一个README文件，再使用&lt;code&gt;git status&lt;/code&gt;可以看到输出结果多了&lt;code&gt;Untracked Files&lt;/code&gt;，包含了README文件&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;On branch master
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Untracked files:
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="o"&gt;(&lt;/span&gt;use &lt;span class="s2"&gt;&amp;#34;git add &amp;lt;file&amp;gt;...&amp;#34;&lt;/span&gt; to include in what will be committed&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; README
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id="跟踪新文件"&gt;跟踪新文件
+&lt;/h2&gt;&lt;p&gt;使用&lt;code&gt;git add FILENAME&lt;/code&gt; 开始跟踪文件，此时再&lt;code&gt;git status&lt;/code&gt; 则发现 &lt;code&gt;Changes to be committed&lt;/code&gt; 这表明文件处于 &lt;strong&gt;已暂存&lt;/strong&gt; 状态。&lt;br&gt;
+&lt;code&gt;git add&lt;/code&gt; 接受文件或者目录，如果是目录则会递归跟踪该目录下的所有文件。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;On branch master
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Changes to be committed:
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="o"&gt;(&lt;/span&gt;use &lt;span class="s2"&gt;&amp;#34;git restore --staged &amp;lt;file&amp;gt;...&amp;#34;&lt;/span&gt; to unstage&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; new file: README
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id="暂存已修改文件"&gt;暂存已修改文件
+&lt;/h2&gt;&lt;p&gt;假设现在有一个文件 &lt;code&gt;aaa.md&lt;/code&gt; ，且已被跟踪。你对它进行了修改，此时运行&lt;code&gt;git status&lt;/code&gt; 则会有：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;On branch master
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Changes not staged &lt;span class="k"&gt;for&lt;/span&gt; commit:
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="o"&gt;(&lt;/span&gt;use &lt;span class="s2"&gt;&amp;#34;git add &amp;lt;file&amp;gt;...&amp;#34;&lt;/span&gt; to update what will be committed&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="o"&gt;(&lt;/span&gt;use &lt;span class="s2"&gt;&amp;#34;git restore &amp;lt;file&amp;gt;...&amp;#34;&lt;/span&gt; to discard changes in working directory&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; modified: aaa.md
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;no changes added to commit &lt;span class="o"&gt;(&lt;/span&gt;use &lt;span class="s2"&gt;&amp;#34;git add&amp;#34;&lt;/span&gt; and/or &lt;span class="s2"&gt;&amp;#34;git commit -a&amp;#34;&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;code&gt;Changes not staged for commit&lt;/code&gt; 表明已跟踪文件发生了变化，但没有暂存。如果需要&lt;strong&gt;暂存&lt;/strong&gt;这次更新，则运行&lt;code&gt;git add&lt;/code&gt; ，当这个命令接受的文件是已跟踪文件，则功能变化为将已跟踪的文件放入暂存区。将这个命令理解为“将内容添加到下一次的提交中”是比较合适的说法。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;On branch master
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Changes to be committed:
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="o"&gt;(&lt;/span&gt;use &lt;span class="s2"&gt;&amp;#34;git restore --staged &amp;lt;file&amp;gt;...&amp;#34;&lt;/span&gt; to unstage&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; modified: aaa.md
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;注意：如果你现在对&lt;code&gt;aaa.md&lt;/code&gt;进行修改，再运行&lt;code&gt;git status&lt;/code&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;On branch master
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Changes to be committed:
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="o"&gt;(&lt;/span&gt;use &lt;span class="s2"&gt;&amp;#34;git restore --staged &amp;lt;file&amp;gt;...&amp;#34;&lt;/span&gt; to unstage&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; new file: README
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; modified: aaa.md
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Changes not staged &lt;span class="k"&gt;for&lt;/span&gt; commit:
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="o"&gt;(&lt;/span&gt;use &lt;span class="s2"&gt;&amp;#34;git add &amp;lt;file&amp;gt;...&amp;#34;&lt;/span&gt; to update what will be committed&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="o"&gt;(&lt;/span&gt;use &lt;span class="s2"&gt;&amp;#34;git restore &amp;lt;file&amp;gt;...&amp;#34;&lt;/span&gt; to discard changes in working directory&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; modified: aaa.md
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;现在&lt;code&gt;aaa.md&lt;/code&gt; 同时存在暂存区和非暂存区，这是因为Git记录的是你最后一次&lt;code&gt;git add&lt;/code&gt; 的文件版本，所以如果你需要提交最新文件那么，你得再次&lt;code&gt;git add&lt;/code&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;On branch master
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Changes to be committed:
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="o"&gt;(&lt;/span&gt;use &lt;span class="s2"&gt;&amp;#34;git restore --staged &amp;lt;file&amp;gt;...&amp;#34;&lt;/span&gt; to unstage&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; new file: README
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; modified: aaa.md
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id="状态简略输出"&gt;状态简略输出
+&lt;/h2&gt;&lt;p&gt;使用&lt;code&gt;git status -s&lt;/code&gt; 或者 &lt;code&gt;git status --short&lt;/code&gt; 可以获得一个更为紧凑的输出&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;A README
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;M aaa.md
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;事实上，输出类型共有三种分别为&lt;code&gt;?&lt;/code&gt;,&lt;code&gt;A&lt;/code&gt;,&lt;code&gt;M&lt;/code&gt;,分别指代&lt;strong&gt;未跟踪&lt;/strong&gt;，&lt;strong&gt;新添加&lt;/strong&gt;，&lt;strong&gt;已修改&lt;/strong&gt;。 不仅如此，输出结果事实上有两栏，我现在再对&lt;code&gt;aaa.md&lt;/code&gt; 修改。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;A README
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;MM aaa.md
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;strong&gt;左栏代表着暂存区状态，右栏表示工作区状态。&lt;/strong&gt;&lt;br&gt;
+所以&lt;code&gt;MM&lt;/code&gt;表明文件修改有一部分是暂存的，还有一部分没有被暂存。&lt;/p&gt;
+&lt;h2 id="忽略文件gitignore"&gt;忽略文件（.gitignore)
+&lt;/h2&gt;&lt;p&gt;有些文件我们不希望它进入Git的管理中，我们也不希望它们出现在未跟踪列表。比如编译缓存，日志等。此时我们可以创建&lt;code&gt;.gitignore&lt;/code&gt; 文件。下面是一个示例&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;*.[oa]
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;*~
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;第一行表明忽略所有 &lt;code&gt;.o&lt;/code&gt; 和 &lt;code&gt;.a&lt;/code&gt; 文件。第二行表明 忽略所有最后以&lt;code&gt;~&lt;/code&gt;结尾的文件。 &lt;br&gt;
+&lt;code&gt;.gitginore&lt;/code&gt; 的规则如下：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;所有空行或 以&lt;code&gt;#&lt;/code&gt; 开头的行会被忽略&lt;/li&gt;
+&lt;li&gt;使用glob模式匹配，并且递归的应用于整个工作区中。&lt;/li&gt;
+&lt;li&gt;匹配模式可以使用&lt;code&gt;/&lt;/code&gt; 开头防止递归（使用&lt;code&gt;/temp&lt;/code&gt;这种写法，只会匹配根目录的temp文件夹，而不会匹配其他目录里的文件夹，如果使用&lt;code&gt;temp/&lt;/code&gt;则会匹配所有temp文件夹）&lt;/li&gt;
+&lt;li&gt;匹配模式可以使用&lt;code&gt;/&lt;/code&gt; 结尾指定目录（如&lt;code&gt;build/&lt;/code&gt;）&lt;/li&gt;
+&lt;li&gt;一些符合匹配忽略规则的，但是我们希望加入版本管理的文件，使用&lt;code&gt;!&lt;/code&gt; 取反。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;其中glob模式是指：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;使用&lt;code&gt;*&lt;/code&gt;作为通配符，匹配任意多个任意字符。&lt;/li&gt;
+&lt;li&gt;使用&lt;code&gt;[]&lt;/code&gt;匹配方括号内任意一个字符。如&lt;code&gt;[abc]&lt;/code&gt;可以为a,b,c任意一个字符&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;？&lt;/code&gt; 匹配任意&lt;strong&gt;一个&lt;/strong&gt;字符&lt;/li&gt;
+&lt;li&gt;使用&lt;code&gt;**&lt;/code&gt;匹配任意中间目录，如&lt;code&gt;src/**/*.js&lt;/code&gt;则会匹配所有子文件的&lt;code&gt;js&lt;/code&gt;文件&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="查看已暂存和未暂存的修改"&gt;查看已暂存和未暂存的修改
+&lt;/h2&gt;&lt;p&gt;&lt;code&gt;git status&lt;/code&gt;只能查看哪些文件有改变，但是不能查看具体修改了些什么，此时可以使用&lt;code&gt;git diff&lt;/code&gt;，&lt;code&gt;git diff&lt;/code&gt;能通过文件补丁的方式具体显示哪些行发生了变化。这个指令展示的是工作区和暂存区之间的差异，也就是修改后没有暂存的内容。&lt;br&gt;
+如果想要查看已暂存的文件和最后一次提交（commit）的区别，那么使用&lt;code&gt;git diff --staged&lt;/code&gt; 或者 &lt;code&gt;git diff --cached&lt;/code&gt;&lt;/p&gt;
+&lt;h2 id="提交更新commit"&gt;提交更新（commit）
+&lt;/h2&gt;&lt;p&gt;在提交之前，请确保没有已经修改的文件却没有&lt;code&gt;git add&lt;/code&gt;过，否则提交时不会记录这些文件的变化。所以使用 &lt;code&gt;git status&lt;/code&gt; 确保所有文件已暂存。
+使用 &lt;code&gt;git commit&lt;/code&gt; 指令提交更新，这是会启用你的文本编辑器来输入提交说明。&lt;br&gt;
+&lt;code&gt;git commit&lt;/code&gt; 会默认使用注释格式显示 &lt;code&gt;git status&lt;/code&gt; 的内容，这有助你确认修改内容，如果你希望查看 &lt;code&gt;git diff&lt;/code&gt; 的输出内容，那么commit时添加额外的参数 &lt;code&gt;-v&lt;/code&gt; 。&lt;br&gt;
+除此之外，如果你希望直接在命令里输入提交说明，那么，使用参数 &lt;code&gt;-m&lt;/code&gt; 并附带消息，如 &lt;code&gt;git commit -m &amp;quot;God Bless You!&amp;quot;&lt;/code&gt;&lt;/p&gt;
+&lt;h2 id="跳过暂存区"&gt;跳过暂存区
+&lt;/h2&gt;&lt;p&gt;如果你不希望添加暂存并提交，这样略繁琐的步骤，那么，直接使用参数 &lt;code&gt;-a&lt;/code&gt; 可以直接把所有已跟踪文件暂存并提交&lt;br&gt;
+&lt;code&gt;git commit -a -m &amp;quot;add: new feature&amp;quot;&lt;/code&gt;&lt;/p&gt;
+&lt;h2 id="移除文件"&gt;移除文件
+&lt;/h2&gt;&lt;p&gt;如果想要从Git中移除文件，那么就也得从暂存区中移除并提交。如果直接在本地手动删除文件，那么会导致这个文件仍然记录在未暂存区域。需要使用 &lt;code&gt;git rm FILENAME&lt;/code&gt; 来移除一个未修改文件。&lt;br&gt;
+如果一个文件已经保留在暂存区中，或者处于已修改的文件，那么需要使用 &lt;code&gt;git rm -f &amp;lt;filename&amp;gt;&lt;/code&gt; ，这是为了确保尚未添加到快照中的文件不被误删除。或者使用 &lt;code&gt;git rm --cached &amp;lt;filename&amp;gt;&lt;/code&gt; 指令，这会使文件在Git仓库中被删除，但是保留本地文件，这是为了处理误添加了一堆不想跟踪的文件进暂存区的情况 ，如没有使用 &lt;code&gt;.gitignore&lt;/code&gt; 导致的一堆编译文件。&lt;br&gt;
+当然 &lt;code&gt;git rm &lt;/code&gt; 指令后也可以使用glob模式匹配文件，如 &lt;code&gt;git rm log/\*.log&lt;/code&gt; 注意，&lt;code&gt;\&lt;/code&gt;是用于展开通配符 &lt;code&gt;*&lt;/code&gt; 的。&lt;/p&gt;
+&lt;h2 id="移动文件"&gt;移动文件
+&lt;/h2&gt;&lt;p&gt;在Git中对文件改名，使用 &lt;code&gt;git mv file_from file_to&lt;/code&gt; 这等价于&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;mv file_from file_to
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git rm file_from
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git add file_to
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h1 id="查看提交历史"&gt;查看提交历史
+&lt;/h1&gt;&lt;p&gt;使用 &lt;code&gt;git log&lt;/code&gt; 指令，可以查看所有提交，默认最近的更新在最上方，并会给出每次提交的校验，作者的姓名和邮箱，提交时间，提交说明。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;git log&lt;/code&gt; 有许多选项，其中 &lt;code&gt;-p&lt;/code&gt; 或者 &lt;code&gt;--patch&lt;/code&gt; ，这会按照补丁（类似于&lt;code&gt;git diff&lt;/code&gt;)的格式输出，也可以使用 &lt;code&gt;-2&lt;/code&gt; 这类命令限制一次输出的日志数量。&lt;code&gt;--stat&lt;/code&gt; 会按照简略形式表示更改。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;span class="lnt"&gt;15
+&lt;/span&gt;&lt;span class="lnt"&gt;16
+&lt;/span&gt;&lt;span class="lnt"&gt;17
+&lt;/span&gt;&lt;span class="lnt"&gt;18
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;commit ded2ebf137ddc0b1f60e09fe3c96a3b88f491033 &lt;span class="o"&gt;(&lt;/span&gt;HEAD -&amp;gt; master&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Author: foth &amp;lt;fothli0626@gmail.com&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Date: Sat Oct &lt;span class="m"&gt;18&lt;/span&gt; 19:34:56 &lt;span class="m"&gt;2025&lt;/span&gt; +0800
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; God Bless You
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; README &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt; +
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; aaa.md &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="m"&gt;2&lt;/span&gt; ++
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="m"&gt;2&lt;/span&gt; files changed, &lt;span class="m"&gt;3&lt;/span&gt; insertions&lt;span class="o"&gt;(&lt;/span&gt;+&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;commit 42a782e56593d75b86ef8f3d52309dc09ed66406
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Author: foth &amp;lt;fothli0626@gmail.com&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Date: Sat Oct &lt;span class="m"&gt;18&lt;/span&gt; 16:25:11 &lt;span class="m"&gt;2025&lt;/span&gt; +0800
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; aaa.md
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; aaa.md &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt; +
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="m"&gt;1&lt;/span&gt; file changed, &lt;span class="m"&gt;1&lt;/span&gt; insertion&lt;span class="o"&gt;(&lt;/span&gt;+&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id="格式参数"&gt;格式参数
+&lt;/h2&gt;&lt;p&gt;使用 &lt;code&gt;pretty&lt;/code&gt; 参数可以改变提交显示的格式。有 &lt;code&gt;oneline&lt;/code&gt; &lt;code&gt;short&lt;/code&gt; &lt;code&gt;full&lt;/code&gt; &lt;code&gt;fuller&lt;/code&gt; 等内置参数，还可以使用 &lt;code&gt;pretty=format&amp;quot;THIS IS CUSTOM FORMAT&amp;quot;&lt;/code&gt; 自定义输出格式。关于format具体有哪些格式和参数，这里不做介绍。&lt;br&gt;
+&lt;code&gt;--graph&lt;/code&gt; 能够是用&lt;code&gt;ascii&lt;/code&gt;字符画形式，可视化的展现仓库的提交历史（俗称画电路板（笑）。）&lt;/p&gt;
+&lt;h2 id="时间参数"&gt;时间参数
+&lt;/h2&gt;&lt;p&gt;上面我们提到可以展示任意条数量记录的 &lt;code&gt;-&amp;lt;n&amp;gt;&lt;/code&gt; 参数，也可以使用 &lt;code&gt;--since&lt;/code&gt; 或者 &lt;code&gt;--until&lt;/code&gt; 这种形式 &lt;code&gt;--since=2.weeks&lt;/code&gt; 表示最近两周的提交，这类格式不仅可以使用绝对日期，也可以使用相对时间如 &lt;code&gt;&amp;quot;2 years 1 day 3 minutes ago&amp;quot;&lt;/code&gt;&lt;/p&gt;
+&lt;h2 id="过滤与搜索"&gt;过滤与搜索
+&lt;/h2&gt;&lt;p&gt;使用 &lt;code&gt;--author&lt;/code&gt; , &lt;code&gt;--commiter&lt;/code&gt; &lt;code&gt;--grep&lt;/code&gt; 可以搜索作者，提交者和提交信息中的关键词。&lt;br&gt;
+另一个有用的过滤条件是参数 &lt;code&gt;-S&lt;/code&gt; ，这个参数需要一个字符串参数，这会搜索出所有修改的文件内容中包含该字符串的提交。比如你想寻找添加或者删除了某一个函数的调用的提交那么可以使用 &lt;code&gt;git log -S &amp;quot;function_name&amp;quot;&lt;/code&gt; 。&lt;br&gt;
+最后，如果想要搜索某个有关特定文件的提交，可以使用 &lt;code&gt;-- path/to/file&lt;/code&gt; 这个参数，注意，这个参数&lt;strong&gt;必须&lt;/strong&gt;为 &lt;code&gt;git log&lt;/code&gt; 的最后一个参数。
+不过注意，当有多个参数搜索时，任一条件满足即会打印，加上 &lt;code&gt;--all-match&lt;/code&gt; 参数才会打印出所有条件都满足的提交。（即 &lt;code&gt;||&lt;/code&gt; 逻辑和 &lt;code&gt;&amp;amp;&amp;amp;&lt;/code&gt; 逻辑）&lt;/p&gt;
+&lt;h1 id="撤销操作"&gt;撤销操作
+&lt;/h1&gt;&lt;p&gt;这一节会有一些撤销操作的教学，&lt;strong&gt;注意&lt;/strong&gt;部分操作是不可逆的。&lt;/p&gt;
+&lt;h2 id="替换commit"&gt;替换commit
+&lt;/h2&gt;&lt;p&gt;&lt;code&gt;git commit --amend&lt;/code&gt; 会“覆盖”你的上一次提交，通常我们会用于修改一些小错误或者重写提交信息。如果只需要更改消息，那么直接运行该指令即可，如果需要修改文件或者提交漏提交的文件，那么可以这样：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git commit -m &lt;span class="s2"&gt;&amp;#34;a mistake commit&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git add missing_file
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git commit --amend
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;这个指令会使新的提交替换掉旧的提交，所以旧的提交完全不存在仓库的历史中。这能使你的提交历史被“修正笔误”或者“忘记提交一个文件”之类的记录弄乱你的记录。&lt;br&gt;
+l## 撤销已暂存的文件
+如果你修改了两个文件，想分两次提交，但是已经一次性提交了，应该如何操作？&lt;br&gt;
+在 &lt;code&gt;git status&lt;/code&gt; 中，已有提示: &lt;code&gt;git reset HEAD &amp;lt;filename&amp;gt;&lt;/code&gt; 来取消暂存。&lt;br&gt;
+如何取消已修改但为未暂存的文件？此事在 &lt;code&gt;git status&lt;/code&gt; 中亦有记载：&lt;br&gt;
+使用 &lt;code&gt;git checkout -- &amp;lt;filename&amp;gt;&lt;/code&gt; 可以撤销修改，不过这是一个危险的命令，因为实质上是使用上一次提交里的文件版本覆盖掉当前文件。&lt;/p&gt;
+&lt;h1 id="远程仓库remote"&gt;远程仓库（remote）
+&lt;/h1&gt;&lt;p&gt;远程仓库指托管在网络中的仓库，与他人协作时需要管理远程仓库。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;远程仓库可以在本地的主机上，这里的远程表明的是仓库在别处而已。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id="查看远程仓库"&gt;查看远程仓库
+&lt;/h2&gt;&lt;p&gt;使用 &lt;code&gt;git remote&lt;/code&gt; 查看远程仓库的简写，通常来说，你应该能看到 &lt;code&gt;origin&lt;/code&gt; ，这是克隆的仓库的默认名字。&lt;br&gt;
+使用 &lt;code&gt;git remote -v&lt;/code&gt; 则会额外列出仓库简写的对应的URL。这个指令也会列出全部的远程仓库（如果不止一个）。&lt;/p&gt;
+&lt;h2 id="添加远程仓库"&gt;添加远程仓库
+&lt;/h2&gt;&lt;p&gt;使用 &lt;code&gt;git remote add &amp;lt;shrotname&amp;gt; &amp;lt;url&amp;gt;&lt;/code&gt; 的格式添加远程仓库并指定简写。&lt;br&gt;
+现在可以使用简写代替这个仓库的URL，如拉取远程仓库的更新 &lt;code&gt;git fetch origin&lt;/code&gt;&lt;/p&gt;
+&lt;h2 id="从远程仓库抓取与拉取"&gt;从远程仓库抓取与拉取
+&lt;/h2&gt;&lt;p&gt;就如刚才所提：使用 &lt;code&gt;git fetch &amp;lt;remote&amp;gt;&lt;/code&gt; 可以获取远程仓库中的数据，并将新数据抓取到本地，值得注意的是，这不会合并到你当前的工作区，所以需要手动合并。&lt;br&gt;
+一般来说， &lt;code&gt;git clone&lt;/code&gt; 克隆一个仓库，默认会将这个仓库设置为远程仓库，并添加简写为 &lt;code&gt;origin&lt;/code&gt; 。&lt;br&gt;
+如果当前分支已经设置了跟踪远程分支（请等待git分支一节），那么使用 &lt;code&gt;git pull&lt;/code&gt; 即可自动抓取远程并合并。另外， &lt;code&gt;git clone&lt;/code&gt; 命令会默认设置本地的 &lt;code&gt;master&lt;/code&gt; 分支跟踪远程的 &lt;code&gt;master&lt;/code&gt; 分支。 运行 &lt;code&gt;git pull&lt;/code&gt; 会从克隆的服务器上抓取并自动尝试合并到当前分支。&lt;/p&gt;
+&lt;h2 id="推送到远程仓库"&gt;推送到远程仓库
+&lt;/h2&gt;&lt;p&gt;使用 &lt;code&gt;git push &amp;lt;remote&amp;gt; &amp;lt;branch&amp;gt;&lt;/code&gt; 即可， 通常来说，有：&lt;br&gt;
+&lt;code&gt;git push origin master&lt;/code&gt; （这是克隆的默认名称）&lt;br&gt;
+并且，只有你拥有远程服务器的写入权限，并且没有其他人推送过，这才是有效的。否则，你需要将他人的工作合并到本地后才能推送。&lt;/p&gt;
+&lt;h2 id="查看远程仓库-1"&gt;查看远程仓库
+&lt;/h2&gt;&lt;p&gt;使用 &lt;code&gt;git remote show &amp;lt;remote&amp;gt;&lt;/code&gt; ,如此博客：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git remote show origin
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;* remote origin
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; Fetch URL: https://github.com/FOTH0626/foth0626.github.io.git
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; Push URL: https://github.com/FOTH0626/foth0626.github.io.git
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; HEAD branch: master
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; Remote branch:
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; master tracked
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; Local branch configured &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;git pull&amp;#39;&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; master merges with remote master
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; Local ref configured &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;git push&amp;#39;&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; master pushes to master &lt;span class="o"&gt;(&lt;/span&gt;up to date&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;这能显示每个分支会推送的远程分支，哪些远程分支不在本地等等信息。&lt;/p&gt;
+&lt;h2 id="远程仓库重命名"&gt;远程仓库重命名
+&lt;/h2&gt;&lt;p&gt;使用 &lt;code&gt;git remote rename &amp;lt;old&amp;gt; &amp;lt;new&amp;gt;&lt;/code&gt; 这也会改变你远程跟踪的分支名字。&lt;br&gt;
+如果你需要移除一个远程仓库（如你不再使用服务器/不使用某个镜像/某个维护者不再维护），那么可以使用 &lt;code&gt;git remote remove &amp;lt;remote&amp;gt;&lt;/code&gt; ，这也会删除远程仓库的跟踪和配置信息。-&lt;/p&gt;
+&lt;h1 id="标签"&gt;标签
+&lt;/h1&gt;&lt;h2 id="列出标签"&gt;列出标签
+&lt;/h2&gt;&lt;p&gt;使用 &lt;code&gt;git tag&lt;/code&gt; 命令（可加上 &lt;code&gt;-l&lt;/code&gt; 或者 &lt;code&gt;--list&lt;/code&gt; 按照通配符查找)&lt;/p&gt;
+&lt;h2 id="创建标签"&gt;创建标签
+&lt;/h2&gt;&lt;p&gt;Git 存在两种标签：轻量（lightweight）与附注（annotated）。&lt;br&gt;
+轻量标签只是某个提交的引用，它是不会改变的。&lt;br&gt;
+附注标签是一个完整的，存储在Git数据库的对象，它是可以被校验的，包含标签创建者的姓名、电子邮件、日期时间、标签信息，并且可以使用GNU Privacy Guard(GPG)进行签名并校验。&lt;/p&gt;
+&lt;h2 id="附注标签"&gt;附注标签
+&lt;/h2&gt;&lt;p&gt;使用 &lt;code&gt;-a&lt;/code&gt; 参数即可创建附注标签，如 &lt;code&gt;git tag -a &amp;lt;tag&amp;gt; -m &amp;lt;message&amp;gt;&lt;/code&gt; ，如果没有显式地使用 &lt;code&gt;-m&lt;/code&gt; 那么，将如提交时一样，需要在文本编辑器内输入标签的信息。&lt;br&gt;
+使用 &lt;code&gt;git show &amp;lt;tag&amp;gt;&lt;/code&gt; 可以查看该标签的详细信息。有标签创建者信息，标签日期，附注，提交信息。（这里我的显示与书中不同，我额外显示了这次commit的修改文件的具体信息，很奇葩。）&lt;/p&gt;
+&lt;h2 id="轻量标签"&gt;轻量标签
+&lt;/h2&gt;&lt;p&gt;不额外附带参数即可创建轻量标签，如 &lt;code&gt;git tag &amp;lt;tag&amp;gt;&lt;/code&gt; 。&lt;br&gt;
+这时的标签只会展现出提交信息。（不过我还是显示了一堆消息，可能是 &lt;code&gt;git show&lt;/code&gt; 的问题？）&lt;/p&gt;
+&lt;h2 id="后期打标签对过去的提交打标签"&gt;后期打标签（对过去的提交打标签）
+&lt;/h2&gt;&lt;p&gt;对于一个已经提交的记录，可以使用 &lt;code&gt;git tag -a &amp;lt;tag&amp;gt; &amp;lt;checksum&amp;gt;&lt;/code&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;$ git log --pretty&lt;span class="o"&gt;=&lt;/span&gt;oneline
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;33849c071fbd57dbefcb279b97255b24c794f319 &lt;span class="o"&gt;(&lt;/span&gt;HEAD -&amp;gt; master, tag: 1.0, tag: 0.1&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="nb"&gt;test&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ded2ebf137ddc0b1f60e09fe3c96a3b88f491033 God Bless You
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;42a782e56593d75b86ef8f3d52309dc09ed66406 aaa.md
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;可以使用 &lt;code&gt;git tag -a v0.8 ded2eb&lt;/code&gt; 在 &lt;code&gt;God Bless You&lt;/code&gt; 打上tag。&lt;/p&gt;
+&lt;h2 id="共享标签"&gt;共享标签
+&lt;/h2&gt;&lt;p&gt;默认情况下， &lt;code&gt;git push&lt;/code&gt; 并不会推送标签到远程服务器，必须显式地使用 &lt;code&gt;git push origin &amp;lt;tag&amp;gt;&lt;/code&gt; 推送标签，或者使用 &lt;code&gt;git push origin --tags&lt;/code&gt; 附带所有不在远程仓库的所有tag提交。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;没有简单的方法可以只推送附注标签或轻量标签。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id="删除标签"&gt;删除标签
+&lt;/h2&gt;&lt;p&gt;使用 &lt;code&gt;git tag -d &amp;lt;tagname&amp;gt;&lt;/code&gt; 。&lt;br&gt;
+例如 &lt;code&gt;git tag -d 0.8&lt;/code&gt; ,与push不会推送到远程一样，这个指令不会删除远程仓库，需要使用 &lt;code&gt;git push &amp;lt;remote&amp;gt; :refs/tags/&amp;lt;tag&amp;gt;&lt;/code&gt; 才能更新远程仓库。&lt;br&gt;
+另外一种方式是使用指令： &lt;code&gt;git push origin --delete &amp;lt;tag&amp;gt;&lt;/code&gt;&lt;/p&gt;
+&lt;h2 id="检出标签"&gt;检出标签
+&lt;/h2&gt;&lt;p&gt;如果想要查看某个标签指向的版本，可以使用 &lt;code&gt;git checkout &amp;lt;tag&amp;gt;&lt;/code&gt; ，但是这会让你出于“分离头指针”状态，这会导致不好的副作用。&lt;br&gt;
+这个状态下，你的新提交不会属于任何分支，并且无法访问，除非通过确切的提交哈希。因此，需要进行更改时，需要新建一个分支。（总之我也没看懂，尽量不要使用该该功能？欢迎指正）&lt;/p&gt;
+&lt;h1 id="git别名"&gt;Git别名
+&lt;/h1&gt;&lt;p&gt;可以使用 &lt;code&gt;git config&lt;/code&gt; 为命令设置一个别名。如&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git config --global alias.co checkout
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git config --global alias.br branch
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git config --global alias.ci commit
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git config --global alias.st status
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;当使用 &lt;code&gt;git commit&lt;/code&gt; 时， 只需要输入 &lt;code&gt;git ci&lt;/code&gt; 。&lt;br&gt;
+别名是非常有用的，所以创建时不要犹豫，比如取消暂存文件的命令可以输入 &lt;code&gt;git config --global alias.unstage 'reset HEAD --'&lt;/code&gt; 这让两个命令等价。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git unstage &amp;lt;file&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git reset HEAD -- &amp;lt;file&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;或者有： &lt;code&gt;git config --global alias.last 'log -1 HEAD'&lt;/code&gt;&lt;br&gt;
+这样可以快速查看最后一次提交。&lt;br&gt;
+如果想使用外部程序，可以添加 &lt;code&gt;!&lt;/code&gt;，如&lt;br&gt;
+&lt;code&gt;git config --global alias.visual '!gitk'&lt;/code&gt; ，可以使用 &lt;code&gt;git visual&lt;/code&gt; 调用 &lt;code&gt;gitk&lt;/code&gt; 程序。（这GUI真tm的丑。2000年前后的风格）&lt;/p&gt;
+&lt;h1 id="总结"&gt;总结
+&lt;/h1&gt;&lt;p&gt;这一节我们学习了基础操作，下一节我们来学习Git杀手级特性：Git分支模型。&lt;/p&gt;</description></item><item><title>ProGit Learn Record 1 ：起步</title><link>https://foth0626.github.io/article/progit-book-1/</link><pubDate>Tue, 14 Oct 2025 15:21:06 +0800</pubDate><guid>https://foth0626.github.io/article/progit-book-1/</guid><description>&lt;blockquote&gt;
+&lt;p&gt;本系列文章基于《Pro Git》一书，作为本人学习记录&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h1 id="git的来源"&gt;Git的来源
+&lt;/h1&gt;&lt;p&gt;版本管理是开发中常用的需求，最开始的版本管理软件，基于本地数据库管理，最流行的便是RCS。后来，面对不同系统的开发者需要协同工作的需求，产生了集中版本控制系统（Centralized Version Control Systems，CVCS），但是CVCS会导致一旦服务器不工作就会导致整个仓库的历史遗失，于是针对这一问题，分布式版本控制系统（（Distributed Version Control System，DVCS）诞生了，这种版本控制系统会在下载仓库中的文件时，一同下载历史更改，所以即使服务器挂掉，也可以通过本地的仓库恢复完整记录。&lt;br&gt;
+Linux作为一个系统内核，拥有着极其繁重的版本控制需求。一开始，Linux社区使用Bitkeeper作为版本控制软件，但是随着合作关系的结束，Bitkeeper公司结束了Linux免费使用该软件的权利，于是Linus自己编写Git这个版本控制软件，并且设定了如下目标：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;速度&lt;/li&gt;
+&lt;li&gt;简单的设计&lt;/li&gt;
+&lt;li&gt;对于非线性开发的支持（拥有大量的并行开发的分支）&lt;/li&gt;
+&lt;li&gt;完全基于分布式&lt;/li&gt;
+&lt;li&gt;高效管理超大规模的项目（如Linux内核）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;ul&gt;
+&lt;li&gt;Git不记载每个文件与初始版本文件的差异，它对每个文件进行快照。Git对待数据更像是一个快照流。&lt;/li&gt;
+&lt;li&gt;Git会把在数据存储前使用哈希进行校验他，这使得Git保证了数据的完整性。&lt;/li&gt;
+&lt;li&gt;Git一般只会往Git的数据库中添加数据，你很难从Git数据库中删除数据&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;p&gt;Git有三种状态：&lt;strong&gt;已提交（Committed）&lt;/strong&gt; 、&lt;strong&gt;已修改（modified）&lt;/strong&gt; 和&lt;strong&gt;已暂存（staged）&lt;/strong&gt; 。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;modified 表明已修改了文件，但尚未保存到数据库中。&lt;/li&gt;
+&lt;li&gt;staged 表明对一个已修改文件的当前版本做了标记，使其包含在下次提交的快照中。&lt;/li&gt;
+&lt;li&gt;committed 表示数据已安全的保存在本地数据库中。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;这使得Git有用三个阶段：工作区、暂存区和Git目录。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;工作区是对项目的某个版本独立提取出来的内容。 这些从 Git 仓库的压缩数据库中提取出来的文件，放在磁盘上供你使用或修改。&lt;/li&gt;
+&lt;li&gt;暂存区是一个文件，保存了下次将要提交的文件列表信息，一般在 Git 仓库目录中。&lt;/li&gt;
+&lt;li&gt;Git 仓库目录是 Git 用来保存项目的元数据和对象数据库的地方。 这是 Git 中最重要的部分，从其它计算机克隆仓库时，复制的就是这里的数据。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;因此，最基本的Git工作流就是：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;修改文件（工作区）&lt;/li&gt;
+&lt;li&gt;将你的更改暂存（暂存区）&lt;/li&gt;
+&lt;li&gt;提交更新（将暂存区的快照永久地提交到Git目录中）&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h1 id="命令行"&gt;命令行
+&lt;/h1&gt;&lt;p&gt;本系列只使用Git 命令行，因为&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;不是所有人都一定有GUI工具，但一定有CLI。&lt;/li&gt;
+&lt;li&gt;GUI通常对Git的所有功能取一个子集，CLI拥有Git的所有功能。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="下载并安装git"&gt;下载并安装Git
+&lt;/h2&gt;&lt;p&gt;请自行在 &lt;a class="link" href="https://git-scm.com/downloads" target="_blank" rel="noopener"
+&gt;Git 官网&lt;/a&gt; 或通过搜索引擎自行查找下载安装方式。&lt;/p&gt;
+&lt;h2 id="配置config"&gt;配置（config）
+&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;在&lt;code&gt;/etc/gitconfig&lt;/code&gt; 文件中，包含系统中每一个用户及他们仓库的通用配置。&lt;/li&gt;
+&lt;li&gt;在 &lt;code&gt;~/.gitconfig&lt;/code&gt; 或 &lt;code&gt;~/.config/git/config&lt;/code&gt; 文件包含当前用户的配置。使用 &lt;code&gt;--global&lt;/code&gt; 选项可以使系统中所有仓库生效&lt;/li&gt;
+&lt;li&gt;项目仓库中 &lt;code&gt;.git/config&lt;/code&gt; 是该仓库的设置，使用 &lt;code&gt;--local&lt;/code&gt; 可以使git强制使用它（虽然默认就是它）&lt;br&gt;
+Windows 系统在 &lt;code&gt;$HOME&lt;/code&gt; 目录下（ &lt;code&gt;C:\Users\$User&lt;/code&gt;) 的&lt;code&gt;.gitconfig&lt;/code&gt;目录，系统级目录在 &lt;code&gt;C:\ProgramData\Git\config&lt;/code&gt;&lt;br&gt;
+使用 &lt;code&gt;git config --list --show-origin&lt;/code&gt; 查看所有配置&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="用户信息"&gt;用户信息
+&lt;/h2&gt;&lt;p&gt;使用&lt;br&gt;
+&lt;code&gt;git config --global user.name &amp;lt;name&amp;gt;&lt;/code&gt; 和
+&lt;code&gt;git config --global user.email &amp;lt;email&amp;gt;&lt;/code&gt;&lt;br&gt;
+如果你想在不同的项目使用不同的名字和邮箱，那么在那个项目里使用不带&lt;code&gt;--global&lt;/code&gt; 的命令。&lt;/p&gt;
+&lt;h2 id="文本编辑器"&gt;文本编辑器
+&lt;/h2&gt;&lt;p&gt;配置默认文本编辑器，Git 会在输入信息时使用它，如果未配置，则会调用默认的编辑器&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;git config --global core.editor EDITOR&lt;/code&gt;&lt;/p&gt;
+&lt;h2 id="检查配置"&gt;检查配置
+&lt;/h2&gt;&lt;p&gt;使用 &lt;code&gt;git config --list&lt;/code&gt; 检查所有能找到的配置。&lt;br&gt;
+使用 &lt;code&gt;git config &amp;lt;key&amp;gt;&lt;/code&gt; 如 &lt;code&gt;git config user.name&lt;/code&gt; 检查某一项配置&lt;br&gt;
+使用 &lt;code&gt;git config --show-origin &amp;lt;key&amp;gt;&lt;/code&gt; 来检查哪一个文件最后设置了该值&lt;/p&gt;
+&lt;h2 id="获取帮助"&gt;获取帮助
+&lt;/h2&gt;&lt;p&gt;使用 &lt;code&gt;git help &amp;lt;verb&amp;gt;&lt;/code&gt; 或 &lt;code&gt;git &amp;lt;verb&amp;gt; --help&lt;/code&gt; 或 &lt;code&gt;man git-&amp;lt;verb&amp;gt;&lt;/code&gt; 获取manpage。如&lt;code&gt;git help config&lt;/code&gt;&lt;br&gt;
+如果使用 &lt;code&gt;-h&lt;/code&gt; ，则可以获得简短的快速参考&lt;/p&gt;</description></item></channel></rss>
