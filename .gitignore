@@ -5,3 +5,4 @@ resources
 Templates/
 *.canvas
 Draft/
+.stfolder/
