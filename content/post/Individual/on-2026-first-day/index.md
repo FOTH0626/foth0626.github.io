@@ -3,7 +3,7 @@ title: 写在2026元旦：在纷繁的世界中向未来奔去——怀揣着勇
 description: wish for 2026
 slug: 2026-future-on-1th-jan
 image:
-draft: true
+draft: false
 categories:
   - individual
 date: 2026-01-02 12:56:23+08:00
