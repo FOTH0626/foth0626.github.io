@@ -2,8 +2,7 @@ name: Build and deploy
 on:
   push:
     branches:
-      - main  # 确认你的主分支是 main 还是 master，如果是 master 请改这里
-      - master
+      - master  # 或者是 master，根据你的实际分支名修改
   workflow_dispatch:
 
 permissions:
@@ -23,11 +22,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      HUGO_VERSION: 0.155.2  # 建议写死一个版本，或者保持 0.154.0+
-      DART_SASS_VERSION: 1.97.1
+      HUGO_VERSION: 0.155.2
+      DART_SASS_VERSION: 1.83.0 # 建议使用稳定版本，或者保持你原来的 1.97.1
     steps:
       - name: Checkout
-        uses: actions/checkout@v4 # 注意：v5 可能还未发布，建议用 v4
+        uses: actions/checkout@v4
         with:
           submodules: recursive
           fetch-depth: 0
@@ -35,31 +34,22 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.23' # 推荐较新的 Go 版本
+          go-version: '1.23'
 
       - name: Install Dart Sass
         run: |
+          mkdir -p "${HOME}/.local"
           curl -sLJO "https://github.com/sass/dart-sass/releases/download/${DART_SASS_VERSION}/dart-sass-${DART_SASS_VERSION}-linux-x64.tar.gz"
           tar -C "${HOME}/.local" -xf "dart-sass-${DART_SASS_VERSION}-linux-x64.tar.gz"
           rm "dart-sass-${DART_SASS_VERSION}-linux-x64.tar.gz"
           echo "${HOME}/.local/dart-sass" >> "${GITHUB_PATH}"
-        # 这一步是为了预备 .local 目录
-        env:
-           HOME: /home/runner 
-      
-      - name: Create directory for user-specific executable files
-        run: mkdir -p "${HOME}/.local"
 
       - name: Setup Hugo
         uses: peaceiris/actions-hugo@v3
         with:
-          hugo-version: ${{ env.HUGO_VERSION }} # 这里引用上面定义的版本
+          hugo-version: ${{ env.HUGO_VERSION }}
           extended: true
 
-      - name: Configure Git Global
-        run: git config --global core.quotepath false
-
-      # 这一步非常重要，确保你的 go.mod 正常工作
       - name: Initialize Go Modules
         run: hugo mod get -u ./...
 
