@@ -100,7 +100,7 @@ ml等人工智能领域使用显卡是因为显卡并行处理大型数据和计
 
 ## 图形学应用领域
 
-(以下图片来自![GAMES101](https://www.bilibili.com/video/av90798049/?p=1))
+(以下图片来自[GAMES101](https://www.bilibili.com/video/av90798049/?p=1))
 
 ![](videogame.png)
 
