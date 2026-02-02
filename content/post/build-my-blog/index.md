@@ -231,5 +231,15 @@ steps:
 
 <script type="text/javascript" id="clustrmaps" src="//clustrmaps.com/map_v2.js?d= YOUR_KEY "></script>
 
-</head
+</head>
+
+ 
 ```
+
+# 主题大版本更新 
+
+stack 主题从 v3 大版本更新到了 v4 ，所以更改了一些设置。
+
+1. 更改了 `go.mod` `go.sum`的依赖项，直接照抄了新的快速上手模板
+2. 取消了actions ——> branch ——> vercel 部署的思路，改为vercel 直接监听 `master` 分支，也取消了deploy actions。不然会造成actions build一份， vercel build 一份的冗余。
+3. 移除了submodule，v4主题直接使用go module在构建时拉取一份。
