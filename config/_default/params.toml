@@ -15,11 +15,8 @@ lastUpdated = "2006-01-02 15:04:05"
 [sidebar]
 emoji = "🍥"
 subtitle = "小小的人偶，想要摘月亮"
+avatar = "img/foth.jpg"
 
-[sidebar.avatar]
-enabled = true
-local = true
-src = "img/foth.jpg"
 
 [article]
 headingAnchor = false
